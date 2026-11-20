@@ -1,0 +1,12 @@
+[submodule "third_party/core"]
+	path = third_party/core
+	url = https://github.com/saxonnicholls/core.git
+	shallow = true
+[submodule "third_party/googletest"]
+	path = third_party/googletest
+	url = https://github.com/google/googletest.git
+	shallow = true
+[submodule "third_party/benchmark"]
+	path = third_party/benchmark
+	url = https://github.com/google/benchmark.git
+	shallow = true
