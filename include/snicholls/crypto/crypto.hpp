@@ -17,6 +17,10 @@
 /// \ingroup crypto
 /// \brief The curve, ECDSA with RFC 6979 nonces and public-key recovery, BIP-340 Schnorr.
 
+/// \defgroup wallet Wallets
+/// \ingroup crypto
+/// \brief BIP-39 mnemonics, BIP-32 and SLIP-10 derivation, and derivation paths.
+
 #ifndef snicholls_crypto_crypto_hpp
 #define snicholls_crypto_crypto_hpp
 
@@ -24,6 +28,8 @@
 #include <snicholls/crypto/error.hpp>
 #include <snicholls/crypto/secret.hpp>
 #include <snicholls/crypto/version.hpp>
+#include <snicholls/crypto/bip39/mnemonic.hpp>
+#include <snicholls/crypto/bip39/wordlist.hpp>
 #include <snicholls/crypto/secp256k1/field.hpp>
 #include <snicholls/crypto/secp256k1/point.hpp>
 #include <snicholls/crypto/secp256k1/scalar.hpp>

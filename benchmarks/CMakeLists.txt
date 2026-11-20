@@ -14,3 +14,5 @@ function(snicholls_crypto_add_benchmark name source)
     add_test(NAME benchmark.${name} COMMAND snicholls_crypto_${name} --benchmark_min_time=0.01s)
     set_tests_properties(benchmark.${name} PROPERTIES LABELS benchmark TIMEOUT 300)
 endfunction()
+
+snicholls_crypto_add_benchmark(mnemonic_benchmark bip39/mnemonic_benchmark.cpp)

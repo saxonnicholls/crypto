@@ -6,6 +6,8 @@ add_executable(snicholls_crypto_tests
     error_test.cpp
     secret_test.cpp
     version_test.cpp
+    bip39/mnemonic_test.cpp
+    bip39/wordlist_test.cpp
     detail/hashes_test.cpp
     detail/limbs_test.cpp
     secp256k1/field_test.cpp
@@ -35,3 +37,10 @@ add_test(NAME cmake.diamond
         -DGENERATOR=${CMAKE_GENERATOR}
         -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/diamond_test.cmake)
 set_tests_properties(cmake.diamond PROPERTIES LABELS boundary TIMEOUT 900)
+
+# The BIP-39 word list must be exactly the official file (its SHA-256 recomputed from the header's words), and the
+# Trezor fixture must name its pinned source
+find_package(Python3 COMPONENTS Interpreter REQUIRED)
+add_test(NAME generated.bip39_wordlist_is_official
+    COMMAND Python3::Interpreter ${PROJECT_SOURCE_DIR}/scripts/generate_bip39_wordlist.py --check)
+set_tests_properties(generated.bip39_wordlist_is_official PROPERTIES LABELS boundary)
