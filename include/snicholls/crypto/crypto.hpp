@@ -30,6 +30,7 @@
 #include <snicholls/crypto/version.hpp>
 #include <snicholls/crypto/bip39/mnemonic.hpp>
 #include <snicholls/crypto/bip39/wordlist.hpp>
+#include <snicholls/crypto/hd/path.hpp>
 #include <snicholls/crypto/secp256k1/field.hpp>
 #include <snicholls/crypto/secp256k1/point.hpp>
 #include <snicholls/crypto/secp256k1/scalar.hpp>

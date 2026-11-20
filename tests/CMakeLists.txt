@@ -10,6 +10,7 @@ add_executable(snicholls_crypto_tests
     bip39/wordlist_test.cpp
     detail/hashes_test.cpp
     detail/limbs_test.cpp
+    hd/path_test.cpp
     secp256k1/field_test.cpp
     secp256k1/point_test.cpp
     secp256k1/scalar_test.cpp)
