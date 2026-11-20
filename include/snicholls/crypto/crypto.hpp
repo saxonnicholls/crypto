@@ -32,6 +32,7 @@
 #include <snicholls/crypto/curve25519/edwards.hpp>
 #include <snicholls/crypto/curve25519/field.hpp>
 #include <snicholls/crypto/curve25519/scalar.hpp>
+#include <snicholls/crypto/curve25519/x25519.hpp>
 #include <snicholls/crypto/secp256k1/field.hpp>
 #include <snicholls/crypto/secp256k1/point.hpp>
 #include <snicholls/crypto/secp256k1/scalar.hpp>
