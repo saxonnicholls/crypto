@@ -23,3 +23,12 @@ snicholls_crypto_add_benchmark(x25519_benchmark curve25519/x25519_benchmark.cpp)
 snicholls_crypto_add_benchmark(bip32_benchmark hd/bip32_benchmark.cpp)
 snicholls_crypto_add_benchmark(ecdsa_benchmark secp256k1/ecdsa_benchmark.cpp)
 snicholls_crypto_add_benchmark(schnorr_benchmark secp256k1/schnorr_benchmark.cpp)
+
+# The informational dudect-style timing test (benchmarks/ct/timing.cpp): fixed against random secrets, Welch's t.
+# The smoke run is short; run it by hand with more samples for evidence. It fails only on a wrong result.
+add_executable(snicholls_crypto_ct_timing ct/timing.cpp)
+target_link_libraries(snicholls_crypto_ct_timing PRIVATE snicholls::crypto)
+target_compile_definitions(snicholls_crypto_ct_timing PRIVATE NDEBUG)
+snicholls_crypto_test_options(snicholls_crypto_ct_timing)
+add_test(NAME benchmark.ct_timing COMMAND snicholls_crypto_ct_timing 400)
+set_tests_properties(benchmark.ct_timing PROPERTIES LABELS benchmark TIMEOUT 600)

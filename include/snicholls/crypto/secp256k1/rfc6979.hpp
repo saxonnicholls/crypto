@@ -129,7 +129,7 @@ public:
             v_ = crypto::detail::hmac_sha256::mac(k_, v_);
             const auto k = crypto::detail::from_be(v_);
             const std::uint64_t ok = crypto::detail::mask_less4(k, q_) & ~crypto::detail::mask_is_zero4(k);
-            if (ok)
+            if (ct::declassify(ok))   // a candidate at or above q: probability below 2^-127 for secp256k1
                 return secret_bytes<32>(std::span<const std::uint8_t, 32>(v_));
         }
     }

@@ -59,3 +59,23 @@ find_package(Python3 COMPONENTS Interpreter REQUIRED)
 add_test(NAME generated.bip39_wordlist_is_official
     COMMAND Python3::Interpreter ${PROJECT_SOURCE_DIR}/scripts/generate_bip39_wordlist.py --check)
 set_tests_properties(generated.bip39_wordlist_is_official PROPERTIES LABELS boundary)
+
+# The constant-time check (tests/ct/secret_marking.cpp): every secret path run under Valgrind's memcheck with the
+# secrets marked undefined, so a branch or an index on a secret fails. Only where Valgrind and its header exist
+# (the Ubuntu image), and not under the sanitizers. The control case leaks on purpose and must be reported.
+find_program(SNICHOLLS_CRYPTO_VALGRIND valgrind)
+include(CheckIncludeFileCXX)
+check_include_file_cxx(valgrind/memcheck.h SNICHOLLS_CRYPTO_HAVE_MEMCHECK_H)
+if(SNICHOLLS_CRYPTO_VALGRIND AND SNICHOLLS_CRYPTO_HAVE_MEMCHECK_H AND NOT SNICHOLLS_CRYPTO_SANITIZE)
+    add_executable(snicholls_crypto_ct_secret_marking ct/secret_marking.cpp)
+    target_link_libraries(snicholls_crypto_ct_secret_marking PRIVATE snicholls::crypto)
+    snicholls_crypto_test_options(snicholls_crypto_ct_secret_marking)
+    add_test(NAME ct.secret_marking
+        COMMAND ${SNICHOLLS_CRYPTO_VALGRIND} --error-exitcode=1 --quiet $<TARGET_FILE:snicholls_crypto_ct_secret_marking>)
+    add_test(NAME ct.secret_marking.control
+        COMMAND ${SNICHOLLS_CRYPTO_VALGRIND} --error-exitcode=1 --quiet $<TARGET_FILE:snicholls_crypto_ct_secret_marking> --control)
+    set_tests_properties(ct.secret_marking ct.secret_marking.control PROPERTIES LABELS ct TIMEOUT 1200)
+    set_tests_properties(ct.secret_marking.control PROPERTIES WILL_FAIL TRUE)
+else()
+    message(STATUS "snicholls-crypto: Valgrind or valgrind/memcheck.h not found: the ct.secret_marking check is not built")
+endif()

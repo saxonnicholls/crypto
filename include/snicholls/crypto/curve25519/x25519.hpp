@@ -163,7 +163,7 @@ struct public_key {
                                                                                 const public_key& peer) noexcept
 {
     auto out = scalar_mult(secret.reveal(), peer.bytes);
-    if (ct::is_zero(out))
+    if (ct::declassify(ct::is_zero(out)))
         return snicholls::err(errc::small_order);
     return snicholls::ok(secret_bytes<32>(std::move(out)));
 }

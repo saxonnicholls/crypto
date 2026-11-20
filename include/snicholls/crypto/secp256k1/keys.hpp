@@ -170,7 +170,7 @@ public:
         scalar d = scalar::from_bytes_ct(bytes, below);
         const std::uint64_t valid = below & ~d.is_zero_mask();
         secure_wipe(d);
-        if (!valid)   // reveals only that the key is invalid
+        if (!ct::declassify(valid))   // reveals only that the key is invalid
             return err(errc::invalid_private_key);
         return ok(private_key(secret_bytes<32>(bytes)));
     }
@@ -184,7 +184,7 @@ public:
         scalar d = scalar::from_bytes_ct(bytes.reveal(), below);
         const std::uint64_t valid = below & ~d.is_zero_mask();
         secure_wipe(d);
-        if (!valid)
+        if (!ct::declassify(valid))
             return err(errc::invalid_private_key);
         return ok(private_key(std::move(bytes)));
     }

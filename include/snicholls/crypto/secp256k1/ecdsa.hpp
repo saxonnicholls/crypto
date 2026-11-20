@@ -241,10 +241,13 @@ struct recoverable_signature {
         scalar s = k_inverse * (z + r * d);
         const std::uint64_t high = s.is_high_mask();
         s = scalar::select(high, -s, s);
-        const auto id = static_cast<std::uint8_t>((big_r.y.is_odd() ^ (high & 1)) | ((~below & 1) << 1));
+        // The recovery id is published with the signature: its two bits are public from here on
+        const std::uint64_t parity = ct::declassify(big_r.y.is_odd() ^ (high & 1));
+        const std::uint64_t overflow = ct::declassify(~below & 1);
+        const auto id = static_cast<std::uint8_t>(parity | (overflow << 1));
         secure_wipe(k);
         secure_wipe(k_inverse);
-        if (r.is_zero() || s.is_zero())   // probability about 2^-256: the next RFC 6979 nonce
+        if (ct::declassify(r.is_zero_mask() | s.is_zero_mask()))   // probability about 2^-256: the next RFC 6979 nonce
             continue;
         secure_wipe(d);
         secure_wipe(z);

@@ -158,7 +158,7 @@ constexpr scalar even_y_key(const private_key& key, affine_point& p) noexcept
         auto rand = hn.finish();
         scalar k = scalar::from_bytes_reduced(rand);
         secure_wipe(rand);
-        if (k.is_zero()) {   // probability about 2^-256; BIP-340 fails here, this library tries once more with aux'
+        if (ct::declassify(k.is_zero_mask())) {   // probability about 2^-256; BIP-340 fails here, this library tries once more with aux'
             t[0] ^= 1;
             continue;
         }

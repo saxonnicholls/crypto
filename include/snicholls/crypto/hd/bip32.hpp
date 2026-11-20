@@ -340,7 +340,7 @@ public:
         secure_wipe(il);
         secure_wipe(kp);
         secure_wipe(child);
-        if (!valid) {   // probability below 2^-127, and public by BIP-32's rule
+        if (!ct::declassify(valid)) {   // probability below 2^-127, and public by BIP-32's rule
             secure_wipe(i);
             secure_wipe(child_bytes);
             return err(errc::invalid_derivation);

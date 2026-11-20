@@ -76,6 +76,12 @@
 /// \gotchas
 /// `to_text` writes the words without a terminating NUL; it returns the length.
 ///
+/// `to_seed` is constant time except in the length of the mnemonic's text: PBKDF2 hashes the text, and the number
+/// of SHA-512 blocks it takes (and whether the HMAC key is first hashed, above 128 bytes) follows the length, the sum
+/// of the word lengths. That length carries about four to five bits of the words (its spread over the 2048-word
+/// list), against 128 to 256 bits of entropy; the Valgrind check declassifies it explicitly. Hiding it would need a
+/// SHA-512 whose final blocks are chosen by masks over the maximum length.
+///
 /// \status
 /// Experimental (0.1).
 
@@ -189,9 +195,14 @@ public:
                 len += ~ct::mask_is_zero((packed >> (8 * b)) & 0xff) & 1;
             const std::uint64_t space_wanted = ct::mask_from_bit(w + 1 < count_ ? 1 : 0);
             for (std::uint64_t j = 0; j < max_text_length; ++j) {
-                const std::uint64_t k = j - pos;
+                // j through the barrier: otherwise GCC rewrites the loop around k, whose start is secret
+                const std::uint64_t k = ct::value_barrier(j) - pos;
                 const std::uint64_t in_word = ct::mask_less(k, len);
-                const auto letter = static_cast<unsigned char>((packed >> (8 * (k & 7))) & 0xff);
+                // the k-th byte of the word, chosen by masks over all eight (no shift by a secret amount)
+                std::uint64_t byte = 0;
+                for (std::uint64_t b = 0; b < max_word_length; ++b)
+                    byte |= ct::mask_equal(k, b) & ((packed >> (8 * b)) & 0xff);
+                const auto letter = static_cast<unsigned char>(byte);
                 const std::uint64_t at_space = ct::mask_equal(k, len) & space_wanted;
                 auto c = static_cast<unsigned char>(out[j]);
                 c = ct::select<unsigned char>(in_word, letter, c);
@@ -330,7 +341,8 @@ constexpr std::uint8_t checksum(std::span<const std::uint8_t> entropy) noexcept
     secure_wipe(acc);
 
     errc failure{};
-    if (bad)
+    count = ct::declassify(count);   // the number of words is public (as the text's length is)
+    if (ct::declassify(bad))
         failure = errc::non_canonical;
     else if (!detail::valid_word_count(count))
         failure = errc::invalid_mnemonic_length;
@@ -343,7 +355,7 @@ constexpr std::uint8_t checksum(std::span<const std::uint8_t> entropy) noexcept
         m.words_[w] = static_cast<std::uint16_t>(i & 0x7ff);
     }
     secure_wipe(slot);
-    if (failure == errc{} && unknown)
+    if (failure == errc{} && ct::declassify(unknown))
         failure = errc::unknown_word;
     if (failure != errc{})
         return err(failure);
@@ -360,7 +372,7 @@ constexpr std::uint8_t checksum(std::span<const std::uint8_t> entropy) noexcept
     const std::uint8_t expected = detail::checksum(std::span<const std::uint8_t>(bits).first(ent));
     const std::uint64_t mismatch = ~ct::mask_equal(expected, bits[ent]);
     secure_wipe(bits);
-    if (mismatch)
+    if (ct::declassify(mismatch))
         return err(errc::invalid_checksum);
     return ok(std::move(m));
 }
@@ -376,10 +388,12 @@ constexpr std::uint8_t checksum(std::span<const std::uint8_t> entropy) noexcept
     std::uint64_t high = 0;
     for (const char c : passphrase)
         high |= static_cast<unsigned char>(c) & 0x80u;
-    if (form == passphrase_form::ascii && high)
+    if (form == passphrase_form::ascii && ct::declassify(high))
         return err(errc::non_canonical);
     std::array<char, max_text_length> text{};
-    const std::size_t n = m.to_text(text);
+    // The text's length (the sum of the word lengths) decides how many SHA-512 blocks PBKDF2 hashes, so it reaches
+    // the timing: about four or five bits of the words, declassified here on purpose (see "Known issues").
+    const std::size_t n = ct::declassify(m.to_text(text));
     std::array<std::uint8_t, 64> seed{};
     crypto::detail::pbkdf2_hmac_sha512(crypto::detail::text_bytes({text.data(), n}), crypto::detail::text_bytes("mnemonic"),
                                        crypto::detail::text_bytes(passphrase), 2048, seed);

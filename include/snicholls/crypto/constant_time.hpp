@@ -86,6 +86,26 @@ template <class T>
 #endif
 }
 
+/// \brief Marks a value computed from secrets as public from here on, and returns it.
+///
+/// For the few results the library deliberately reveals: whether a key or a mnemonic is valid, whether a nonce
+/// must be retried (probability about 2^-128 or less), which error a failure is. It is the identity. A build
+/// that checks constant time defines `SNICHOLLS_CRYPTO_DECLASSIFY(pointer, size)` before including the library
+/// (the Valgrind check defines it as `VALGRIND_MAKE_MEM_DEFINED`), so that a branch on a declassified value is
+/// not reported and every other branch on secret data is. Grep for `declassify` to audit what is revealed.
+/// \tparam T A trivially copyable type.
+/// \param x The value.
+/// \return `x`.
+template <class T>
+[[nodiscard]] constexpr T declassify(T x) noexcept
+{
+#if defined(SNICHOLLS_CRYPTO_DECLASSIFY)
+    if (!std::is_constant_evaluated())
+        SNICHOLLS_CRYPTO_DECLASSIFY(&x, sizeof x);
+#endif
+    return x;
+}
+
 /// \brief All ones if `bit` is 1, zero if it is 0.
 /// \pre `bit` is 0 or 1.
 /// \param bit The condition as a number.
