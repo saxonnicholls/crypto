@@ -78,7 +78,7 @@ Crypto takes part in two diamonds, each with core's three rules (first copy wins
 `*_assert_single_version()`), implemented in `CMakeLists.txt` and `cmake/SnichollsCryptoRequire.cmake` and tested by
 `tests/cmake/diamond_test.cmake`:
 
-- **Core's.** Crypto pins core as a submodule at `third_party/core`, by tag (now `v0.16.0`), and adds it in
+- **Core's.** Crypto pins core as a submodule at `third_party/core`, by tag (`v0.16.0`; for now a development pin on core's feature/hashes, see "Waiting on other libraries"), and adds it in
   `CMakeLists.txt`; when the top-level project added core first, core skips crypto's copy. Crypto states its minimum
   with `snicholls_core_require(...)`. A pin moves only in a commit of its own,
   `third_party: bump core vX.Y.Z -> vA.B.C`, with every test green; a development pin on an untagged core commit is
@@ -158,9 +158,11 @@ test-only stand-in, if one is unavoidable, is marked as such and deleted when co
 
 ## Waiting on other libraries
 
-- **Hashes (core 0.17.0).** SHA-256, SHA-512, HMAC, PBKDF2-HMAC-SHA512 and RIPEMD-160 are in
-  `detail/hashes.hpp` until core releases its own; then that file becomes aliases of core's (or is deleted) in one
-  commit with every vector still passing. RIPEMD-160 is proposed to core (HASH160 for BIP-32 fingerprints).
+- **Hashes (core 0.17.0).** SHA-256, SHA-512, RIPEMD-160, HMAC and PBKDF2 are core's (`hash/`), reached through
+  `detail/hashes.hpp`, an adapter that gives them the library's byte types and wipes their states. Core is pinned
+  for now at a **development commit** of its feature/hashes branch (564d0c4, not yet on core's public remote); it
+  becomes the v0.17.0 tag before crypto is released. PBKDF2 with a two-part salt (BIP-39) uses core's
+  `detail::pbkdf2_blocks` until core offers a public form.
 - **base58check.** BIP-32's `xprv` / `xpub` text is produced and parsed through a codec the caller passes
   (`hd/extended_key.hpp`); the tests use a test-only base58check. No codec library is pinned.
 - **NFKD.** BIP-39 seeds hash the NFKD form of the mnemonic and passphrase. English mnemonics are ASCII and need
@@ -177,7 +179,7 @@ template parameters; `SNICHOLLS_CRYPTO_` macros. `noexcept` is accurate.
 
 | Dependency | Path | Pinned to | Used by |
 |---|---|---|---|
-| snicholls-core | `third_party/core` | `v0.16.0` | the library |
+| snicholls-core | `third_party/core` | `564d0c4` (development pin, to be `v0.17.0`) | the library |
 | GoogleTest | `third_party/googletest` | `v1.18.0` | tests only |
 | Google Benchmark | `third_party/benchmark` | `v1.9.5` | benchmarks only |
 
