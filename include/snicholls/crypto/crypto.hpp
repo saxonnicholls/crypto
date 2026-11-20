@@ -21,6 +21,10 @@
 /// \ingroup crypto
 /// \brief The field and scalars of Curve25519, edwards25519, Ed25519 signatures and X25519 key agreement.
 
+/// \defgroup wallet Wallets
+/// \ingroup crypto
+/// \brief BIP-39 mnemonics, BIP-32 and SLIP-10 derivation, and derivation paths.
+
 #ifndef snicholls_crypto_crypto_hpp
 #define snicholls_crypto_crypto_hpp
 
@@ -28,11 +32,14 @@
 #include <snicholls/crypto/error.hpp>
 #include <snicholls/crypto/secret.hpp>
 #include <snicholls/crypto/version.hpp>
+#include <snicholls/crypto/bip39/mnemonic.hpp>
+#include <snicholls/crypto/bip39/wordlist.hpp>
 #include <snicholls/crypto/curve25519/ed25519.hpp>
 #include <snicholls/crypto/curve25519/edwards.hpp>
 #include <snicholls/crypto/curve25519/field.hpp>
 #include <snicholls/crypto/curve25519/scalar.hpp>
 #include <snicholls/crypto/curve25519/x25519.hpp>
+#include <snicholls/crypto/hd/path.hpp>
 #include <snicholls/crypto/secp256k1/field.hpp>
 #include <snicholls/crypto/secp256k1/point.hpp>
 #include <snicholls/crypto/secp256k1/scalar.hpp>
