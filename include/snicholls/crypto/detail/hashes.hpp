@@ -374,15 +374,18 @@ private:
 using hmac_sha256 = hmac<sha256>;
 using hmac_sha512 = hmac<sha512>;
 
-// PBKDF2 (RFC 8018) with HMAC-SHA512, writing out.size() bytes. iterations >= 1.
+// PBKDF2 (RFC 8018) with HMAC-SHA512, writing out.size() bytes. iterations >= 1. The salt is the concatenation
+// salt || salt_tail, so BIP-39's "mnemonic" + passphrase needs no buffer and no length limit.
 constexpr void pbkdf2_hmac_sha512(std::span<const std::uint8_t> password, std::span<const std::uint8_t> salt,
-                                  std::uint32_t iterations, std::span<std::uint8_t> out) noexcept
+                                  std::span<const std::uint8_t> salt_tail, std::uint32_t iterations,
+                                  std::span<std::uint8_t> out) noexcept
 {
     const hmac_sha512 keyed(password);   // the password absorbed once, copied per block
     std::uint32_t block = 1;
     for (std::size_t done = 0; done < out.size(); ++block) {
         hmac_sha512 m = keyed;
         m.update(salt);
+        m.update(salt_tail);
         const std::uint8_t be[4] = {static_cast<std::uint8_t>(block >> 24), static_cast<std::uint8_t>(block >> 16),
                                     static_cast<std::uint8_t>(block >> 8), static_cast<std::uint8_t>(block)};
         m.update(be);
@@ -400,6 +403,12 @@ constexpr void pbkdf2_hmac_sha512(std::span<const std::uint8_t> password, std::s
         secure_wipe(u);
         secure_wipe(t);
     }
+}
+
+constexpr void pbkdf2_hmac_sha512(std::span<const std::uint8_t> password, std::span<const std::uint8_t> salt,
+                                  std::uint32_t iterations, std::span<std::uint8_t> out) noexcept
+{
+    pbkdf2_hmac_sha512(password, salt, {}, iterations, out);
 }
 
 } // namespace snicholls::crypto::detail
