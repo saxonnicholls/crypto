@@ -23,7 +23,6 @@
 
 import argparse
 import hashlib
-import json
 import os
 import re
 import sys
@@ -208,6 +207,8 @@ def generate(source):
         f.write(HEADER_TOP % {"commit": BIPS_COMMIT, "sha": ENGLISH_SHA256})
         f.write("\n".join(lines) + "\n")
         f.write(HEADER_BOTTOM)
+
+    import json   # only when generating: --check runs on python3-minimal, which has no json
 
     rows = json.loads(vectors)["english"]
     with open(FIXTURE, "w", encoding="utf-8", newline="\n") as f:

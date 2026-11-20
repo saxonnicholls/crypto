@@ -98,8 +98,9 @@ TEST(CryptoAddressBech32, SegwitVectorsUnderBip350)
             // BIP-173's v1+ addresses were bech32; BIP-350 requires bech32m for them, so they are now invalid
             superseded += bip173_v1_plus;
             EXPECT_FALSE(w) << address;
-            if (bip173_v1_plus)
+            if (bip173_v1_plus) {
                 EXPECT_EQ(w.unwrap_err(), errc::invalid_checksum) << address;
+            }
         }
     }
     EXPECT_EQ(superseded, 3);

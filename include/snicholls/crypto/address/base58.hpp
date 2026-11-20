@@ -142,8 +142,11 @@ template <std::size_t MaxBytes = base58_default_max_bytes>
     if (bytes.size() > MaxBytes)
         return err(errc::invalid_length);
     std::size_t zeros = 0;
-    while (zeros < bytes.size() && bytes[zeros] == 0)
+    while (zeros < bytes.size() && bytes[zeros] == 0) {   // one leading symbol per leading zero byte
+        if (zeros < out.size())
+            out[zeros] = alphabet.symbols[0];
         ++zeros;
+    }
     if (zeros > out.size())
         return err(errc::invalid_length);
     // Base-58 digits of the rest, least significant first, built in out[zeros...]
@@ -163,15 +166,18 @@ template <std::size_t MaxBytes = base58_default_max_bytes>
             carry /= 58;
         }
     }
-    for (std::size_t i = 0; i < length / 2; ++i) {
-        const char t = digits[i];
-        digits[i] = digits[length - 1 - i];
-        digits[length - 1 - i] = t;
+    // Most significant first, each digit mapped to its symbol, in one two-ended pass (one loop, which GCC 13's
+    // vectoriser does not turn into stores it cannot bound)
+    std::size_t lo = 0, hi = length;
+    while (lo + 1 < hi) {
+        --hi;
+        const auto a = static_cast<unsigned char>(digits[lo]), b = static_cast<unsigned char>(digits[hi]);
+        digits[lo] = alphabet.symbols[b];
+        digits[hi] = alphabet.symbols[a];
+        ++lo;
     }
-    for (std::size_t i = 0; i < length; ++i)
-        digits[i] = alphabet.symbols[static_cast<unsigned char>(digits[i])];
-    for (std::size_t i = 0; i < zeros; ++i)
-        out[i] = alphabet.symbols[0];
+    if (lo + 1 == hi)
+        digits[lo] = alphabet.symbols[static_cast<unsigned char>(digits[lo])];
     return ok(zeros + length);
 }
 
