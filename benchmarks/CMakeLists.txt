@@ -14,3 +14,6 @@ function(snicholls_crypto_add_benchmark name source)
     add_test(NAME benchmark.${name} COMMAND snicholls_crypto_${name} --benchmark_min_time=0.01s)
     set_tests_properties(benchmark.${name} PROPERTIES LABELS benchmark TIMEOUT 300)
 endfunction()
+
+snicholls_crypto_add_benchmark(ed25519_benchmark curve25519/ed25519_benchmark.cpp)
+snicholls_crypto_add_benchmark(x25519_benchmark curve25519/x25519_benchmark.cpp)
