@@ -42,6 +42,15 @@ themselves, with the section they come from.
 RFC 6979's own vectors (appendix A.2.5, P-256 with SHA-256, "sample" and "test") are written into
 `tests/secp256k1/rfc6979_test.cpp`, which checks the nonce generator for any 256-bit order.
 
+## BIP-32 and SLIP-10 (`hd/`)
+
+Converted by `scripts/generate_hd_fixtures.py --source DIR`, which refuses a source whose SHA-256 differs.
+
+| Fixture | Source | Source SHA-256 | Licence |
+|---|---|---|---|
+| `hd/bip32.txt` | BIP-32's test vectors 1 to 5, <https://github.com/bitcoin/bips/blob/a7f91321f25b5be8d93e901775621c21519e80b7/bip-0032.mediawiki> (17 chains, 16 invalid keys) | `e5e00a8289db2f681052cf24a745320afc225e66b25d1e489a7c884d2fc7f11f` | BSD-2-Clause (BIP-32) |
+| `hd/slip10.txt` | SLIP-10's secp256k1 and ed25519 test vectors 1 and 2, <https://github.com/satoshilabs/slips/blob/02e7b618deb32952acf77aceb0b6ba984c2420b5/slip-0010.md> (12 rows each) | `dbd5a324f2a6014bf78fc8cfa85833e4a16256a02283b93d648fccba18ed1ce7` | CC-BY-SA-4.0 (the SLIPs repository) |
+
 ## BIP-39 (`bip39/trezor_english.txt`)
 
 - Source: Trezor's reference vectors for BIP-39,

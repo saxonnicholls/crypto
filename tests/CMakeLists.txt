@@ -18,7 +18,9 @@ add_executable(snicholls_crypto_tests
     curve25519/x25519_test.cpp
     detail/hashes_test.cpp
     detail/limbs_test.cpp
+    hd/bip32_test.cpp
     hd/path_test.cpp
+    hd/slip10_test.cpp
     secp256k1/ecdsa_test.cpp
     secp256k1/field_test.cpp
     secp256k1/keys_test.cpp

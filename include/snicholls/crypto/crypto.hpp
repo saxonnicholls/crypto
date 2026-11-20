@@ -46,7 +46,9 @@
 #include <snicholls/crypto/curve25519/field.hpp>
 #include <snicholls/crypto/curve25519/scalar.hpp>
 #include <snicholls/crypto/curve25519/x25519.hpp>
+#include <snicholls/crypto/hd/bip32.hpp>
 #include <snicholls/crypto/hd/path.hpp>
+#include <snicholls/crypto/hd/slip10.hpp>
 #include <snicholls/crypto/secp256k1/ecdsa.hpp>
 #include <snicholls/crypto/secp256k1/field.hpp>
 #include <snicholls/crypto/secp256k1/keys.hpp>
