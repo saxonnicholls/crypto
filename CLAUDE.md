@@ -2,12 +2,14 @@
 
 Header-only C++20 library of elliptic curves, signatures and wallet key derivation for the snicholls libraries:
 secp256k1 (ECDSA with RFC 6979 nonces, low-S, public-key recovery, BIP-340 Schnorr), Ed25519 and X25519, BIP-39
-mnemonics, BIP-32 and SLIP-10 derivation, and the BIP-44 family of paths. It pins snicholls-core and nothing else.
+mnemonics, BIP-32 and SLIP-10 derivation, the BIP-44 family of paths, and the address encodings (base58 with any
+alphabet, base58check, bech32 and bech32m, segwit addresses). It pins snicholls-core and nothing else.
 Namespace `snicholls::crypto`, include root `<snicholls/crypto/...>`, CMake target `snicholls::crypto`.
 
 Signing code holds private keys, so it lives here, apart from core: one place where every secret-dependent path is
 constant-time and reviewed together. Hashes, MACs and KDFs are core's (constexpr, no secrets of their own to protect
-beyond wiping); byte codecs (base58, bech32, hex) belong to the codec libraries or to the caller.
+beyond wiping). Base58 and bech32 live here (decided 2026-11-20: they do not fit base-encode-decode's bit-group
+codec design, and wallet formats are their only users); hex digits are core's.
 
 ## Authorship and commits
 
@@ -46,8 +48,9 @@ It may become public: no file and no commit names a private repository, product,
    `std::span<const std::uint8_t>`, hashed in a stream.
 6. **Results, not exceptions.** Anything that can fail on its input returns `snicholls::result<V, errc>`
    (`error.hpp`, one enumeration for the library). Nothing throws.
-7. **No dependency beyond core.** Address formats and text codecs (base58check, bech32, EIP-55) are left to callers
-   or to the codec libraries; where a standard format needs one (BIP-32's `xprv` / `xpub`), the codec is a parameter.
+7. **No dependency beyond core.** The address encodings a wallet format needs (base58check for `xprv` / `xpub` and
+   WIF, bech32 / bech32m for segwit) are in `address/`; formats built on another hash (EIP-55 needs Keccak-256,
+   core's) are the caller's.
 8. **Strict input.** Non-canonical encodings are rejected, never repaired: a mnemonic that is not lower-case words
    separated by single spaces, a path component with a leading zero, a non-hardened index where only hardened is
    defined (never silently hardened), an `s` above n / 2 where only low-S is accepted.
@@ -55,16 +58,22 @@ It may become public: no file and no commit names a private repository, product,
 What is constant-time and what is not is listed per header in its **Guarantees** section; the evidence (the
 Valgrind secret-marking check and the timing test) and its limits are in README.md, "Constant time".
 
+9. **What is revealed on purpose goes through `ct::declassify`.** A key's or a mnemonic's validity, a retry of
+   probability below 2^-127, the recovery id, a mnemonic's text length: each is a `ct::declassify(...)` call, so
+   `grep declassify` is the complete list, and the Valgrind check (`tests/ct/secret_marking.cpp`, CTest label `ct`)
+   fails on any other branch or index on a secret. A new secret path is added to that check in the same change.
+
 ## Layout
 
 - `include/snicholls/crypto/<name>.hpp` for the shared pieces (`version`, `error`, `constant_time`, `secret`),
   `include/snicholls/crypto/<area>/<name>.hpp` for the algorithms. `crypto.hpp` is the umbrella (applications only).
-- Areas: `secp256k1/` (`field`, `scalar`, `point`, `keys`, `ecdsa`, `schnorr`; `snicholls::crypto::secp256k1`),
-  `curve25519/` (`field`, `scalar`, `edwards`, `ed25519`, `x25519`; `snicholls::crypto::ed25519`,
+- Areas: `address/` (`base58`, `base58check`, `bech32`; `snicholls::crypto::address`), `secp256k1/` (`field`,
+  `scalar`, `point`, `keys`, `rfc6979`, `ecdsa`, `schnorr`; `snicholls::crypto::secp256k1`), `curve25519/` (`field`,
+  `scalar`, `edwards` in `snicholls::crypto::curve25519`; `ed25519`, `x25519` in `snicholls::crypto::ed25519` and
   `snicholls::crypto::x25519`), `bip39/` (`wordlist`, `mnemonic`; `snicholls::crypto::bip39`), `hd/` (`path`,
-  `bip32`, `slip10`, `extended_key`; `snicholls::crypto::hd`).
+  `bip32`, `slip10`; `snicholls::crypto::hd`).
 - `detail/` holds internals (`snicholls::crypto::detail` and `<area>::detail`): tested, not demonstrated, not
-  documented by Doxygen. `detail/hashes.hpp` is **interim**: see "Waiting on other libraries".
+  documented by Doxygen. `detail/hashes.hpp` adapts core's hashes: see "Waiting on other libraries".
 - `tests/`, `demos/` and `benchmarks/` mirror `include/snicholls/crypto/`. `tests/fixtures/` holds the official test
   vectors, each with its provenance in `tests/fixtures/README.md`. `tests/support/` holds test-only helpers.
 - Header guards are named, `snicholls_crypto_<path>_hpp`. Macros carry the `SNICHOLLS_CRYPTO_` prefix.
@@ -163,8 +172,6 @@ test-only stand-in, if one is unavoidable, is marked as such and deleted when co
   for now at a **development commit** of its feature/hashes branch (564d0c4, not yet on core's public remote); it
   becomes the v0.17.0 tag before crypto is released. PBKDF2 with a two-part salt (BIP-39) uses core's
   `detail::pbkdf2_blocks` until core offers a public form.
-- **base58check.** BIP-32's `xprv` / `xpub` text is produced and parsed through a codec the caller passes
-  (`hd/extended_key.hpp`); the tests use a test-only base58check. No codec library is pinned.
 - **NFKD.** BIP-39 seeds hash the NFKD form of the mnemonic and passphrase. English mnemonics are ASCII and need
   none; a non-ASCII passphrase is refused (`errc::non_canonical`) unless the caller states it is already NFKD.
   Core's Unicode tables have canonical decomposition (NFD) only; compatibility decomposition would lift the limit.

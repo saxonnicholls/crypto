@@ -1,0 +1,82 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  CMAKE_BUILD_PARALLEL_LEVEL: 4
+
+# The family's legs (core's CLAUDE.md, "Build and CI"): Linux x86-64 and ARM64 with GCC and Clang, macOS ARM64 and
+# x86-64 with Apple Clang, sanitizers on the Clang legs; the Valgrind secret-marking check on the Linux GCC legs;
+# the documentation with warnings as errors. Every leg blocks.
+jobs:
+  build-and-test:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    env:
+      CMAKE_BUILD_PARALLEL_LEVEL: ${{ matrix.jobs || 4 }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: Linux x86-64 GCC, os: ubuntu-latest, cxx: g++, valgrind: true }
+          - { name: Linux x86-64 Clang, os: ubuntu-latest, cxx: clang++, sanitize: 'address,undefined' }
+          - { name: Linux ARM64 GCC, os: ubuntu-24.04-arm, cxx: g++, jobs: 3, valgrind: true }
+          - { name: Linux ARM64 Clang, os: ubuntu-24.04-arm, cxx: clang++, jobs: 3, sanitize: 'address,undefined' }
+          - { name: macOS ARM64 Apple Clang, os: macos-latest, cxx: c++, jobs: 3 }
+          - { name: macOS x86-64 Apple Clang, os: macos-15-intel, cxx: c++ }
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: true
+      - name: Static checks (version, mirror, nothing private)
+        env:
+          RELEASE_TAG: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || '' }}
+        run: |
+          python3 scripts/check_version.py
+          python3 scripts/check_mirror.py
+          python3 scripts/check_public.py --commits
+      - name: Valgrind
+        if: matrix.valgrind
+        run: sudo apt-get update && sudo apt-get install -y valgrind
+      - name: Release, warnings are errors, benchmarks smoke-run
+        run: |
+          cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=${{ matrix.cxx }} \
+            -DSNICHOLLS_CRYPTO_WERROR=ON -DSNICHOLLS_CRYPTO_BUILD_BENCHMARKS=ON
+          cmake --build build --parallel "$CMAKE_BUILD_PARALLEL_LEVEL"
+          ctest --test-dir build --output-on-failure --parallel "$CMAKE_BUILD_PARALLEL_LEVEL"
+      - name: Debug at -O0, asserts live
+        run: |
+          cmake -B build-debug -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=${{ matrix.cxx }} -DSNICHOLLS_CRYPTO_WERROR=ON
+          cmake --build build-debug --parallel "$CMAKE_BUILD_PARALLEL_LEVEL"
+          ctest --test-dir build-debug --output-on-failure --parallel "$CMAKE_BUILD_PARALLEL_LEVEL"
+      - name: Sanitizers
+        if: matrix.sanitize
+        run: |
+          cmake -B build-san -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_CXX_COMPILER=${{ matrix.cxx }} \
+            -DSNICHOLLS_CRYPTO_WERROR=ON -DSNICHOLLS_CRYPTO_SANITIZE=${{ matrix.sanitize }}
+          cmake --build build-san --parallel "$CMAKE_BUILD_PARALLEL_LEVEL"
+          ctest --test-dir build-san --output-on-failure --parallel "$CMAKE_BUILD_PARALLEL_LEVEL"
+
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: true
+      - name: Doxygen 1.18 (the pinned version, by SHA-256)
+        run: |
+          curl -fsSL -o doxygen.tgz https://github.com/doxygen/doxygen/releases/download/Release_1_18_0/doxygen-1.18.0.linux.bin.tar.gz
+          echo "14fa81bdc34171edb5f1f02b1d60e74802f0439b77fa44e592565d517d72df90  doxygen.tgz" | sha256sum -c -
+          tar -xzf doxygen.tgz && sudo install -m 0755 doxygen-1.18.0/bin/doxygen /usr/local/bin/doxygen
+      - name: Documentation, warnings are errors
+        run: |
+          cmake -B build-docs -DSNICHOLLS_CRYPTO_BUILD_TESTS=OFF -DSNICHOLLS_CRYPTO_BUILD_DOCS=ON
+          cmake --build build-docs --target docs
