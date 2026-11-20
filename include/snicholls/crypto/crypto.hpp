@@ -17,6 +17,10 @@
 /// \ingroup crypto
 /// \brief The curve, ECDSA with RFC 6979 nonces and public-key recovery, BIP-340 Schnorr.
 
+/// \defgroup address Addresses
+/// \ingroup crypto
+/// \brief Address and key text: base58 (any alphabet), base58check, bech32 and bech32m, segwit addresses.
+
 /// \defgroup curve25519 Curve25519
 /// \ingroup crypto
 /// \brief The field and scalars of Curve25519, edwards25519, Ed25519 signatures and X25519 key agreement.
@@ -32,6 +36,9 @@
 #include <snicholls/crypto/error.hpp>
 #include <snicholls/crypto/secret.hpp>
 #include <snicholls/crypto/version.hpp>
+#include <snicholls/crypto/address/base58.hpp>
+#include <snicholls/crypto/address/base58check.hpp>
+#include <snicholls/crypto/address/bech32.hpp>
 #include <snicholls/crypto/bip39/mnemonic.hpp>
 #include <snicholls/crypto/bip39/wordlist.hpp>
 #include <snicholls/crypto/curve25519/ed25519.hpp>

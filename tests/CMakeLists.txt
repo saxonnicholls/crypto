@@ -6,6 +6,9 @@ add_executable(snicholls_crypto_tests
     error_test.cpp
     secret_test.cpp
     version_test.cpp
+    address/base58_test.cpp
+    address/base58check_test.cpp
+    address/bech32_test.cpp
     bip39/mnemonic_test.cpp
     bip39/wordlist_test.cpp
     curve25519/ed25519_test.cpp
