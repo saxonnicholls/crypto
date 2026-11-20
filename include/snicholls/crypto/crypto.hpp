@@ -17,6 +17,10 @@
 /// \ingroup crypto
 /// \brief The curve, ECDSA with RFC 6979 nonces and public-key recovery, BIP-340 Schnorr.
 
+/// \defgroup curve25519 Curve25519
+/// \ingroup crypto
+/// \brief The field and scalars of Curve25519, edwards25519, Ed25519 signatures and X25519 key agreement.
+
 #ifndef snicholls_crypto_crypto_hpp
 #define snicholls_crypto_crypto_hpp
 
@@ -24,6 +28,8 @@
 #include <snicholls/crypto/error.hpp>
 #include <snicholls/crypto/secret.hpp>
 #include <snicholls/crypto/version.hpp>
+#include <snicholls/crypto/curve25519/field.hpp>
+#include <snicholls/crypto/curve25519/scalar.hpp>
 #include <snicholls/crypto/secp256k1/field.hpp>
 #include <snicholls/crypto/secp256k1/point.hpp>
 #include <snicholls/crypto/secp256k1/scalar.hpp>
