@@ -19,9 +19,13 @@ add_executable(snicholls_crypto_tests
     detail/hashes_test.cpp
     detail/limbs_test.cpp
     hd/path_test.cpp
+    secp256k1/ecdsa_test.cpp
     secp256k1/field_test.cpp
+    secp256k1/keys_test.cpp
     secp256k1/point_test.cpp
-    secp256k1/scalar_test.cpp)
+    secp256k1/rfc6979_test.cpp
+    secp256k1/scalar_test.cpp
+    secp256k1/schnorr_test.cpp)
 target_link_libraries(snicholls_crypto_tests PRIVATE snicholls::crypto GTest::gtest_main GTest::gmock)
 # The official test vectors (tests/fixtures/), read at run time; provenance in tests/fixtures/README.md
 target_compile_definitions(snicholls_crypto_tests PRIVATE SNICHOLLS_CRYPTO_FIXTURE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/fixtures")

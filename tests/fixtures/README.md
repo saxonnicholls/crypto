@@ -14,10 +14,14 @@ Project Wycheproof, <https://github.com/C2SP/wycheproof>, licensed under the Apa
 |---|---|---|---|
 | `wycheproof/ed25519.txt` | `ed25519_test.json` | `ea80ffebac085e21cb9d3e903e7fa2b448d96702da5b31f061d0b83b430b74b3` | 210 |
 | `wycheproof/x25519.txt` | `x25519_test.json` | `35c3f5231cf25cc640b524d403461deee9e49441d5d915a3a25b2c8ff5adbe7d` | 518 |
+| `wycheproof/ecdsa_secp256k1_sha256.txt` | `ecdsa_secp256k1_sha256_test.json` (DER) | `43db761c0a2eae71fb0755d355d5130e28ce64a5b07846cf27e7072082597a81` | 476 |
+| `wycheproof/ecdsa_secp256k1_sha256_p1363.txt` | `ecdsa_secp256k1_sha256_p1363_test.json` | `7a339efc7134fb2495cd32afdbd692e0f86427d3c24e9073f6a7d858bb8788d2` | 252 |
+| `wycheproof/ecdsa_secp256k1_sha256_bitcoin.txt` | `ecdsa_secp256k1_sha256_bitcoin_test.json` (DER, low-S) | `d3729ce83ff9740c45e74921009a4061eff6c09185b8dd1225ccd06ac57048a4` | 464 |
 
 Each line is `tcId result field ...` in hex, `-` for an empty field. `result` is Wycheproof's: `valid` must be
 accepted, `invalid` must be rejected, `acceptable` may go either way (each test states what this library does).
-`x25519.txt` is about 105 KB: 518 lines of hex, kept whole.
+`x25519.txt` and the two DER ECDSA files are each about 105 KB: plain hex, one case per line, kept whole. The ECDSA
+files give each group's public key once, on a `key - <uncompressed SEC1 key>` line before its tests.
 
 ## RFC vectors
 
@@ -27,6 +31,16 @@ themselves, with the section they come from.
 | Fixture | Source | Source SHA-256 |
 |---|---|---|
 | `rfc8032_ed25519.txt` | RFC 8032 section 7.1, <https://www.rfc-editor.org/rfc/rfc8032.txt>, converted by `scripts/generate_wycheproof_fixtures.py --rfc8032` (TEST 1024's message is 1,023 bytes) | `ed63657ff389301282b169b0abde9b5dd2c7e4d524fdfa5da6ff3094fc93c4c3` |
+
+## secp256k1
+
+| Fixture | Source | Source SHA-256 | Licence |
+|---|---|---|---|
+| `bip340.txt` | BIP-340's `test-vectors.csv`, <https://github.com/bitcoin/bips/blob/a7f91321f25b5be8d93e901775621c21519e80b7/bip-0340/test-vectors.csv>, converted by `scripts/generate_wycheproof_fixtures.py --bip340` (19 vectors) | `34c9d1d9c3a88d524bc80778540dc43f8306ec249a7485293063c376db851c2d` | BSD-2-Clause (BIP-340) |
+| `rfc6979_secp256k1.txt` | RFC 6979 signatures over secp256k1 with SHA-256 and low-S: rows 1 and 2 are the values published with the curve's RFC 6979 test suites (key 1, "Satoshi Nakamoto" and "All those moments will be lost in time..."); all 16 rows (4 keys x 4 messages) were produced by `@noble/curves` 1.6.0 (MIT), `secp256k1.sign(sha256(m), key, {lowS: true})`, an independent implementation | - | MIT (the oracle) |
+
+RFC 6979's own vectors (appendix A.2.5, P-256 with SHA-256, "sample" and "test") are written into
+`tests/secp256k1/rfc6979_test.cpp`, which checks the nonce generator for any 256-bit order.
 
 ## BIP-39 (`bip39/trezor_english.txt`)
 

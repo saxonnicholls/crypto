@@ -14,6 +14,7 @@
 #      python3 -I scripts/generate_wycheproof_fixtures.py --source DIR --commit SHA          write every fixture
 #      python3 -I scripts/generate_wycheproof_fixtures.py --source DIR --commit SHA --check  compare, write nothing
 #      python3 -I scripts/generate_wycheproof_fixtures.py --rfc8032 rfc8032.txt               RFC 8032's section 7.1
+#      python3 -I scripts/generate_wycheproof_fixtures.py --bip340 test-vectors.csv           BIP-340's vectors
 #
 #  The RFC 8032 mode reads the RFC's plain text (https://www.rfc-editor.org/rfc/rfc8032.txt) and writes
 #  tests/fixtures/rfc8032_ed25519.txt, since TEST 1024's message is too long to copy into a test by hand.
@@ -68,7 +69,21 @@ def x25519(data):
     return ["private", "public", "shared"], lines
 
 
+def ecdsa_secp256k1(data):
+    """ecdsa_secp256k1_sha256*_test.json: a "key" line per group (the uncompressed SEC1 key), then its tests."""
+    lines = []
+    for g in data["testGroups"]:
+        assert g["publicKey"]["curve"] == "secp256k1" and g["sha"] == "SHA-256"
+        lines.append("key - %s" % g["publicKey"]["uncompressed"])
+        for t in g["tests"]:
+            lines.append("%d %s %s %s" % (t["tcId"], t["result"], field(t["msg"]), field(t["sig"])))
+    return ["msg", "sig (key lines: key - uncompressed_public_key)"], lines
+
+
 CONVERTERS = {
+    "ecdsa_secp256k1_sha256_bitcoin_test.json": ("ecdsa_secp256k1_sha256_bitcoin.txt", ecdsa_secp256k1),
+    "ecdsa_secp256k1_sha256_p1363_test.json": ("ecdsa_secp256k1_sha256_p1363.txt", ecdsa_secp256k1),
+    "ecdsa_secp256k1_sha256_test.json": ("ecdsa_secp256k1_sha256.txt", ecdsa_secp256k1),
     "ed25519_test.json": ("ed25519.txt", ed25519),
     "x25519_test.json": ("x25519.txt", x25519),
 }
@@ -98,11 +113,24 @@ def rfc8032_ed25519(raw):
     return "\n".join(out) + "\n"
 
 
+def bip340(raw):
+    """BIP-340's test-vectors.csv: index, secret key, public key, aux_rand, message, signature, result, comment."""
+    import csv, io
+    out = ["# BIP-340 test-vectors.csv, from https://github.com/bitcoin/bips (bip-0340/), converted by",
+           "# scripts/generate_wycheproof_fixtures.py --bip340; source SHA-256 %s; licence BSD-2-Clause (BIP-340)" % hashlib.sha256(raw).hexdigest(),
+           "# Fields: index secret_key public_key aux_rand message signature result(TRUE/FALSE)"]
+    for row in csv.DictReader(io.StringIO(raw.decode("ascii"))):
+        out.append(" ".join([row["index"], field(row["secret key"].lower()), row["public key"].lower(), field(row["aux_rand"].lower()),
+                             field(row["message"].lower()), row["signature"].lower(), row["verification result"]]))
+    return "\n".join(out) + "\n"
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--source", help="directory holding the downloaded Wycheproof JSON files")
     ap.add_argument("--commit", help="the Wycheproof commit the files were downloaded from")
     ap.add_argument("--rfc8032", help="RFC 8032's plain text, to write rfc8032_ed25519.txt")
+    ap.add_argument("--bip340", help="BIP-340's test-vectors.csv, to write bip340.txt")
     ap.add_argument("--check", action="store_true", help="compare with the committed fixtures, write nothing")
     args = ap.parse_args()
 
@@ -114,6 +142,15 @@ def main():
         with open(out, "w", encoding="utf-8") as f:
             f.write(text)
         print("rfc8032_ed25519.txt: %d tests" % (text.count("\n") - 3))
+        return 0
+    if args.bip340:
+        text = bip340(open(args.bip340, "rb").read())
+        out = os.path.join(ROOT, "tests", "fixtures", "bip340.txt")
+        if args.check:
+            return 0 if os.path.exists(out) and open(out, encoding="utf-8").read() == text else 1
+        with open(out, "w", encoding="utf-8") as f:
+            f.write(text)
+        print("bip340.txt: %d vectors" % (text.count("\n") - 3))
         return 0
     if not args.source or not args.commit:
         ap.error("--source and --commit are required for the Wycheproof files")
