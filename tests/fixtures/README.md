@@ -42,3 +42,25 @@ The English word list itself is compiled into `include/snicholls/crypto/bip39/wo
 `2f5eed53a4727b4bf8880d8f3f199efc90e58503646d9ff8eff3a2ed3b24dbda` (the value published with the BIP and checked by
 every BIP-39 implementation). The word lists are part of BIP-39, whose header states `License: MIT`. The CTest
 `generated.bip39_wordlist_is_official` recomputes that SHA-256 from the header's words, offline.
+
+## Addresses (`address/`)
+
+Converted by `scripts/generate_address_fixtures.py --source DIR`, which refuses a source whose SHA-256 differs.
+
+| Fixture | Source | Revision | Source SHA-256 | Licence |
+|---|---|---|---|---|
+| `address/bech32.txt`, `address/segwit.txt` | BIP-173, <https://github.com/bitcoin/bips/blob/a7f91321f25b5be8d93e901775621c21519e80b7/bip-0173.mediawiki>, "Test vectors" | bips `a7f91321` | `b19eab06b264bbd15ad7f7d640fa34de8f4a8809fba8a6ecc3e165545b27a543` | BSD-2-Clause (the BIP's header) |
+| the same | BIP-350, <https://github.com/bitcoin/bips/blob/a7f91321f25b5be8d93e901775621c21519e80b7/bip-0350.mediawiki>, "Test vectors" | bips `a7f91321` | `63634b06aa8bae88b31929674736e74964c4598684269ac2b0b140c43a7a0dec` | BSD-2-Clause (the BIP's header) |
+| `address/base58.txt` | Bitcoin Core, <https://github.com/bitcoin/bitcoin/blob/110183746150428e6385880c79f8c5733b1361ba/src/test/data/base58_encode_decode.json> | tag `v28.0`, commit `11018374` | `73006fdb9d8337117bf330c1900974a1242f2e61fd6a1b77217328dbc4b72025` | MIT |
+
+`bech32.txt` lines are `variant valid|invalid <hex of the string>` (hex, because BIP-173's invalid strings include a
+space, DEL, 0x80 and 0xFF). `segwit.txt` lines are `bip173|bip350 valid|invalid <address> <scriptPubKey>`: BIP-350
+supersedes BIP-173's valid addresses of versions 1 to 16 (written with bech32, now required to be bech32m), and the
+test checks that those three are refused.
+
+Short vectors are written into the tests with their sources: the addresses and WIF keys of private key 1 (every
+Bitcoin library's), BIP-32 test vector 1's master `xprv`, and the XRP Ledger's ACCOUNT_ZERO, ACCOUNT_ONE and genesis
+account from the XRPL documentation, <https://github.com/XRPLF/xrpl-dev-portal/blob/7da79fec8e857e77085a0f0d750b8054c4504db1/docs/concepts/accounts/addresses.md>
+(SHA-256 `488312c3c7fbe3237e89664d0665638ea584827c7a17d5682f1c4fab08dae347`). The Flickr-alphabet vector and the
+decoded payloads of `1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2` and the genesis account were computed with the Python
+packages `base58` 2.1.1 and `bech32` 1.2.0 as an independent oracle.

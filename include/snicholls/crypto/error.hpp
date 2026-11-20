@@ -74,6 +74,10 @@ enum class errc : unsigned char {
     invalid_checksum,         ///< A mnemonic's checksum, or an extended key's, did not match.
     non_canonical,            ///< Text was not in the canonical form this library accepts (see the function's documentation).
     invalid_extended_key,     ///< A serialised BIP-32 extended key was malformed or inconsistent.
+    invalid_character,        ///< Text held a character outside its alphabet (base58, bech32), or outside printable ASCII.
+    invalid_hrp,              ///< A bech32 human-readable part was empty, too long, out of range, missing, or not the one expected.
+    invalid_witness_version,  ///< A segwit witness version above 16, or the wrong checksum variant for the version.
+    invalid_witness_program,  ///< A segwit witness program outside 2 to 40 bytes, or not 20 or 32 bytes for version 0.
 };
 
 /// \brief The name of an error, for logs and messages; never key material.
@@ -99,6 +103,10 @@ enum class errc : unsigned char {
     case errc::invalid_checksum: return "invalid_checksum";
     case errc::non_canonical: return "non_canonical";
     case errc::invalid_extended_key: return "invalid_extended_key";
+    case errc::invalid_character: return "invalid_character";
+    case errc::invalid_hrp: return "invalid_hrp";
+    case errc::invalid_witness_version: return "invalid_witness_version";
+    case errc::invalid_witness_program: return "invalid_witness_program";
     }
     return "unknown";
 }
