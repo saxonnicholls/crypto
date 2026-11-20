@@ -28,6 +28,7 @@
 #include <snicholls/crypto/error.hpp>
 #include <snicholls/crypto/secret.hpp>
 #include <snicholls/crypto/version.hpp>
+#include <snicholls/crypto/curve25519/ed25519.hpp>
 #include <snicholls/crypto/curve25519/edwards.hpp>
 #include <snicholls/crypto/curve25519/field.hpp>
 #include <snicholls/crypto/curve25519/scalar.hpp>

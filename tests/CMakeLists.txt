@@ -6,6 +6,7 @@ add_executable(snicholls_crypto_tests
     error_test.cpp
     secret_test.cpp
     version_test.cpp
+    curve25519/ed25519_test.cpp
     curve25519/edwards_test.cpp
     curve25519/field_test.cpp
     curve25519/scalar_test.cpp
