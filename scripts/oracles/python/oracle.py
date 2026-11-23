@@ -17,7 +17,7 @@
 #
 #      coincurve      libsecp256k1 (bundled in the wheel): keys, ECDSA (RFC 6979, low-S), recovery, BIP-340
 #      openssl        OpenSSL through cryptography: ECDSA on secp256k1 (RFC 6979 when OpenSSL is 3.2 or later),
-#                     Ed25519, X25519
+#                     Ed25519, X25519, RSA (PKCS#1 v1.5 signing and verification, PSS verification, SPKI)
 #      pynacl         libsodium: Ed25519, X25519
 #      mnemonic       python-mnemonic, Trezor's BIP-39 reference
 #      slip10         the SLIP-10 reference: BIP-32 (SLIP-10 on secp256k1 is BIP-32) and SLIP-10 Ed25519
@@ -44,6 +44,8 @@ import slip10 as slip10_lib                                               # noqa
 from cryptography.exceptions import InvalidSignature                     # noqa: E402
 from cryptography.hazmat.primitives import hashes                        # noqa: E402
 from cryptography.hazmat.primitives.asymmetric import ec, ed25519, x25519, utils as asym_utils  # noqa: E402
+from cryptography.hazmat.primitives.asymmetric import padding as rsa_padding, rsa as rsa_lib  # noqa: E402
+from cryptography.hazmat.primitives import serialization  # noqa: E402
 
 N = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141
 
@@ -206,6 +208,32 @@ def openssl_op(q):
             return {"valid": True}
         except InvalidSignature:
             return {"valid": False}
+    if op in ("rsa_verify_pkcs1", "rsa_verify_pss"):
+        try:
+            pub = rsa_lib.RSAPublicNumbers(int(q["e"], 16), int(q["n"], 16)).public_key()
+        except Exception as e:
+            raise Refused(str(e))
+        pad = rsa_padding.PKCS1v15() if op == "rsa_verify_pkcs1" else \
+            rsa_padding.PSS(mgf=rsa_padding.MGF1(hashes.SHA256()), salt_length=q["salt"])
+        try:
+            pub.verify(b(q["sig"]), b(q["m"]), pad, hashes.SHA256())
+            return {"valid": True}
+        except InvalidSignature:
+            return {"valid": False}
+    if op == "rsa_sign_pkcs1":
+        p_, q_, d_, e_, n_ = (int(q[k], 16) for k in ("p", "q", "d", "e", "n"))
+        key = rsa_lib.RSAPrivateNumbers(p_, q_, d_, d_ % (p_ - 1), d_ % (q_ - 1), pow(q_, -1, p_),
+                                        rsa_lib.RSAPublicNumbers(e_, n_)).private_key()
+        return {"sig": h(key.sign(b(q["m"]), rsa_padding.PKCS1v15(), hashes.SHA256()))}
+    if op == "rsa_parse_spki":
+        try:
+            k = serialization.load_der_public_key(b(q["der"]))
+        except Exception as e:
+            raise Refused(str(e))
+        if not isinstance(k, rsa_lib.RSAPublicKey):
+            raise Refused("not RSA")
+        nums = k.public_numbers()
+        return {"n": "%x" % nums.n, "e": "%x" % nums.e}
     if op == "x25519":
         try:
             out = x25519.X25519PrivateKey.from_private_bytes(b(q["k"])).exchange(
@@ -334,7 +362,8 @@ LIBS = {
                    "schnorr_sign", "schnorr_verify"]),
     "openssl": (openssl_op, lambda: "%s (cryptography %s)" % (_openssl_version(), cryptography.__version__),
                 (["ecdsa_sign"] if _deterministic_available() else []) +
-                ["ecdsa_verify", "ecdsa_verify_der", "ed25519_sign", "ed25519_verify", "x25519"]),
+                ["ecdsa_verify", "ecdsa_verify_der", "ed25519_sign", "ed25519_verify", "x25519",
+                 "rsa_sign_pkcs1", "rsa_verify_pkcs1", "rsa_verify_pss", "rsa_parse_spki"]),
     "pynacl": (pynacl_op, lambda: "libsodium %s (PyNaCl %s)" % (_sodium_version(), nacl.__version__),
                ["ed25519_sign", "ed25519_verify", "x25519"]),
     "mnemonic": (mnemonic_op, lambda: mnemonic_lib.__version__ if hasattr(mnemonic_lib, "__version__") else "0.21",

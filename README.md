@@ -16,6 +16,7 @@ release at the root, every version under `/vX.Y.Z/`, the latest `main` under `/m
 |---|---|---|
 | shared | `constant_time.hpp`, `secret.hpp`, `error.hpp` | masks and selections, `ct::declassify`; `secret_bytes<N>` (wiped, move-only, `reveal()`); `errc` |
 | `secp256k1/` | `field`, `scalar`, `point`, `keys`, `rfc6979`, `ecdsa`, `schnorr` | keys and SEC1; ECDSA with RFC 6979, low-S and the recovery id; verification (high-S accepted or rejected); recovery and Ethereum's `ecrecover`; strict DER; BIP-340 |
+| `rsa/` | `rsa` | RSA signature verification only: RSASSA-PKCS1-v1_5 and PSS with SHA-256 (RS256, PS256), keys from JWK `n` / `e`, SubjectPublicKeyInfo or RSAPublicKey, 2048 to 4096 bits |
 | `curve25519/` | `field`, `scalar`, `edwards`, `ed25519`, `x25519` | Ed25519 (RFC 8032, cofactorless verification with S < L) and X25519 (RFC 7748, refusing the all-zero secret) |
 | `bip39/` | `wordlist`, `mnemonic` | entropy to words and back, constant-time word lookup, the seed (PBKDF2-HMAC-SHA512) |
 | `hd/` | `path`, `bip32`, `slip10` | derivation paths and BIP-44/49/84/86; BIP-32 with xprv / xpub (tprv, yprv, zprv); SLIP-10 for Ed25519, hardened only |
@@ -46,6 +47,7 @@ All from the standards or their reference suites; each fixture records its sourc
 | Source | Cases | Result |
 |---|---|---|
 | Wycheproof `ecdsa_secp256k1_sha256` (DER), `_p1363`, `_bitcoin` (low-S) | 476, 252, 464 | all as expected |
+| Wycheproof `rsa_signature_{2048,3072,4096}_sha256`, `rsa_pss_{2048,3072,4096}_sha256_mgf1_32`, `rsa_pss_2048_sha256_mgf1_0` | 776, 324, 103 | all as expected (3 "acceptable" DigestInfos without NULL refused, stated) |
 | Wycheproof `ed25519_test.json`, `x25519_test.json` | 210, 518 | all as expected (29 "acceptable" small-order keys accepted, stated) |
 | RFC 6979 A.2.5 (P-256 nonces), secp256k1 RFC 6979 signatures | 2 + 16 | pass |
 | RFC 8032 section 7.1, RFC 7748 sections 5.2 and 6.1 (1 and 1,000 iterations; 1,000,000 as a disabled test) | 5, 5 | pass |
@@ -76,6 +78,7 @@ listed in `tests/fixtures/README.md`.
 | ethers | 6.17.0 | keys, ECDSA, recovery, Ethereum ecrecover and addresses, BIP-39, BIP-32 (HDNodeWallet) |
 | OpenSSL, through Python cryptography 50.0.2 | 4.0.3 | ECDSA on secp256k1 (its RFC 6979 mode, s compared after low-S normalisation) and verification, DER, Ed25519, X25519 |
 | libsodium, through PyNaCl 1.6.2 | bundled (1.0.19 or later) | Ed25519, X25519 |
+| OpenSSL (through cryptography), Node's crypto, RustCrypto's rsa | 4.0.3, Node 26.13.1 (OpenSSL 3.5.9), 0.10.0 | RSA: PKCS#1 v1.5 signatures byte for byte, verdicts on mutated signatures and malformed encodings, PSS at salt lengths 0, 20, 32 and 64, SubjectPublicKeyInfo |
 | ed25519-dalek, x25519-dalek | 3.0.0, 3.0.0 | Ed25519 (`verify` and `verify_strict`), X25519 |
 | `@noble/curves` | 2.4.0 | Ed25519 (RFC 8032 and ZIP-215 modes), X25519 |
 | python-mnemonic (Trezor's BIP-39 reference) | 0.21 | BIP-39 words, entropy, seeds, non-canonical text |

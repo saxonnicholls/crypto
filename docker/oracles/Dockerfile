@@ -28,8 +28,8 @@ LABEL org.opencontainers.image.title="snicholls-crypto oracles" \
 ENV DEBIAN_FRONTEND=noninteractive
 ARG TARGETARCH
 
-RUN --mount=type=cache,target=/var/cache/apt \
-    --mount=type=cache,target=/var/lib/apt \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt-get update && \
     apt-get install -y --no-install-recommends \
       build-essential g++-13 clang-18 libclang-rt-18-dev \
@@ -107,8 +107,8 @@ ARG SECP256K1_VERSION=0.8.0
 ARG SECP256K1_SHA256=eb52b0e9239dff7dc26be5f9623567141b8720ec47da29eb3c1e0a660d17c8bb
 ARG SODIUM_VERSION=1.0.22
 ARG SODIUM_SHA256=adbdd8f16149e81ac6078a03aca6fc03b592b89ef7b5ed83841c086191be3349
-RUN --mount=type=cache,target=/var/cache/apt \
-    --mount=type=cache,target=/var/lib/apt \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt-get update && apt-get install -y --no-install-recommends libssl-dev && rm -rf /var/lib/apt/lists/* && \
     curl -fsSL -o /tmp/secp.tgz "https://github.com/bitcoin-core/secp256k1/archive/refs/tags/v${SECP256K1_VERSION}.tar.gz" && \
     echo "${SECP256K1_SHA256}  /tmp/secp.tgz" | sha256sum -c - && \

@@ -80,12 +80,41 @@ def ecdsa_secp256k1(data):
     return ["msg", "sig (key lines: key - uncompressed_public_key)"], lines
 
 
+def rsa(data):
+    """rsa_signature_*_sha256_test.json and rsa_pss_*_sha256_mgf1_*_test.json: a "key" line per group (the key as
+    SPKI DER, as a bare PKCS#1 RSAPublicKey, and as n and e; and the PSS salt length, '-' for PKCS#1 v1.5), then
+    its tests."""
+    lines = []
+    for g in data["testGroups"]:
+        assert g["sha"] == "SHA-256", g["sha"]
+        if g["type"] == "RsassaPssVerify":
+            assert g["mgf"] == "MGF1" and g["mgfSha"] == "SHA-256"
+            slen = str(g["sLen"])
+        else:
+            assert g["type"] == "RsassaPkcs1Verify", g["type"]
+            slen = "-"
+        k = g["publicKey"]
+        n = k["modulus"].lstrip("0") or "0"
+        n = ("0" + n) if len(n) % 2 else n
+        lines.append("key - %s %s %s %s %s" % (g["publicKeyDer"], g["publicKeyAsn"], n, k["publicExponent"], slen))
+        for t in g["tests"]:
+            lines.append("%d %s %s %s" % (t["tcId"], t["result"], field(t["msg"]), field(t["sig"])))
+    return ["msg", "sig (key lines: key - spki_der rsapublickey_der n e salt_length)"], lines
+
+
 CONVERTERS = {
     "ecdsa_secp256k1_sha256_bitcoin_test.json": ("ecdsa_secp256k1_sha256_bitcoin.txt", ecdsa_secp256k1),
     "ecdsa_secp256k1_sha256_p1363_test.json": ("ecdsa_secp256k1_sha256_p1363.txt", ecdsa_secp256k1),
     "ecdsa_secp256k1_sha256_test.json": ("ecdsa_secp256k1_sha256.txt", ecdsa_secp256k1),
     "ed25519_test.json": ("ed25519.txt", ed25519),
     "x25519_test.json": ("x25519.txt", x25519),
+    "rsa_signature_2048_sha256_test.json": ("rsa_pkcs1_2048_sha256.txt", rsa),
+    "rsa_signature_3072_sha256_test.json": ("rsa_pkcs1_3072_sha256.txt", rsa),
+    "rsa_signature_4096_sha256_test.json": ("rsa_pkcs1_4096_sha256.txt", rsa),
+    "rsa_pss_2048_sha256_mgf1_0_test.json": ("rsa_pss_2048_sha256_mgf1_0.txt", rsa),
+    "rsa_pss_2048_sha256_mgf1_32_test.json": ("rsa_pss_2048_sha256_mgf1_32.txt", rsa),
+    "rsa_pss_3072_sha256_mgf1_32_test.json": ("rsa_pss_3072_sha256_mgf1_32.txt", rsa),
+    "rsa_pss_4096_sha256_mgf1_32_test.json": ("rsa_pss_4096_sha256_mgf1_32.txt", rsa),
 }
 
 

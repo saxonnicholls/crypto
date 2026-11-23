@@ -23,11 +23,14 @@ add_executable(snicholls_crypto_tests
     curve25519/x25519_oracles_test.cpp
     detail/hashes_test.cpp
     detail/limbs_test.cpp
+    detail/montgomery_test.cpp
     hd/bip32_test.cpp
     hd/bip32_oracles_test.cpp
     hd/path_test.cpp
     hd/slip10_test.cpp
     hd/slip10_oracles_test.cpp
+    rsa/rsa_test.cpp
+    rsa/rsa_oracles_test.cpp
     secp256k1/ecdsa_test.cpp
     secp256k1/ecdsa_oracles_test.cpp
     secp256k1/field_test.cpp

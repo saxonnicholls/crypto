@@ -53,6 +53,27 @@ def main():
     n += write(out, "ed25519", [bytes([i % 64]) + b(r[0]) + bytes([min(len(b(r[1])), 200)]) + b(r[1])[:200] + bytes([i % 14, i % 14])
                                 for i, r in enumerate(rows("ed25519_sign.txt"))])
     n += write(out, "x25519", [bytes([i % 8]) + b(r[0]) + b(r[1]) + bytes([i % 14]) for i, r in enumerate(rows("x25519.txt"))])
+    rsa = []
+    for i, name in enumerate(["rsa_pkcs1_2048_sha256.txt", "rsa_pkcs1_3072_sha256.txt", "rsa_pkcs1_4096_sha256.txt",
+                              "rsa_pss_2048_sha256_mgf1_32.txt", "rsa_pss_3072_sha256_mgf1_32.txt", "rsa_pss_4096_sha256_mgf1_32.txt"]):
+        key = i % 3
+        pss = i >= 3
+        first = True
+        for line in open(os.path.join(ROOT, "tests", "fixtures", "wycheproof", name)):
+            f = line.split()
+            if not f or f[0].startswith("#") or f[0] == "key":
+                if f and f[0] == "key":
+                    if not first:
+                        break   # only the first group: the key the target uses
+                    first = False
+                continue
+            m = b"" if f[2] == "-" else b(f[2])
+            sig = b"" if f[3] == "-" else b(f[3])
+            if len(m) <= 64:
+                rsa.append(bytes([(1 if pss else 0) | 4]) + bytes([key]) + bytes([len(m)]) + m + sig)
+        key_line = next(l for l in open(os.path.join(ROOT, "tests", "fixtures", "wycheproof", name)) if l.startswith("key - "))
+        rsa.append(bytes([3]) + b(key_line.split()[2]))
+    n += write(out, "rsa", rsa)
     text = [b"\x00" + r[2].encode() for r in rows("base58check.txt") if r[0] == "ok" and r[2]]
     text += [b"\x01" + r[4].encode() for r in rows("segwit.txt") if r[0] == "ok"]
     text += [b"\x02" + r[1].replace("+", " ").encode() for r in rows("bip39.txt")]

@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased (0.2.0)
+
+- RSA signature verification (`rsa/rsa.hpp`): RSASSA-PKCS1-v1_5 and RSASSA-PSS with SHA-256 and MGF1-SHA-256
+  (JOSE's RS256 and PS256), with keys from components (a JWK's `n` and `e`), a SubjectPublicKeyInfo or an
+  RSAPublicKey in strict DER, moduli of 2048 to 4096 bits. Verification only, variable time on public data, no
+  allocation, `constexpr` (a whole RS256 verification is a `static_assert`). Montgomery arithmetic for a public
+  modulus in `detail/montgomery.hpp`.
+- Tests: every Wycheproof RSA PKCS#1 v1.5 and PSS SHA-256 case for 2048, 3072 and 4096 bits (1,203), each key read
+  three ways; oracle fixtures from OpenSSL, Node's crypto and RustCrypto's rsa; a fuzz target against OpenSSL.
+
 ## 0.1.1 (2026-11-23)
 
 Build fixes for the compilers of CI's first run; no change in behaviour. Pins snicholls-core at v0.21.0 and

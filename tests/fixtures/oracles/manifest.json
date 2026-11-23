@@ -126,6 +126,38 @@
         "ethers"
       ]
     },
+    "rsa_pkcs1_sign.txt": {
+      "cases": 240,
+      "oracles": [
+        "node_crypto",
+        "openssl",
+        "rsa_rs"
+      ]
+    },
+    "rsa_pkcs1_verify.txt": {
+      "cases": 960,
+      "oracles": [
+        "node_crypto",
+        "openssl",
+        "rsa_rs"
+      ]
+    },
+    "rsa_pss_verify.txt": {
+      "cases": 480,
+      "oracles": [
+        "node_crypto",
+        "openssl",
+        "rsa_rs"
+      ]
+    },
+    "rsa_spki.txt": {
+      "cases": 6,
+      "oracles": [
+        "node_crypto",
+        "openssl",
+        "rsa_rs"
+      ]
+    },
     "sec1_parse.txt": {
       "cases": 1717,
       "oracles": [
@@ -262,8 +294,13 @@
       "program": "node",
       "version": "2.4.0"
     },
+    "node_crypto": {
+      "answers": 1686,
+      "program": "node",
+      "version": "Node v26.13.1, OpenSSL 3.5.9"
+    },
     "openssl": {
-      "answers": 10790,
+      "answers": 12476,
       "program": "python",
       "version": "OpenSSL 4.0.3 29 Sep 2026 (cryptography 50.0.2)"
     },
@@ -271,6 +308,11 @@
       "answers": 2406,
       "program": "python",
       "version": "libsodium 1.0.19 or later, bundled (PyNaCl 1.6.2)"
+    },
+    "rsa_rs": {
+      "answers": 1686,
+      "program": "rust",
+      "version": "rsa 0.10.0"
     },
     "scure_bip39": {
       "answers": 1500,

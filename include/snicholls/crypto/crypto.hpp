@@ -25,6 +25,10 @@
 /// \ingroup crypto
 /// \brief The field and scalars of Curve25519, edwards25519, Ed25519 signatures and X25519 key agreement.
 
+/// \defgroup rsa RSA
+/// \ingroup crypto
+/// \brief RSA signature verification: RSASSA-PKCS1-v1_5 and RSASSA-PSS with SHA-256 (RS256, PS256).
+
 /// \defgroup wallet Wallets
 /// \ingroup crypto
 /// \brief BIP-39 mnemonics, BIP-32 and SLIP-10 derivation, and derivation paths.
@@ -49,6 +53,7 @@
 #include <snicholls/crypto/hd/bip32.hpp>
 #include <snicholls/crypto/hd/path.hpp>
 #include <snicholls/crypto/hd/slip10.hpp>
+#include <snicholls/crypto/rsa/rsa.hpp>
 #include <snicholls/crypto/secp256k1/ecdsa.hpp>
 #include <snicholls/crypto/secp256k1/field.hpp>
 #include <snicholls/crypto/secp256k1/keys.hpp>

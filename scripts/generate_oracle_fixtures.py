@@ -1154,6 +1154,195 @@ def gen_addresses(pool, fx):
 
 
 # ---------------------------------------------------------------------------------------------------------------
+# RSA: test keys made here from fixed seeds (they sign nothing but these fixtures), signatures and verdicts from the
+# oracles
+
+def is_probable_prime(n, rng):
+    if n < 2:
+        return False
+    for p in (2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37):
+        if n % p == 0:
+            return n == p
+    d, r = n - 1, 0
+    while d % 2 == 0:
+        d, r = d // 2, r + 1
+    for _ in range(40):
+        a = rng.randrange(2, n - 1)
+        x = pow(a, d, n)
+        if x in (1, n - 1):
+            continue
+        for _ in range(r - 1):
+            x = x * x % n
+            if x == n - 1:
+                break
+        else:
+            return False
+    return True
+
+
+def rsa_test_key(rng, bits, e=65537):
+    """A deterministic RSA key of exactly `bits` bits: two primes of bits/2 with their top two bits set."""
+    while True:
+        ps = []
+        while len(ps) < 2:
+            c = rng.getrandbits(bits // 2) | (3 << (bits // 2 - 2)) | 1
+            if (c - 1) % e and is_probable_prime(c, rng):
+                ps.append(c)
+        p, q = ps
+        n = p * q
+        if p != q and n.bit_length() == bits:
+            d = pow(e, -1, (p - 1) * (q - 1))
+            return {"n": n, "e": e, "d": d, "p": p, "q": q}
+
+
+def der_len(n):
+    return bytes([n]) if n < 0x80 else (bytes([0x81, n]) if n < 0x100 else bytes([0x82, n >> 8, n & 0xff]))
+
+
+def der(tag, body):
+    return bytes([tag]) + der_len(len(body)) + body
+
+
+def der_uint(v):
+    b = v.to_bytes((v.bit_length() + 7) // 8 or 1, "big")
+    return der(0x02, (b"\x00" + b) if b[0] & 0x80 else b)
+
+
+def rsa_spki(k):
+    rsapub = der(0x30, der_uint(k["n"]) + der_uint(k["e"]))
+    alg = der(0x30, der(0x06, bytes.fromhex("2a864886f70d010101")) + b"\x05\x00")
+    return der(0x30, alg + der(0x03, b"\x00" + rsapub)), rsapub
+
+
+SHA256_DIGEST_INFO = bytes.fromhex("3031300d060960864801650304020105000420")
+
+
+def rsa_raw_sign(k, em):
+    """s = EM^d mod n: an encoded message signed as it is, to make signatures over malformed encodings."""
+    size = (k["n"].bit_length() + 7) // 8
+    return pow(int.from_bytes(em, "big"), k["d"], k["n"]).to_bytes(size, "big")
+
+
+def pss_encode(m_hash, em_bits, salt):
+    em_len = (em_bits + 7) // 8
+    h = hashlib.sha256(b"\x00" * 8 + m_hash + salt).digest()
+    db = b"\x00" * (em_len - len(salt) - 32 - 2) + b"\x01" + salt
+    mask, counter = b"", 0
+    while len(mask) < len(db):
+        mask += hashlib.sha256(h + counter.to_bytes(4, "big")).digest()
+        counter += 1
+    masked = bytearray(x ^ y for x, y in zip(db, mask))
+    masked[0] &= 0xff >> (8 * em_len - em_bits)
+    return bytes(masked) + h + b"\xbc"
+
+
+def gen_rsa(pool, fx):
+    rng = random.Random("rsa keys v1")
+    keys = [rsa_test_key(rng, bits) for bits in (2048, 2048, 3072, 3072, 4096, 4096)]
+    hexn = lambda v: "%x" % v
+    evenhex = lambda v: hx(v.to_bytes((v.bit_length() + 7) // 8, "big"))
+    pub = lambda k: {"n": hexn(k["n"]), "e": hexn(k["e"])}
+    priv = lambda k: dict(pub(k), d=hexn(k["d"]), p=hexn(k["p"]), q=hexn(k["q"]))
+
+    # PKCS#1 v1.5 signatures: deterministic, so byte for byte across the oracles
+    cases = []
+    for k in keys:
+        for _ in range(40):
+            cases.append((k, hx(rand_bytes(rng, rng.choice([0, 1, 32, 100, 1000])))))
+    f = Fixture("rsa_pkcs1_sign.txt", "RSA PKCS#1 v1.5 signatures with SHA-256 (RS256), from deterministic test keys",
+                "SubjectPublicKeyInfo (DER), message, signature",
+                ["The keys are made by the generator from a fixed seed and sign nothing but these fixtures."])
+    answers = pool.ask("rsa_sign_pkcs1", [dict(priv(k), m=m) for k, m in cases])
+    signed = []
+    for (k, m), ans in zip(cases, answers):
+        v, libs = consensus(pool, f.name, {"n": hexn(k["n"]), "m": m}, ans, lambda lib, a: a["sig"])
+        if libs:
+            f.add([hx(rsa_spki(k)[0]), m or None, v], libs)
+            signed.append((k, m, v))
+    fx.append(f)
+
+    # Verification: real signatures and their mutations, and encodings that are not EMSA-PKCS1-v1_5, signed raw
+    vcases = []
+    for i, (k, m, sig) in enumerate(signed):
+        size = len(sig) // 2
+        mh = hashlib.sha256(bytes.fromhex(m)).digest()
+        vcases.append(("valid", k, m, sig))
+        b = bytearray(bytes.fromhex(sig))
+        b[rng.randrange(size)] ^= 1 << rng.randrange(8)
+        vcases.append(("bit flipped", k, m, hx(b)))
+        vcases.append(("another message", k, hx(bytes.fromhex(m) + b"\x00"), sig))
+        if i % 40 < 4:
+            n_bytes = k["n"].to_bytes(size, "big")
+            vcases.append(("s = n", k, m, hx(n_bytes)))
+            vcases.append(("one byte short", k, m, sig[2:]))
+            vcases.append(("one byte long", k, m, "00" + sig))
+            t = SHA256_DIGEST_INFO + mh
+            ps = size - len(t) - 3
+            crafted = {
+                "no NULL": b"\x00\x01" + b"\xff" * (ps + 2) + b"\x00" + bytes.fromhex("302f300b0609608648016503040201") + b"\x04\x20" + mh,
+                "block type 2": b"\x00\x02" + b"\xff" * ps + b"\x00" + t,
+                "a padding byte FE": b"\x00\x01" + b"\xff" * (ps // 2) + b"\xfe" + b"\xff" * (ps - ps // 2 - 1) + b"\x00" + t,
+                "short padding, data after": b"\x00\x01" + b"\xff" * 8 + b"\x00" + t + b"\x00" * (ps - 8),
+                "SHA-1 algorithm": b"\x00\x01" + b"\xff" * (ps + 1) + b"\x00" + bytes.fromhex("3021300906052b0e03021a05000414") + mh[:20] + b"\x00" * 0,
+                "no zero separator": b"\x00\x01" + b"\xff" * (ps + 1) + t,
+                "leading byte 01": b"\x01\x01" + b"\xff" * ps + b"\x00" + t,
+            }
+            for why, em in crafted.items():
+                em = em[:size].ljust(size, b"\x00") if len(em) != size else em
+                vcases.append((why, k, m, hx(rsa_raw_sign(k, em))))
+    f = Fixture("rsa_pkcs1_verify.txt", "RSA PKCS#1 v1.5 verification with SHA-256: valid, mutated and malformed encodings",
+                "case, n, e, message, signature, valid (1 or 0)",
+                ["Malformed encodings are signed raw with the test key, so only the encoding is wrong; every oracle must",
+                 "agree, and this library rebuilds the encoding and compares it whole."])
+    answers = pool.ask("rsa_verify_pkcs1", [dict(pub(k), m=m, sig=sig) for _, k, m, sig in vcases])
+    for (why, k, m, sig), ans in zip(vcases, answers):
+        v, libs = consensus(pool, f.name, {"why": why, "n": hexn(k["n"])[:16], "sig": sig[:16]}, ans,
+                            lambda lib, a: int(bool(a.get("valid"))))
+        if libs:
+            f.add([why.replace(" ", "_").replace(",", ""), evenhex(k["n"]), evenhex(k["e"]), m or None, sig, v], libs)
+    fx.append(f)
+
+    # PSS: encoded here with fixed salts (PSS signing is randomised), verified by every oracle
+    pcases = []
+    for k in keys:
+        size = (k["n"].bit_length() + 7) // 8
+        for j in range(20):
+            salt_len = [32, 0, 20, 64][j % 4]
+            m = rand_bytes(rng, rng.choice([0, 32, 200]))
+            salt = rand_bytes(rng, salt_len)
+            em = pss_encode(hashlib.sha256(m).digest(), k["n"].bit_length() - 1, salt)
+            sig = rsa_raw_sign(k, em.rjust(size, b"\x00"))
+            pcases.append(("valid", k, m, sig, salt_len))
+            b = bytearray(sig)
+            b[rng.randrange(size)] ^= 1 << rng.randrange(8)
+            pcases.append(("bit flipped", k, m, bytes(b), salt_len))
+            pcases.append(("another salt length", k, m, sig, 32 if salt_len != 32 else 20))
+            pcases.append(("another message", k, m + b"\x00", sig, salt_len))
+    f = Fixture("rsa_pss_verify.txt", "RSA PSS verification with SHA-256 and MGF1-SHA-256 (PS256 at salt length 32)",
+                "case, n, e, message, signature, salt length, valid (1 or 0)",
+                ["PSS signing is randomised, so the signatures are encoded here (RFC 8017 9.1.1) with fixed salts and",
+                 "signed raw with the test key; every oracle must verify them alike."])
+    answers = pool.ask("rsa_verify_pss", [dict(pub(k), m=hx(m), sig=hx(sig), salt=sl) for _, k, m, sig, sl in pcases])
+    for (why, k, m, sig, sl), ans in zip(pcases, answers):
+        v, libs = consensus(pool, f.name, {"why": why, "n": hexn(k["n"])[:16]}, ans, lambda lib, a: int(bool(a.get("valid"))))
+        if libs:
+            f.add([why.replace(" ", "_"), evenhex(k["n"]), evenhex(k["e"]), hx(m) or None, hx(sig), sl, v], libs)
+    fx.append(f)
+
+    # SubjectPublicKeyInfo: each oracle reads the generator's DER to the same n and e
+    f = Fixture("rsa_spki.txt", "RSA SubjectPublicKeyInfo (DER) to n and e", "DER, n, e")
+    spkis = [rsa_spki(k)[0] for k in keys]
+    answers = pool.ask("rsa_parse_spki", [{"der": hx(d)} for d in spkis])
+    for k, d, ans in zip(keys, spkis, answers):
+        v, libs = consensus(pool, f.name, {"n": hexn(k["n"])[:16]}, ans, lambda lib, a: refused_or(a, "n", "e"))
+        if libs:
+            if v != [hexn(k["n"]), hexn(k["e"])]:
+                fail(f.name, {"n": hexn(k["n"])[:16]}, "the oracles read another key")
+            f.add([hx(d), evenhex(k["n"]), evenhex(k["e"])], libs)
+    fx.append(f)
+
+
+# ---------------------------------------------------------------------------------------------------------------
 
 def generate():
     pool = Pool()
@@ -1169,6 +1358,7 @@ def generate():
         gen_bip39(pool, fx)
         gen_hd(pool, fx)
         gen_addresses(pool, fx)
+        gen_rsa(pool, fx)
         files = {f.name: f.text(pool) for f in fx}
         manifest = pool.manifest()
         manifest["fixtures"] = {f.name: {"cases": len(f.rows), "oracles": sorted(f.libs)} for f in fx}

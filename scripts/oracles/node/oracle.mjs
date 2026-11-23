@@ -16,6 +16,7 @@
 //      bitcoinjs         bip32 on tiny-secp256k1, bitcoinjs-lib addresses, bs58check
 //      scure_bip39       @scure/bip39
 //      ed25519_hd_key    ed25519-hd-key: SLIP-10 Ed25519
+//      node_crypto       Node's built-in crypto (its bundled OpenSSL): RSA PKCS#1 v1.5 and PSS, SPKI
 //
 
 import * as secp from "@noble/secp256k1";
@@ -30,6 +31,7 @@ import bs58check from "bs58check";
 import * as hdkey from "ed25519-hd-key";
 import { ethers } from "ethers";
 import * as ecc from "tiny-secp256k1";
+import { constants, createPrivateKey, createPublicKey, sign as cryptoSign, verify as cryptoVerify } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { createInterface } from "node:readline";
@@ -45,6 +47,18 @@ const bytes = (h) => Uint8Array.from(Buffer.from(h, "hex"));
 const pad = (n) => n.toString(16).padStart(64, "0");
 
 class Refused extends Error {}
+
+function rsaVerify(q, options) {
+  const b64 = (h) => Buffer.from(h.length % 2 ? "0" + h : h, "hex").toString("base64url");
+  const key = refuse(() => createPublicKey({ format: "jwk", key: { kty: "RSA", n: b64(q.n), e: b64(q.e) } }));
+  let valid;
+  try {
+    valid = cryptoVerify("sha256", bytes(q.m), { key, ...options }, bytes(q.sig));
+  } catch {
+    valid = false;
+  }
+  return { valid };
+}
 const refuse = (f) => {
   try {
     return f();
@@ -208,6 +222,38 @@ const LIBS = {
       },
     },
   },
+  node_crypto: {
+    name: "node",
+    ops: {
+      // RSA through Node's own crypto (its bundled OpenSSL): keys as JWK, hex fields from the request
+      rsa_sign_pkcs1: (q) => {
+        const b64 = (h) => Buffer.from(h.length % 2 ? "0" + h : h, "hex").toString("base64url");
+        const big = (h) => BigInt("0x" + h);
+        const hx = (v) => v.toString(16);
+        const p = big(q.p), qq = big(q.q), d = big(q.d);
+        const inv = (a, m) => {
+          let [r0, r1, s0, s1] = [a % m, m, 1n, 0n];
+          while (r1) { const t = r0 / r1; [r0, r1] = [r1, r0 - t * r1]; [s0, s1] = [s1, s0 - t * s1]; }
+          return ((s0 % m) + m) % m;
+        };
+        const key = createPrivateKey({
+          format: "jwk",
+          key: { kty: "RSA", n: b64(q.n), e: b64(q.e), d: b64(q.d), p: b64(q.p), q: b64(q.q),
+                 dp: b64(hx(d % (p - 1n))), dq: b64(hx(d % (qq - 1n))), qi: b64(hx(inv(qq, p))) },
+        });
+        return { sig: hex(cryptoSign("sha256", bytes(q.m), { key, padding: constants.RSA_PKCS1_PADDING })) };
+      },
+      rsa_verify_pkcs1: (q) => rsaVerify(q, { padding: constants.RSA_PKCS1_PADDING }),
+      rsa_verify_pss: (q) => rsaVerify(q, { padding: constants.RSA_PKCS1_PSS_PADDING, saltLength: q.salt }),
+      rsa_parse_spki: (q) => {
+        const k = refuse(() => createPublicKey({ key: Buffer.from(q.der, "hex"), format: "der", type: "spki" }));
+        if (k.asymmetricKeyType !== "rsa") throw new Refused("not RSA");
+        const j = k.export({ format: "jwk" });
+        const h = (x) => Buffer.from(x, "base64url").toString("hex").replace(/^0+/, "");
+        return { n: h(j.n), e: h(j.e) };
+      },
+    },
+  },
   scure_bip39: {
     name: "@scure/bip39",
     ops: {
@@ -230,8 +276,9 @@ const LIBS = {
 function answer(q) {
   if (q.op === "version") {
     const libs = {};
-    for (const [k, v] of Object.entries(LIBS)) libs[k] = { version: version(v.name), ops: Object.keys(v.ops) };
+    for (const [k, v] of Object.entries(LIBS)) libs[k] = { version: v.name === "node" ? "" : version(v.name), ops: Object.keys(v.ops) };
     libs.noble_secp256k1.version = version("@noble/secp256k1");
+    libs.node_crypto.version = `Node ${process.version}, OpenSSL ${process.versions.openssl}`;
     libs.bitcoinjs.version = `bitcoinjs-lib ${version("bitcoinjs-lib")}, bip32 ${version("bip32")}, ` +
       `tiny-secp256k1 ${version("tiny-secp256k1")}, bs58check ${version("bs58check")}`;
     return { oracle: "node", node: process.version, libs };

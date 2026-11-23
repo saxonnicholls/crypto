@@ -17,6 +17,13 @@ Project Wycheproof, <https://github.com/C2SP/wycheproof>, licensed under the Apa
 | `wycheproof/ecdsa_secp256k1_sha256.txt` | `ecdsa_secp256k1_sha256_test.json` (DER) | `43db761c0a2eae71fb0755d355d5130e28ce64a5b07846cf27e7072082597a81` | 476 |
 | `wycheproof/ecdsa_secp256k1_sha256_p1363.txt` | `ecdsa_secp256k1_sha256_p1363_test.json` | `7a339efc7134fb2495cd32afdbd692e0f86427d3c24e9073f6a7d858bb8788d2` | 252 |
 | `wycheproof/ecdsa_secp256k1_sha256_bitcoin.txt` | `ecdsa_secp256k1_sha256_bitcoin_test.json` (DER, low-S) | `d3729ce83ff9740c45e74921009a4061eff6c09185b8dd1225ccd06ac57048a4` | 464 |
+| `wycheproof/rsa_pkcs1_2048_sha256.txt` | `rsa_signature_2048_sha256_test.json` | `94a917b01ff50fb874cfc05bf29b4af44868d944a6558201cf18380da93fb393` | 259 |
+| `wycheproof/rsa_pkcs1_3072_sha256.txt` | `rsa_signature_3072_sha256_test.json` | `0f5f18cabfaad3e2792e82f7e9882f8999049b456714de924b8a5e202f61ca43` | 259 |
+| `wycheproof/rsa_pkcs1_4096_sha256.txt` | `rsa_signature_4096_sha256_test.json` | `957aca128e30bd02c8982f8ca482d6521d16683f4bbc3f193cdfd4c8f04bc667` | 258 |
+| `wycheproof/rsa_pss_2048_sha256_mgf1_0.txt` | `rsa_pss_2048_sha256_mgf1_0_test.json` | `b22a8d9a2e7e47f681d0ff1d1a55455daaf325d989c64ad005f848bd50b9b4c0` | 103 |
+| `wycheproof/rsa_pss_2048_sha256_mgf1_32.txt` | `rsa_pss_2048_sha256_mgf1_32_test.json` | `7f6efafc160f4816b96cbf1c12188a31051d7e3f001e27505d9edb5f2a0e325c` | 108 |
+| `wycheproof/rsa_pss_3072_sha256_mgf1_32.txt` | `rsa_pss_3072_sha256_mgf1_32_test.json` | `cca48433e6d1accb57f65b3396c4f4dd93c776467101c3f0948e74c283fd4749` | 108 |
+| `wycheproof/rsa_pss_4096_sha256_mgf1_32.txt` | `rsa_pss_4096_sha256_mgf1_32_test.json` | `e627cbf5139a01e0a446c4fe15911f6268224fdd3ef4a1eb714b3942b5686410` | 108 |
 
 Each line is `tcId result field ...` in hex, `-` for an empty field. `result` is Wycheproof's: `valid` must be
 accepted, `invalid` must be rejected, `acceptable` may go either way (each test states what this library does).
@@ -118,6 +125,9 @@ The differences found and stated (each in the fixture's header too):
 | BIP-39 text | python-mnemonic, ethers, @scure/bip39, bip39 crate | normalise case or whitespace first | canonical text only (CLAUDE.md rule 8); all agree on every canonical text and every checksum, word or length error |
 | BIP-32 | bip32 crate 0.6 | seeds of 16, 32 or 64 bytes only | any length from 16 to 64, as BIP-32 |
 | BIP-32, SLIP-10 | bitcoinjs bip32, ed25519-hd-key | no derivation along the empty path `m` | the master key |
+| RSA SubjectPublicKeyInfo (fuzzing) | OpenSSL 3.0.13 (`d2i_PUBKEY`) | reads an even modulus as a key | refuses it (`errc::invalid_public_key`) |
+| RSA SubjectPublicKeyInfo (fuzzing) | OpenSSL 3.0.13 (`d2i_PUBKEY`) | accepts rsaEncryption parameters other than NULL (RFC 3279 requires NULL) | refuses them |
+| RSA SubjectPublicKeyInfo (fuzzing) | OpenSSL 3.0.13 (`d2i_PUBKEY`) | reads an INTEGER with its top bit set (negative in DER) as its unsigned magnitude, for the modulus or exponent; OpenSSL 4.0 refuses it | refuses it |
 | Paths (fuzzing) | bip32 crate | reads the hardened marks `'` and `h`, not `H` | reads all three, as its grammar states |
 | base58check (fuzzing) | python base58 | strips trailing whitespace before decoding | refuses it |
 | Segwit | bitcoinjs-lib `fromBech32` | no check of the version range or program length | refuses, as the reference code and the bech32 crate do |

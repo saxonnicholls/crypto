@@ -17,6 +17,7 @@
 //      bech32_rs       the bech32 crate (rust-bitcoin): segwit addresses
 //      bs58_rs         bs58 with base58check
 //      slip10_rs       slip10_ed25519
+//      rsa_rs          RustCrypto's rsa: PKCS#1 v1.5 and PSS
 //
 
 use serde_json::{json, Map, Value};
@@ -296,6 +297,48 @@ fn bs58_op(op: &str, q: &Value) -> Option<Answer> {
 }
 
 // ---------------------------------------------------------------------------------------------------------------
+// RustCrypto's rsa: PKCS#1 v1.5 signing and verification, PSS verification, SPKI
+
+fn rsa_op(op: &str, q: &Value) -> Option<Answer> {
+    use rsa::sha2::{Digest, Sha256};
+    use rsa::{BoxedUint, Pkcs1v15Sign, PrivateKey, PublicKey, Pss};
+    let big = |k: &str| -> Result<BoxedUint, Refused> {
+        let mut h = text(q, k).to_string();
+        if h.len() % 2 == 1 {
+            h.insert(0, '0');
+        }
+        Ok(BoxedUint::from_be_slice_vartime(&hex::decode(h).map_err(r)?))
+    };
+    Some((|| -> Answer {
+        let hash = Sha256::digest(bytes(q, "m"));
+        match op {
+            "rsa_sign_pkcs1" => {
+                let key = PrivateKey::from_components(big("n")?, big("e")?, big("d")?, vec![big("p")?, big("q")?]).map_err(r)?;
+                Ok(json!({"sig": hex::encode(key.sign(Pkcs1v15Sign::new::<Sha256>(), &hash).map_err(r)?)}))
+            }
+            "rsa_verify_pkcs1" | "rsa_verify_pss" => {
+                let key = PublicKey::new(big("n")?, big("e")?).map_err(r)?;
+                let ok = if op == "rsa_verify_pkcs1" {
+                    key.verify(Pkcs1v15Sign::new::<Sha256>(), &hash, &bytes(q, "sig")).is_ok()
+                } else {
+                    let salt = q["salt"].as_u64().unwrap_or(32) as usize;
+                    key.verify(Pss::<Sha256>::new_with_salt(salt), &hash, &bytes(q, "sig")).is_ok()
+                };
+                Ok(json!({"valid": ok}))
+            }
+            "rsa_parse_spki" => {
+                use rsa::pkcs8::DecodePublicKey;
+                let key = PublicKey::from_public_key_der(&bytes(q, "der")).map_err(r)?;
+                use rsa::traits::PublicKeyParts;
+                Ok(json!({"n": hex::encode(key.n().to_be_bytes_trimmed_vartime()).trim_start_matches('0'),
+                          "e": hex::encode(key.e().to_be_bytes_trimmed_vartime()).trim_start_matches('0')}))
+            }
+            _ => Err(Refused("unsupported".into())),
+        }
+    })())
+}
+
+// ---------------------------------------------------------------------------------------------------------------
 
 type OpFn = fn(&str, &Value) -> Option<Answer>;
 
@@ -312,6 +355,7 @@ const LIBS: &[(&str, &str, OpFn, &[&str])] = &[
     ("slip10_rs", "slip10_ed25519 0.1.3", slip10_op, &["slip10_ed25519"]),
     ("bech32_rs", "bech32 0.12.0", bech32_op, &["segwit_encode", "segwit_decode"]),
     ("bs58_rs", "bs58 0.5.1", bs58_op, &["base58check_encode", "base58check_decode"]),
+    ("rsa_rs", "rsa 0.10.0", rsa_op, &["rsa_sign_pkcs1", "rsa_verify_pkcs1", "rsa_verify_pss", "rsa_parse_spki"]),
 ];
 
 fn answer(q: &Value) -> Value {
