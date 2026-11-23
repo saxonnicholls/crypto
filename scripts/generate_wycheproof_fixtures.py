@@ -70,14 +70,28 @@ def x25519(data):
 
 
 def aead(data):
-    """chacha20_poly1305_test.json, xchacha20_poly1305_test.json: one line per test, the nonce first."""
+    """chacha20_poly1305_test.json, xchacha20_poly1305_test.json, aes_gcm_test.json: one line per test, the nonce
+    first; groups with a key other than 256 bits or a tag other than 128 bits are left out (AES-128 and AES-192
+    are not in this library)."""
     lines = []
     for g in data["testGroups"]:
-        assert g["keySize"] == 256 and g["tagSize"] == 128
+        if g["keySize"] != 256 or g["tagSize"] != 128:
+            continue
         for t in g["tests"]:
             lines.append("%d %s %s %s %s %s %s %s" % (t["tcId"], t["result"], field(t["iv"]), t["key"], field(t["aad"]),
                                                     field(t["msg"]), field(t["ct"]), t["tag"]))
     return ["iv", "key", "aad", "msg", "ct", "tag"], lines
+
+
+def key_wrap(data):
+    """aes_wrap_test.json: the 256-bit key-encryption keys, one line per test."""
+    lines = []
+    for g in data["testGroups"]:
+        if g["keySize"] != 256:
+            continue
+        for t in g["tests"]:
+            lines.append("%d %s %s %s %s" % (t["tcId"], t["result"], t["key"], field(t["msg"]), field(t["ct"])))
+    return ["key", "msg", "ct"], lines
 
 
 def ecdsa_p256(data):
@@ -130,6 +144,8 @@ CONVERTERS = {
     "ecdsa_secp256k1_sha256_test.json": ("ecdsa_secp256k1_sha256.txt", ecdsa_secp256k1),
     "ed25519_test.json": ("ed25519.txt", ed25519),
     "x25519_test.json": ("x25519.txt", x25519),
+    "aes_gcm_test.json": ("aes256_gcm.txt", aead),
+    "aes_wrap_test.json": ("aes256_wrap.txt", key_wrap),
     "chacha20_poly1305_test.json": ("chacha20_poly1305.txt", aead),
     "xchacha20_poly1305_test.json": ("xchacha20_poly1305.txt", aead),
     "ecdsa_secp256r1_sha256_test.json": ("ecdsa_p256_sha256.txt", ecdsa_p256),

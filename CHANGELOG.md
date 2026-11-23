@@ -6,7 +6,11 @@
   with associated data, constant time in the key and the data, a constant-time tag check, output zeroed when the
   tag does not verify; in-place use; `constexpr`, no allocation. ChaCha20, HChaCha20 and Poly1305 in `detail/`.
   `errc::authentication_failed`. Keys from a secret: core's `hkdf`.
-- Tests: RFC 8439 and the XChaCha draft's vectors; all 640 Wycheproof ChaCha20-Poly1305 and XChaCha20-Poly1305
+- AES-256-GCM (`aead/aes256_gcm.hpp`, JWE's A256GCM) and AES-256 key wrap (`aead/aes_key_wrap.hpp`, RFC 3394,
+  A256KW): AES-256 without tables (`detail/aes.hpp`: the S-box computed as the GF(2^8) inverse and the affine map,
+  no memory index on a secret) and a masked GHASH. Slower than AES-NI, constant time.
+- Tests: RFC 8439 and the XChaCha draft's vectors; FIPS 197, the GCM specification and RFC 3394; all 640
+  Wycheproof ChaCha20-Poly1305 and XChaCha20-Poly1305 cases, its AES-256-GCM (96-bit nonces) and AES-256 key-wrap
   cases; oracle fixtures from OpenSSL, libsodium and Node's crypto; a fuzz target against libsodium; the secret
   paths in the Valgrind check.
 

@@ -22,6 +22,8 @@
 
 #define SNICHOLLS_CRYPTO_DECLASSIFY(pointer, size) VALGRIND_MAKE_MEM_DEFINED(pointer, size)
 
+#include <snicholls/crypto/aead/aes256_gcm.hpp>
+#include <snicholls/crypto/aead/aes_key_wrap.hpp>
 #include <snicholls/crypto/aead/chacha20_poly1305.hpp>
 #include <snicholls/crypto/bip39/mnemonic.hpp>
 #include <snicholls/crypto/curve25519/ed25519.hpp>
@@ -112,6 +114,29 @@ void aead_paths()
     make_public(back);
     make_public(msg);
     check(opened && back == msg, "XChaCha20-Poly1305 seal and open");
+
+    std::array<std::uint8_t, 12> n12{};
+    mark_secret(msg);
+    auto gtag = aead::aes256_gcm_seal(key, n12, {}, msg, ct).unwrap();
+    make_public(ct);
+    make_public(gtag);
+    const bool gopened = aead::aes256_gcm_open(key, n12, {}, ct, gtag, back).is_ok();
+    make_public(back);
+    make_public(msg);
+    check(gopened && back == msg, "AES-256-GCM seal and open (the computed S-box)");
+
+    std::array<std::uint8_t, 32> cek{};
+    for (std::size_t i = 0; i < cek.size(); ++i)
+        cek[i] = static_cast<std::uint8_t>(i);
+    mark_secret(cek);
+    std::array<std::uint8_t, 40> wrapped{};
+    std::array<std::uint8_t, 32> unwrapped{};
+    (void)aead::aes256_key_wrap(key, cek, wrapped);
+    make_public(wrapped);
+    const bool uw = aead::aes256_key_unwrap(key, wrapped, unwrapped).is_ok();
+    make_public(unwrapped);
+    make_public(cek);
+    check(uw && unwrapped == cek, "AES-256 key wrap and unwrap");
 }
 
 void p256_paths()

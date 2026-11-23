@@ -12,6 +12,9 @@
 
 #include <snicholls/crypto/aead/chacha20_poly1305.hpp>
 
+#include <snicholls/crypto/aead/aes256_gcm.hpp>
+
+#include <openssl/evp.h>
 #include <sodium.h>
 
 #include <vector>
@@ -31,6 +34,29 @@ extern "C" int LLVMFuzzerTestOneInput(const std::uint8_t* data, std::size_t size
     const auto n24 = in.take<24>();
     auto ad = in.take_upto(64);
     auto msg = in.rest();
+    if ((mode & 0x10) != 0) {   // AES-256-GCM against OpenSSL's EVP
+        std::vector<std::uint8_t> ours(msg.size());
+        const auto t = aead::aes256_gcm_seal(key, std::span<const std::uint8_t, 12>(n24.data(), 12), ad, msg, ours).unwrap();
+        EVP_CIPHER_CTX* c = EVP_CIPHER_CTX_new();
+        std::vector<std::uint8_t> theirs(msg.size() + 16);
+        int n = 0, m = 0;
+        EVP_EncryptInit_ex(c, EVP_aes_256_gcm(), nullptr, key.data(), n24.data());
+        EVP_EncryptUpdate(c, nullptr, &n, ad.data(), static_cast<int>(ad.size()));
+        EVP_EncryptUpdate(c, theirs.data(), &n, msg.data(), static_cast<int>(msg.size()));
+        EVP_EncryptFinal_ex(c, theirs.data() + n, &m);
+        std::array<std::uint8_t, 16> otag{};
+        EVP_CIPHER_CTX_ctrl(c, EVP_CTRL_GCM_GET_TAG, 16, otag.data());
+        EVP_CIPHER_CTX_free(c);
+        if (!std::equal(ours.begin(), ours.end(), theirs.begin()) || t != otag)
+            f::divergence(T, "AES-256-GCM seal: key " + f::hex(key) + " message " + f::hex(msg));
+        auto bad = t;
+        bad[mode % 16] ^= static_cast<std::uint8_t>((mode & 4) ? 1 : 0);
+        std::vector<std::uint8_t> out(ours.size());
+        const bool o = static_cast<bool>(aead::aes256_gcm_open(key, std::span<const std::uint8_t, 12>(n24.data(), 12), ad, ours, bad, out));
+        if (o != ((mode & 4) == 0))
+            f::divergence(T, "AES-256-GCM open verdict");
+        return 0;
+    }
     const bool x = mode & 1;
     const std::span<const std::uint8_t, 12> n12(n24.data(), 12);
 

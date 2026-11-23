@@ -273,6 +273,18 @@ const LIBS = {
       },
       rsa_verify_pkcs1: (q) => rsaVerify(q, { padding: constants.RSA_PKCS1_PADDING }),
       rsa_verify_pss: (q) => rsaVerify(q, { padding: constants.RSA_PKCS1_PSS_PADDING, saltLength: q.salt }),
+      gcm_seal: (q) => {
+        const c = createCipheriv("aes-256-gcm", bytes(q.k), bytes(q.n), { authTagLength: 16 });
+        c.setAAD(bytes(q.ad));
+        const ct = Buffer.concat([c.update(bytes(q.m)), c.final()]);
+        return { ct: hex(ct), tag: hex(c.getAuthTag()) };
+      },
+      gcm_open: (q) => {
+        const d = createDecipheriv("aes-256-gcm", bytes(q.k), bytes(q.n), { authTagLength: 16 });
+        d.setAAD(bytes(q.ad));
+        d.setAuthTag(bytes(q.tag));
+        return { m: hex(refuse(() => Buffer.concat([d.update(bytes(q.ct)), d.final()]))) };
+      },
       chacha_seal: (q) => {
         const c = createCipheriv("chacha20-poly1305", bytes(q.k), bytes(q.n), { authTagLength: 16 });
         c.setAAD(bytes(q.ad), { plaintextLength: q.m.length / 2 });

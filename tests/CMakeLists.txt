@@ -7,6 +7,9 @@ add_executable(snicholls_crypto_tests
     secret_test.cpp
     version_test.cpp
     address/base58_test.cpp
+    aead/aes256_gcm_test.cpp
+    aead/aes256_gcm_oracles_test.cpp
+    aead/aes_key_wrap_test.cpp
     aead/chacha20_poly1305_test.cpp
     aead/chacha20_poly1305_oracles_test.cpp
     address/base58check_test.cpp
@@ -24,6 +27,7 @@ add_executable(snicholls_crypto_tests
     curve25519/x25519_test.cpp
     curve25519/x25519_oracles_test.cpp
     detail/hashes_test.cpp
+    detail/aes_test.cpp
     detail/chacha20_test.cpp
     detail/ecdsa_der_test.cpp
     detail/limbs_test.cpp

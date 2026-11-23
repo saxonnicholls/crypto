@@ -208,10 +208,10 @@ def openssl_op(q):
             return {"valid": True}
         except InvalidSignature:
             return {"valid": False}
-    if op in ("chacha_seal", "chacha_open"):
-        from cryptography.hazmat.primitives.ciphers.aead import ChaCha20Poly1305
-        c = ChaCha20Poly1305(b(q["k"]))
-        if op == "chacha_seal":
+    if op in ("chacha_seal", "chacha_open", "gcm_seal", "gcm_open"):
+        from cryptography.hazmat.primitives.ciphers.aead import AESGCM, ChaCha20Poly1305
+        c = (ChaCha20Poly1305 if op.startswith("chacha") else AESGCM)(b(q["k"]))
+        if op.endswith("_seal"):
             out = c.encrypt(b(q["n"]), b(q["m"]), b(q["ad"]))
             return {"ct": h(out[:-16]), "tag": h(out[-16:])}
         try:
@@ -419,7 +419,7 @@ LIBS = {
                 (["ecdsa_sign"] if _deterministic_available() else []) +
                 ["ecdsa_verify", "ecdsa_verify_der", "ed25519_sign", "ed25519_verify", "x25519",
                  "rsa_sign_pkcs1", "rsa_verify_pkcs1", "rsa_verify_pss", "rsa_parse_spki",
-                 "p256_pub", "p256_sign", "p256_verify", "p256_pub_parse", "chacha_seal", "chacha_open"]),
+                 "p256_pub", "p256_sign", "p256_verify", "p256_pub_parse", "chacha_seal", "chacha_open", "gcm_seal", "gcm_open"]),
     "pynacl": (pynacl_op, lambda: "libsodium %s (PyNaCl %s)" % (_sodium_version(), nacl.__version__),
                ["ed25519_sign", "ed25519_verify", "x25519", "chacha_seal", "chacha_open", "xchacha_seal", "xchacha_open"]),
     "mnemonic": (mnemonic_op, lambda: mnemonic_lib.__version__ if hasattr(mnemonic_lib, "__version__") else "0.21",
