@@ -26,7 +26,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">snicholls-crypto<span id="projectnumber">&#160;0.1.1</span>
+   <div id="projectname">snicholls-crypto<span id="projectnumber">&#160;0.2.0</span>
    </div>
    <div id="projectbrief">Elliptic curves, signatures and wallet key derivation for the snicholls libraries</div>
   </td>
@@ -152,6 +152,7 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('functions_func
 <li>entropy_size()&#160;:&#160;<a class="el" href="classsnicholls_1_1crypto_1_1bip39_1_1mnemonic.html#a352e92f983dec0be5b23f16a45bb85b7">snicholls::crypto::bip39::mnemonic</a></li>
 <li>equal_mask()&#160;:&#160;<a class="el" href="classsnicholls_1_1crypto_1_1curve25519_1_1field__element.html#a2bad5532813b465cf89c5a0e83638e8c">snicholls::crypto::curve25519::field_element</a></li>
 <li>ethereum()&#160;:&#160;<a class="el" href="structsnicholls_1_1crypto_1_1secp256k1_1_1recoverable__signature.html#a8911e7379c7ecbd27b0a4e805b15a0fb">snicholls::crypto::secp256k1::recoverable_signature</a></li>
+<li>exponent()&#160;:&#160;<a class="el" href="classsnicholls_1_1crypto_1_1rsa_1_1public__key.html#ab02b4de8e01b65a12d11206b6db1a1bc">snicholls::crypto::rsa::public_key</a></li>
 <li>extended_private_key()&#160;:&#160;<a class="el" href="classsnicholls_1_1crypto_1_1hd_1_1extended__private__key.html#ae1f60f53eb74e885c56c57c9bb39d1c3">snicholls::crypto::hd::extended_private_key</a></li>
 </ul>
 
@@ -166,10 +167,13 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('functions_func
 <li>from_bytes_reduced()&#160;:&#160;<a class="el" href="classsnicholls_1_1crypto_1_1curve25519_1_1scalar.html#a99e62360c3310b3abba179b27c77f0d9">snicholls::crypto::curve25519::scalar</a>, <a class="el" href="classsnicholls_1_1crypto_1_1secp256k1_1_1scalar.html#a0d2563818ee8a0eddbe3de885de87121">snicholls::crypto::secp256k1::scalar</a></li>
 <li>from_canonical()&#160;:&#160;<a class="el" href="classsnicholls_1_1crypto_1_1curve25519_1_1scalar.html#abac69fa84809658e354f350b611dec30">snicholls::crypto::curve25519::scalar</a></li>
 <li>from_compact()&#160;:&#160;<a class="el" href="structsnicholls_1_1crypto_1_1secp256k1_1_1signature.html#ad4f7ee9e629f4aeab63523488f743925">snicholls::crypto::secp256k1::signature</a></li>
+<li>from_components()&#160;:&#160;<a class="el" href="classsnicholls_1_1crypto_1_1rsa_1_1public__key.html#ac59a6c400eec3654ef87a8dba7363ca0">snicholls::crypto::rsa::public_key</a></li>
 <li>from_der()&#160;:&#160;<a class="el" href="structsnicholls_1_1crypto_1_1secp256k1_1_1signature.html#aab223f36dc98b805a44d9099e5a45f74">snicholls::crypto::secp256k1::signature</a></li>
 <li>from_limbs()&#160;:&#160;<a class="el" href="classsnicholls_1_1crypto_1_1secp256k1_1_1field__element.html#abc14691054b5cad59cb2af31446a283c">snicholls::crypto::secp256k1::field_element</a></li>
+<li>from_pkcs1_der()&#160;:&#160;<a class="el" href="classsnicholls_1_1crypto_1_1rsa_1_1public__key.html#a3e124149ac5685b3d12d64cb926e76f2">snicholls::crypto::rsa::public_key</a></li>
 <li>from_secret()&#160;:&#160;<a class="el" href="classsnicholls_1_1crypto_1_1secp256k1_1_1private__key.html#ab5c353bdb1fbe5c270fbf786510e379c">snicholls::crypto::secp256k1::private_key</a></li>
 <li>from_seed()&#160;:&#160;<a class="el" href="classsnicholls_1_1crypto_1_1ed25519_1_1key__pair.html#acf45a50af5e50d75a4659eb4e033cc83">snicholls::crypto::ed25519::key_pair</a>, <a class="el" href="classsnicholls_1_1crypto_1_1hd_1_1extended__private__key.html#a6a1b9478e9817ed24f3f9021d2e6ba87">snicholls::crypto::hd::extended_private_key</a>, <a class="el" href="classsnicholls_1_1crypto_1_1hd_1_1slip10__ed25519__key.html#a5ad2fd46b984a6952a6242e1a7eee144">snicholls::crypto::hd::slip10_ed25519_key</a></li>
+<li>from_spki_der()&#160;:&#160;<a class="el" href="classsnicholls_1_1crypto_1_1rsa_1_1public__key.html#aa265a6054de0cf2dfc949cb6325e8d57">snicholls::crypto::rsa::public_key</a></li>
 <li>from_u64()&#160;:&#160;<a class="el" href="classsnicholls_1_1crypto_1_1curve25519_1_1field__element.html#a185a56717e9a80a034e6493d890fcaf5">snicholls::crypto::curve25519::field_element</a>, <a class="el" href="classsnicholls_1_1crypto_1_1curve25519_1_1scalar.html#ab1dc647856b4a154759ade0ce72fd538">snicholls::crypto::curve25519::scalar</a>, <a class="el" href="classsnicholls_1_1crypto_1_1secp256k1_1_1field__element.html#acb1b01e98b241e5dbb2c4d00a0ba5ddc">snicholls::crypto::secp256k1::field_element</a>, <a class="el" href="classsnicholls_1_1crypto_1_1secp256k1_1_1scalar.html#ac38eaa9e3c0d512e6a26930865eabfb3">snicholls::crypto::secp256k1::scalar</a></li>
 </ul>
 
@@ -208,6 +212,8 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('functions_func
 
 <h3 class="doxsection"><a id="index_m" name="index_m"></a>- m -</h3><ul>
 <li>mnemonic()&#160;:&#160;<a class="el" href="classsnicholls_1_1crypto_1_1bip39_1_1mnemonic.html#af19d3e36dcd867531c5c8c3839a5c6f1">snicholls::crypto::bip39::mnemonic</a></li>
+<li>modulus_bits()&#160;:&#160;<a class="el" href="classsnicholls_1_1crypto_1_1rsa_1_1public__key.html#a0cd9d881a1431565f613f61e914541d8">snicholls::crypto::rsa::public_key</a></li>
+<li>modulus_bytes()&#160;:&#160;<a class="el" href="classsnicholls_1_1crypto_1_1rsa_1_1public__key.html#af5d2785f6d338ad5410cb0d07abe1842">snicholls::crypto::rsa::public_key</a></li>
 <li>mul()&#160;:&#160;<a class="el" href="classsnicholls_1_1crypto_1_1curve25519_1_1point.html#a7304d582b781404049d3723df67c805e">snicholls::crypto::curve25519::point</a>, <a class="el" href="classsnicholls_1_1crypto_1_1secp256k1_1_1point.html#a0b5b61a4ddb7769bf38b3646a10eec0c">snicholls::crypto::secp256k1::point</a></li>
 <li>mul_add()&#160;:&#160;<a class="el" href="classsnicholls_1_1crypto_1_1curve25519_1_1scalar.html#a393798e75d596ad8e8b67b67e157b9b9">snicholls::crypto::curve25519::scalar</a></li>
 <li>mul_add_public()&#160;:&#160;<a class="el" href="classsnicholls_1_1crypto_1_1curve25519_1_1point.html#a29a70e559a92747b6b30c47fb80691a0">snicholls::crypto::curve25519::point</a>, <a class="el" href="classsnicholls_1_1crypto_1_1secp256k1_1_1point.html#a277d9fe011c38eed52c9dd9bf0bff5e1">snicholls::crypto::secp256k1::point</a></li>
@@ -224,6 +230,7 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('functions_func
 
 
 <h3 class="doxsection"><a id="index_o" name="index_o"></a>- o -</h3><ul>
+<li>open()&#160;:&#160;<a class="el" href="classsnicholls_1_1crypto_1_1rsa_1_1public__key.html#aa9d50d2da123be164bd1ef79ad2430ab">snicholls::crypto::rsa::public_key</a></li>
 <li>operator=()&#160;:&#160;<a class="el" href="classsnicholls_1_1crypto_1_1bip39_1_1mnemonic.html#a0d2e33b2f65d03147d7a0f447bb237d1">snicholls::crypto::bip39::mnemonic</a>, <a class="el" href="classsnicholls_1_1crypto_1_1hd_1_1extended__private__key.html#a792528872f19536e626229aff7172b52">snicholls::crypto::hd::extended_private_key</a>, <a class="el" href="classsnicholls_1_1crypto_1_1hd_1_1slip10__ed25519__key.html#a958a9dbc714af403fd55f249f5b66a7a">snicholls::crypto::hd::slip10_ed25519_key</a>, <a class="el" href="classsnicholls_1_1crypto_1_1secret__bytes.html#a8fc77faeef4845ecfe9518e3cf365300">snicholls::crypto::secret_bytes&lt; N &gt;</a></li>
 <li>operator[]()&#160;:&#160;<a class="el" href="classsnicholls_1_1crypto_1_1hd_1_1derivation__path.html#a7b7ba2405e3df609dab7e6f388761b2f">snicholls::crypto::hd::derivation_path</a></li>
 <li>order_bytes()&#160;:&#160;<a class="el" href="classsnicholls_1_1crypto_1_1secp256k1_1_1scalar.html#a1d245c296ef422248a56ceff074e7aee">snicholls::crypto::secp256k1::scalar</a></li>

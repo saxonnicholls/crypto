@@ -27,6 +27,9 @@ var annotated_dup =
           [ "key_versions", "structsnicholls_1_1crypto_1_1hd_1_1key__versions.html", "structsnicholls_1_1crypto_1_1hd_1_1key__versions" ],
           [ "slip10_ed25519_key", "classsnicholls_1_1crypto_1_1hd_1_1slip10__ed25519__key.html", "classsnicholls_1_1crypto_1_1hd_1_1slip10__ed25519__key" ]
         ] ],
+        [ "rsa", "namespacesnicholls_1_1crypto_1_1rsa.html", [
+          [ "public_key", "classsnicholls_1_1crypto_1_1rsa_1_1public__key.html", "classsnicholls_1_1crypto_1_1rsa_1_1public__key" ]
+        ] ],
         [ "secp256k1", "namespacesnicholls_1_1crypto_1_1secp256k1.html", [
           [ "affine_point", "structsnicholls_1_1crypto_1_1secp256k1_1_1affine__point.html", "structsnicholls_1_1crypto_1_1secp256k1_1_1affine__point" ],
           [ "field_element", "classsnicholls_1_1crypto_1_1secp256k1_1_1field__element.html", "classsnicholls_1_1crypto_1_1secp256k1_1_1field__element" ],

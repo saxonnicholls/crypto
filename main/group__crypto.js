@@ -3,6 +3,7 @@ var group__crypto =
     [ "secp256k1", "group__secp256k1.html", "group__secp256k1" ],
     [ "Addresses", "group__address.html", "group__address" ],
     [ "Curve25519", "group__curve25519.html", "group__curve25519" ],
+    [ "RSA", "group__rsa.html", "group__rsa" ],
     [ "Wallets", "group__wallet.html", "group__wallet" ],
     [ "constant_time.hpp", "constant__time_8hpp.html", null ],
     [ "crypto.hpp", "crypto_8hpp.html", null ],

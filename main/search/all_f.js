@@ -11,5 +11,7 @@ var searchData=
   ['reveal_8',['reveal',['../classsnicholls_1_1crypto_1_1secp256k1_1_1private__key.html#a25f871e799cfa3115111a255dfe6a6fe',1,'snicholls::crypto::secp256k1::private_key::reveal()'],['../classsnicholls_1_1crypto_1_1secret__bytes.html#a294731b2f5a603bcf724b4675934a711',1,'snicholls::crypto::secret_bytes::reveal() const noexcept']]],
   ['reveal_5fmutable_9',['reveal_mutable',['../classsnicholls_1_1crypto_1_1secret__bytes.html#af00215e26f720893561b037b0bbb4387',1,'snicholls::crypto::secret_bytes']]],
   ['rfc6979_10',['rfc6979',['../classsnicholls_1_1crypto_1_1secp256k1_1_1rfc6979.html',1,'snicholls::crypto::secp256k1::rfc6979'],['../classsnicholls_1_1crypto_1_1secp256k1_1_1rfc6979.html#aa064be14d9cb97c490c8439167f18a63',1,'snicholls::crypto::secp256k1::rfc6979::rfc6979()']]],
-  ['rfc6979_2ehpp_11',['rfc6979.hpp',['../rfc6979_8hpp.html',1,'']]]
+  ['rfc6979_2ehpp_11',['rfc6979.hpp',['../rfc6979_8hpp.html',1,'']]],
+  ['rsa_12',['RSA',['../group__rsa.html',1,'']]],
+  ['rsa_2ehpp_13',['rsa.hpp',['../rsa_8hpp.html',1,'']]]
 ];

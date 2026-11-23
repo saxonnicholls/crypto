@@ -4,6 +4,7 @@ var dir_e640b4835ac9da1ad5a0ff265cb85ec2 =
     [ "bip39", "dir_323d9dcd85b1acc0d1055cca7cd45f91.html", "dir_323d9dcd85b1acc0d1055cca7cd45f91" ],
     [ "curve25519", "dir_d2e7d9ecc5e355351d89bcde468f4602.html", "dir_d2e7d9ecc5e355351d89bcde468f4602" ],
     [ "hd", "dir_3b6f9e86862f58b58a08fcb1467e7f8d.html", "dir_3b6f9e86862f58b58a08fcb1467e7f8d" ],
+    [ "rsa", "dir_c29bb2ec8c85a2565e5daf2ba5d43a77.html", "dir_c29bb2ec8c85a2565e5daf2ba5d43a77" ],
     [ "secp256k1", "dir_afc772d580e723965230b12d50aaca5d.html", "dir_afc772d580e723965230b12d50aaca5d" ],
     [ "constant_time.hpp", "constant__time_8hpp.html", "constant__time_8hpp" ],
     [ "crypto.hpp", "crypto_8hpp.html", null ],

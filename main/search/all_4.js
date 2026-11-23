@@ -13,7 +13,8 @@ var searchData=
   ['errc_10',['errc',['../group__crypto.html#gaa314007c5b3658974966bfdaeb2c3625',1,'snicholls::crypto']]],
   ['error_2ehpp_11',['error.hpp',['../error_8hpp.html',1,'']]],
   ['ethereum_12',['ethereum',['../structsnicholls_1_1crypto_1_1secp256k1_1_1recoverable__signature.html#a8911e7379c7ecbd27b0a4e805b15a0fb',1,'snicholls::crypto::secp256k1::recoverable_signature::ethereum()'],['../namespacesnicholls_1_1crypto_1_1hd_1_1coin__type.html#a18da3adf1c131ac1561ebd1a3f0c4ef4',1,'snicholls::crypto::hd::coin_type::ethereum']]],
-  ['extended_5fkey_5ftext_13',['extended_key_text',['../namespacesnicholls_1_1crypto_1_1hd.html#ac9690f351937084a2a798f1e574bfff6',1,'snicholls::crypto::hd']]],
-  ['extended_5fprivate_5fkey_14',['extended_private_key',['../classsnicholls_1_1crypto_1_1hd_1_1extended__private__key.html',1,'snicholls::crypto::hd::extended_private_key'],['../classsnicholls_1_1crypto_1_1hd_1_1extended__private__key.html#ae1f60f53eb74e885c56c57c9bb39d1c3',1,'snicholls::crypto::hd::extended_private_key::extended_private_key()']]],
-  ['extended_5fpublic_5fkey_15',['extended_public_key',['../structsnicholls_1_1crypto_1_1hd_1_1extended__public__key.html',1,'snicholls::crypto::hd']]]
+  ['exponent_13',['exponent',['../classsnicholls_1_1crypto_1_1rsa_1_1public__key.html#ab02b4de8e01b65a12d11206b6db1a1bc',1,'snicholls::crypto::rsa::public_key']]],
+  ['extended_5fkey_5ftext_14',['extended_key_text',['../namespacesnicholls_1_1crypto_1_1hd.html#ac9690f351937084a2a798f1e574bfff6',1,'snicholls::crypto::hd']]],
+  ['extended_5fprivate_5fkey_15',['extended_private_key',['../classsnicholls_1_1crypto_1_1hd_1_1extended__private__key.html',1,'snicholls::crypto::hd::extended_private_key'],['../classsnicholls_1_1crypto_1_1hd_1_1extended__private__key.html#ae1f60f53eb74e885c56c57c9bb39d1c3',1,'snicholls::crypto::hd::extended_private_key::extended_private_key()']]],
+  ['extended_5fpublic_5fkey_16',['extended_public_key',['../structsnicholls_1_1crypto_1_1hd_1_1extended__public__key.html',1,'snicholls::crypto::hd']]]
 ];
