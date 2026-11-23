@@ -1343,6 +1343,98 @@ def gen_rsa(pool, fx):
 
 
 # ---------------------------------------------------------------------------------------------------------------
+# P-256
+
+P256_P = 2**256 - 2**224 + 2**192 + 2**96 - 1
+P256_N = 0xFFFFFFFF00000000FFFFFFFFFFFFFFFFBCE6FAADA7179E84F3B9CAC2FC632551
+P256_B = 0x5AC635D8AA3A93E7B3EBBD55769886BC651D06B0CC53B0F63BCE3C3E27D2604B
+
+
+def gen_p256(pool, fx):
+    rng = random.Random("p256 v1")
+    edges = [0, 1, 2, P256_N - 1, P256_N, P256_N + 1, 2**256 - 1]
+    keys = [i32(k) for k in edges] + [hx(rand_bytes(rng, 32)) for _ in range(500)]
+    f = Fixture("p256_keys.txt", "P-256 private keys to public keys (SEC1)",
+                "private key, compressed, uncompressed ('-' '-': refused, 0 or at or above n)")
+    answers = pool.ask("p256_pub", [{"sk": k} for k in keys])
+    good = []
+    for k, ans in zip(keys, answers):
+        v, libs = consensus(pool, f.name, {"sk": k}, ans, lambda lib, a: refused_or(a, "c", "u"))
+        if libs:
+            f.add([k] + (v or [None, None]), libs)
+            if v:
+                good.append((k, v[0], v[1]))
+    fx.append(f)
+
+    # Signatures: RFC 6979 with SHA-256, s as computed (no low-S), byte for byte across OpenSSL, noble and p256
+    cases = []
+    for i, (k, c, u) in enumerate(good[:500]):
+        m = rand_bytes(rng, rng.choice([0, 1, 32, 100]))
+        cases.append({"sk": k, "m": hx(m), "h": hx(hashlib.sha256(m).digest())})
+    f = Fixture("p256_sign.txt", "P-256 ECDSA signatures (ES256): RFC 6979 nonces with SHA-256, s as computed",
+                "private key, message, SHA-256 of the message, r, s")
+    answers = pool.ask("p256_sign", [{"sk": c["sk"], "h": c["h"]} for c in cases])
+    signed = []
+    pub_of = {k: (c, u) for k, c, u in good}
+    for case, ans in zip(cases, answers):
+        v, libs = consensus(pool, f.name, case, ans, lambda lib, a: [a["r"], a["s"]])
+        if libs:
+            f.add([case["sk"], case["m"] or None, case["h"], v[0], v[1]], libs)
+            signed.append((case, v[0], v[1]))
+    fx.append(f)
+
+    # Verification, every oracle (Node's crypto hashes the message itself)
+    vcases = []
+    for i, (case, r, s_) in enumerate(signed[:400]):
+        c, u = pub_of[case["sk"]]
+        pub = u if i % 2 else c
+        ri, si = int(r, 16), int(s_, 16)
+        def add(why, pub_, m, h, rr, ss):
+            vcases.append({"why": why, "pub": pub_, "m": m, "h": h, "sig": i32(rr % 2**256) + i32(ss % 2**256)})
+        add("valid", pub, case["m"], case["h"], ri, si)
+        add("n - s", pub, case["m"], case["h"], ri, P256_N - si)   # either s verifies
+        add("r bit flipped", pub, case["m"], case["h"], ri ^ (1 << rng.randrange(256)), si)
+        add("s bit flipped", pub, case["m"], case["h"], ri, si ^ (1 << rng.randrange(256)))
+        m2 = case["m"] + "00"
+        add("another message", pub, m2, hx(hashlib.sha256(bytes.fromhex(m2)).digest()), ri, si)
+        add("another key", good[(i + 1) % len(good)][2], case["m"], case["h"], ri, si)
+        if i < 20:
+            for rr, ss, why in ((0, si, "r = 0"), (ri, 0, "s = 0"), (P256_N, si, "r = n"), (ri, P256_N, "s = n"),
+                                (ri + P256_N, si, "r + n"), (ri, 2**256 - 1, "s = 2^256 - 1")):
+                add(why, pub, case["m"], case["h"], rr, ss)
+    f = Fixture("p256_verify.txt", "P-256 ECDSA verification (either s accepted)",
+                "case, public key (SEC1), message, SHA-256, r || s, valid (1 or 0)",
+                ["Node's crypto verifies the message (it hashes it) with uncompressed keys only; the others verify the hash."])
+    answers = pool.ask("p256_verify", [{k: c[k] for k in ("pub", "m", "h", "sig")} for c in vcases])
+    for case, ans in zip(vcases, answers):
+        v, libs = consensus(pool, f.name, {"why": case["why"], "sig": case["sig"][:16]}, ans,
+                            lambda lib, a: int(bool(a.get("valid"))))
+        if libs:
+            f.add([case["why"].replace(" ", "_"), case["pub"], case["m"] or None, case["h"], case["sig"], v], libs)
+    fx.append(f)
+
+    # SEC1 parsing
+    pcases = []
+    for k, c, u in good[:200]:
+        x, y = int(u[2:66], 16), int(u[66:], 16)
+        pcases += [c, u, "04" + i32(x) + i32((y + 1) % P256_P), "%02x" % (6 + (y & 1)) + u[2:]]
+    for _ in range(100):
+        pcases.append(rng.choice(["02", "03"]) + hx(rand_bytes(rng, 32)))
+    for x in (P256_P, P256_P + 1, 2**256 - 1, 0):
+        pcases += ["02" + i32(x), "03" + i32(x)]
+    pcases += ["00", "04"]
+    f = Fixture("p256_sec1.txt", "P-256 SEC1 public-key parsing", "encoding, compressed form ('-': refused)",
+                ["Every oracle and this library refuse the hybrid form (0x06, 0x07), points off the curve and x or y",
+                 "at or above p."])
+    answers = pool.ask("p256_pub_parse", [{"pub": c} for c in pcases])
+    for c, ans in zip(pcases, answers):
+        v, libs = consensus(pool, f.name, {"pub": c}, ans, lambda lib, a: refused_or(a, "c"))
+        if libs:
+            f.add([c, v[0] if v else None], libs)
+    fx.append(f)
+
+
+# ---------------------------------------------------------------------------------------------------------------
 
 def generate():
     pool = Pool()
@@ -1359,6 +1451,7 @@ def generate():
         gen_hd(pool, fx)
         gen_addresses(pool, fx)
         gen_rsa(pool, fx)
+        gen_p256(pool, fx)
         files = {f.name: f.text(pool) for f in fx}
         manifest = pool.manifest()
         manifest["fixtures"] = {f.name: {"cases": len(f.rows), "oracles": sorted(f.libs)} for f in fx}

@@ -18,6 +18,7 @@
 //      bs58_rs         bs58 with base58check
 //      slip10_rs       slip10_ed25519
 //      rsa_rs          RustCrypto's rsa: PKCS#1 v1.5 and PSS
+//      p256_rs         RustCrypto's p256: ECDSA on P-256
 //
 
 use serde_json::{json, Map, Value};
@@ -297,6 +298,39 @@ fn bs58_op(op: &str, q: &Value) -> Option<Answer> {
 }
 
 // ---------------------------------------------------------------------------------------------------------------
+// RustCrypto's p256
+
+fn p256_op(op: &str, q: &Value) -> Option<Answer> {
+    use p256::ecdsa::signature::hazmat::{PrehashSigner, PrehashVerifier};
+    use p256::ecdsa::{Signature, SigningKey, VerifyingKey};
+    Some((|| -> Answer {
+        match op {
+            "p256_pub" => {
+                let sk = SigningKey::from_slice(&bytes(q, "sk")).map_err(r)?;
+                let vk = sk.verifying_key();
+                Ok(json!({"c": hex::encode(vk.to_sec1_point(true).as_bytes()), "u": hex::encode(vk.to_sec1_point(false).as_bytes())}))
+            }
+            "p256_sign" => {
+                let sk = SigningKey::from_slice(&bytes(q, "sk")).map_err(r)?;
+                let sig: Signature = sk.sign_prehash(&bytes(q, "h")).map_err(r)?;
+                let rs = sig.to_bytes();
+                Ok(json!({"r": hex::encode(&rs[..32]), "s": hex::encode(&rs[32..])}))
+            }
+            "p256_pub_parse" => {
+                let vk = VerifyingKey::from_sec1_bytes(&bytes(q, "pub")).map_err(r)?;
+                Ok(json!({"c": hex::encode(vk.to_sec1_point(true).as_bytes())}))
+            }
+            "p256_verify" => {
+                let vk = VerifyingKey::from_sec1_bytes(&bytes(q, "pub")).map_err(r)?;
+                let Ok(sig) = Signature::from_slice(&bytes(q, "sig")) else { return Ok(json!({"valid": false})) };
+                Ok(json!({"valid": vk.verify_prehash(&bytes(q, "h"), &sig).is_ok()}))
+            }
+            _ => Err(Refused("unsupported".into())),
+        }
+    })())
+}
+
+// ---------------------------------------------------------------------------------------------------------------
 // RustCrypto's rsa: PKCS#1 v1.5 signing and verification, PSS verification, SPKI
 
 fn rsa_op(op: &str, q: &Value) -> Option<Answer> {
@@ -355,6 +389,7 @@ const LIBS: &[(&str, &str, OpFn, &[&str])] = &[
     ("slip10_rs", "slip10_ed25519 0.1.3", slip10_op, &["slip10_ed25519"]),
     ("bech32_rs", "bech32 0.12.0", bech32_op, &["segwit_encode", "segwit_decode"]),
     ("bs58_rs", "bs58 0.5.1", bs58_op, &["base58check_encode", "base58check_decode"]),
+    ("p256_rs", "p256 0.14.0", p256_op, &["p256_pub", "p256_sign", "p256_verify", "p256_pub_parse"]),
     ("rsa_rs", "rsa 0.10.0", rsa_op, &["rsa_sign_pkcs1", "rsa_verify_pkcs1", "rsa_verify_pss", "rsa_parse_spki"]),
 ];
 

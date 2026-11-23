@@ -47,7 +47,7 @@
 /// \brief Major version of snicholls-crypto.
 #define SNICHOLLS_CRYPTO_VERSION_MAJOR 0
 /// \brief Minor version of snicholls-crypto.
-#define SNICHOLLS_CRYPTO_VERSION_MINOR 2
+#define SNICHOLLS_CRYPTO_VERSION_MINOR 3
 /// \brief Patch version of snicholls-crypto.
 #define SNICHOLLS_CRYPTO_VERSION_PATCH 0
 

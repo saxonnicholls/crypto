@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.3.0 (2026-11-24)
+
+P-256 (ES256). Pins snicholls-core at v0.22.0. Experimental and not independently audited.
+
+- P-256 (`p256/`): the field and scalars in Montgomery form on four 64-bit limbs (`detail/mont256.hpp`, constant
+  time), points with Renes, Costello and Batina's complete addition for a = -3, keys and SEC1, ECDSA with SHA-256
+  (ES256) with RFC 6979 nonces, constant time in the key and the nonce, verification, JOSE's r || s and DER
+  (`detail/ecdsa_der.hpp`). `constexpr` throughout: an RFC 6979 signature is a `static_assert`.
+- Tests: RFC 6979 A.2.5 (P-256, SHA-256) byte for byte; every Wycheproof `ecdsa_secp256r1_sha256` case, DER and
+  P1363; oracle fixtures from OpenSSL, noble-curves, RustCrypto's p256 and Node's crypto; the secret paths in the
+  Valgrind check; a fuzz target against OpenSSL.
+
 ## 0.2.0 (2026-11-24)
 
 RSA signature verification, and snicholls-core v0.22.0 (required at 0.17.0 or later). Experimental and not

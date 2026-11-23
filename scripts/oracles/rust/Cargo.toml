@@ -17,6 +17,7 @@ bip39 = "=3.0.0"
 bech32 = "=0.12.0"
 bs58 = { version = "=0.5.1", features = ["check"] }
 slip10_ed25519 = "=0.1.3"
+p256 = { version = "=0.14.0", features = ["ecdsa"] }
 rsa = { version = "=0.10.0", features = ["encoding", "pkcs1v15"] }
 serde_json = "=1.0.154"
 hex = "=0.4.3"

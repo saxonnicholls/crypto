@@ -126,6 +126,39 @@
         "ethers"
       ]
     },
+    "p256_keys.txt": {
+      "cases": 507,
+      "oracles": [
+        "noble_p256",
+        "openssl",
+        "p256_rs"
+      ]
+    },
+    "p256_sec1.txt": {
+      "cases": 910,
+      "oracles": [
+        "noble_p256",
+        "openssl",
+        "p256_rs"
+      ]
+    },
+    "p256_sign.txt": {
+      "cases": 500,
+      "oracles": [
+        "noble_p256",
+        "openssl",
+        "p256_rs"
+      ]
+    },
+    "p256_verify.txt": {
+      "cases": 2520,
+      "oracles": [
+        "noble_p256",
+        "node_crypto",
+        "openssl",
+        "p256_rs"
+      ]
+    },
     "rsa_pkcs1_sign.txt": {
       "cases": 240,
       "oracles": [
@@ -279,6 +312,11 @@
       "program": "node",
       "version": "2.4.0"
     },
+    "noble_p256": {
+      "answers": 4437,
+      "program": "node",
+      "version": "2.4.0"
+    },
     "noble_secp256k1": {
       "answers": 15842,
       "program": "node",
@@ -295,14 +333,19 @@
       "version": "2.4.0"
     },
     "node_crypto": {
-      "answers": 1686,
+      "answers": 3146,
       "program": "node",
       "version": "Node v26.13.1, OpenSSL 3.5.9"
     },
     "openssl": {
-      "answers": 12476,
+      "answers": 16913,
       "program": "python",
       "version": "OpenSSL 4.0.3 29 Sep 2026 (cryptography 50.0.2)"
+    },
+    "p256_rs": {
+      "answers": 4437,
+      "program": "rust",
+      "version": "p256 0.14.0"
     },
     "pynacl": {
       "answers": 2406,

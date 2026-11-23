@@ -208,6 +208,37 @@ def openssl_op(q):
             return {"valid": True}
         except InvalidSignature:
             return {"valid": False}
+    if op == "p256_pub":
+        try:
+            k = ec.derive_private_key(int(q["sk"], 16), ec.SECP256R1())
+        except Exception as e:
+            raise Refused(str(e))
+        pub = k.public_key()
+        return {"c": h(pub.public_bytes(serialization.Encoding.X962, serialization.PublicFormat.CompressedPoint)),
+                "u": h(pub.public_bytes(serialization.Encoding.X962, serialization.PublicFormat.UncompressedPoint))}
+    if op == "p256_sign":
+        k = ec.derive_private_key(int(q["sk"], 16), ec.SECP256R1())
+        der = k.sign(b(q["h"]), ec.ECDSA(asym_utils.Prehashed(hashes.SHA256()), deterministic_signing=True))
+        r, s = asym_utils.decode_dss_signature(der)
+        return {"r": "%064x" % r, "s": "%064x" % s}
+    if op == "p256_pub_parse":
+        try:
+            pub = ec.EllipticCurvePublicKey.from_encoded_point(ec.SECP256R1(), b(q["pub"]))
+        except Exception as e:
+            raise Refused(str(e))
+        return {"c": h(pub.public_bytes(serialization.Encoding.X962, serialization.PublicFormat.CompressedPoint))}
+    if op == "p256_verify":
+        try:
+            pub = ec.EllipticCurvePublicKey.from_encoded_point(ec.SECP256R1(), b(q["pub"]))
+        except Exception as e:
+            raise Refused(str(e))
+        rs = b(q["sig"])
+        try:
+            pub.verify(asym_utils.encode_dss_signature(int.from_bytes(rs[:32], "big"), int.from_bytes(rs[32:], "big")),
+                       b(q["h"]), ec.ECDSA(asym_utils.Prehashed(hashes.SHA256())))
+            return {"valid": True}
+        except InvalidSignature:
+            return {"valid": False}
     if op in ("rsa_verify_pkcs1", "rsa_verify_pss"):
         try:
             pub = rsa_lib.RSAPublicNumbers(int(q["e"], 16), int(q["n"], 16)).public_key()
@@ -363,7 +394,8 @@ LIBS = {
     "openssl": (openssl_op, lambda: "%s (cryptography %s)" % (_openssl_version(), cryptography.__version__),
                 (["ecdsa_sign"] if _deterministic_available() else []) +
                 ["ecdsa_verify", "ecdsa_verify_der", "ed25519_sign", "ed25519_verify", "x25519",
-                 "rsa_sign_pkcs1", "rsa_verify_pkcs1", "rsa_verify_pss", "rsa_parse_spki"]),
+                 "rsa_sign_pkcs1", "rsa_verify_pkcs1", "rsa_verify_pss", "rsa_parse_spki",
+                 "p256_pub", "p256_sign", "p256_verify", "p256_pub_parse"]),
     "pynacl": (pynacl_op, lambda: "libsodium %s (PyNaCl %s)" % (_sodium_version(), nacl.__version__),
                ["ed25519_sign", "ed25519_verify", "x25519"]),
     "mnemonic": (mnemonic_op, lambda: mnemonic_lib.__version__ if hasattr(mnemonic_lib, "__version__") else "0.21",

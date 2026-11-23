@@ -27,6 +27,7 @@
 #include <snicholls/crypto/curve25519/x25519.hpp>
 #include <snicholls/crypto/hd/bip32.hpp>
 #include <snicholls/crypto/hd/slip10.hpp>
+#include <snicholls/crypto/p256/ecdsa.hpp>
 #include <snicholls/crypto/secp256k1/ecdsa.hpp>
 #include <snicholls/crypto/secp256k1/schnorr.hpp>
 
@@ -90,6 +91,23 @@ void secp256k1_paths()
     make_public(xonly);
     make_public(ssig);
     check(static_cast<bool>(schnorr_verify(xonly, hash, ssig)), "BIP-340 sign");
+}
+
+void p256_paths()
+{
+    namespace p256 = snicholls::crypto::p256;
+    auto key_bytes = bytes32(3);   // 0x3a... is below P-256's n too
+    mark_secret(key_bytes);
+    const auto key = p256::private_key::from_bytes(key_bytes).unwrap();
+    auto pub = key.public_key();
+    make_public(pub);
+    check(p256::public_key::parse(pub.compressed()).is_ok(), "P-256 public key");
+
+    std::array<std::uint8_t, 32> hash{};
+    hash[0] = 1;
+    auto sig = p256::sign(key, hash);
+    make_public(sig);
+    check(static_cast<bool>(p256::verify(pub, hash, sig)), "P-256 ECDSA sign (RFC 6979)");
 }
 
 void hd_paths()
@@ -184,6 +202,7 @@ int main(int argc, char** argv)
     }
     std::printf("secret marking: every secret input undefined for memcheck\n");
     secp256k1_paths();
+    p256_paths();
     hd_paths();
     curve25519_paths();
     bip39_paths();

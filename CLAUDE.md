@@ -84,7 +84,8 @@ Valgrind secret-marking check and the timing test) and its limits are in README.
   `scalar`, `point`, `keys`, `rfc6979`, `ecdsa`, `schnorr`; `snicholls::crypto::secp256k1`), `curve25519/` (`field`,
   `scalar`, `edwards` in `snicholls::crypto::curve25519`; `ed25519`, `x25519` in `snicholls::crypto::ed25519` and
   `snicholls::crypto::x25519`), `bip39/` (`wordlist`, `mnemonic`; `snicholls::crypto::bip39`), `hd/` (`path`,
-  `bip32`, `slip10`; `snicholls::crypto::hd`), `rsa/` (`rsa`, verification only; `snicholls::crypto::rsa`).
+  `bip32`, `slip10`; `snicholls::crypto::hd`), `rsa/` (`rsa`, verification only; `snicholls::crypto::rsa`), `p256/` (`field`, `scalar`, `point`,
+  `ecdsa`; `snicholls::crypto::p256`).
 - `detail/` holds internals (`snicholls::crypto::detail` and `<area>::detail`): tested, not demonstrated, not
   documented by Doxygen. `detail/hashes.hpp` adapts core's hashes: see "Waiting on other libraries".
 - `tests/`, `demos/` and `benchmarks/` mirror `include/snicholls/crypto/`. `tests/fixtures/` holds the official test

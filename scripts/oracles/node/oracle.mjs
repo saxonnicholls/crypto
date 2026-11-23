@@ -21,6 +21,7 @@
 
 import * as secp from "@noble/secp256k1";
 import { ed25519, x25519 } from "@noble/curves/ed25519.js";
+import { p256 } from "@noble/curves/nist.js";
 import { hmac } from "@noble/hashes/hmac.js";
 import { sha256 } from "@noble/hashes/sha2.js";
 import * as bip39 from "@scure/bip39";
@@ -112,6 +113,33 @@ const LIBS = {
         return { sig: hex(secp.schnorr.sign(bytes(q.m), sk, bytes(q.aux))), x: hex(secp.schnorr.getPublicKey(sk)) };
       },
       schnorr_verify: (q) => ({ valid: secp.schnorr.verify(bytes(q.sig), bytes(q.m), bytes(q.x)) }),
+    },
+  },
+  noble_p256: {
+    name: "@noble/curves",
+    ops: {
+      p256_pub: (q) => {
+        const sk = bytes(q.sk);
+        refuse(() => {
+          if (!p256.utils.isValidSecretKey(sk)) throw new Error("invalid secret key");
+        });
+        return { c: hex(p256.getPublicKey(sk, true)), u: hex(p256.getPublicKey(sk, false)) };
+      },
+      p256_sign: (q) => {
+        const sig = p256.Signature.fromBytes(p256.sign(bytes(q.h), bytes(q.sk), { prehash: false, lowS: false }));
+        return { r: pad(sig.r), s: pad(sig.s) };
+      },
+      p256_pub_parse: (q) => ({ c: hex(refuse(() => p256.Point.fromBytes(bytes(q.pub)).toBytes(true))) }),
+      p256_verify: (q) => {
+        refuse(() => p256.Point.fromBytes(bytes(q.pub)));
+        let valid;
+        try {
+          valid = p256.verify(bytes(q.sig), bytes(q.h), bytes(q.pub), { prehash: false, lowS: false });
+        } catch {
+          valid = false;
+        }
+        return { valid };
+      },
     },
   },
   noble_ed25519: {
@@ -245,6 +273,20 @@ const LIBS = {
       },
       rsa_verify_pkcs1: (q) => rsaVerify(q, { padding: constants.RSA_PKCS1_PADDING }),
       rsa_verify_pss: (q) => rsaVerify(q, { padding: constants.RSA_PKCS1_PSS_PADDING, saltLength: q.salt }),
+      // ES256 as JOSE signs it: Node hashes the message itself; the signature is r || s (IEEE P1363)
+      p256_verify: (q) => {
+        const u = bytes(q.pub);
+        if (u.length !== 65) return { unsupported: true };
+        const key = refuse(() => createPublicKey({ format: "jwk", key: { kty: "EC", crv: "P-256",
+          x: Buffer.from(u.slice(1, 33)).toString("base64url"), y: Buffer.from(u.slice(33)).toString("base64url") } }));
+        let valid;
+        try {
+          valid = cryptoVerify("sha256", bytes(q.m), { key, dsaEncoding: "ieee-p1363" }, bytes(q.sig));
+        } catch {
+          valid = false;
+        }
+        return { valid };
+      },
       rsa_parse_spki: (q) => {
         const k = refuse(() => createPublicKey({ key: Buffer.from(q.der, "hex"), format: "der", type: "spki" }));
         if (k.asymmetricKeyType !== "rsa") throw new Refused("not RSA");

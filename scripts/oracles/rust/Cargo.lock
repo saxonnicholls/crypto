@@ -318,6 +318,7 @@ dependencies = [
  "ff",
  "group",
  "hybrid-array",
+ "pem-rfc7468",
  "pkcs8",
  "rand_core 0.10.1",
  "sec1",
@@ -480,6 +481,19 @@ name = "once_cell"
 version = "1.21.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9f7c3e4beb33f85d45ae3e3a1792185706c8e16d043238c593331cc7cd313b50"
+
+[[package]]
+name = "p256"
+version = "0.14.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d2c9239b2dbc807adbbe147e8cf72ea7450c3a0aabe62cb8e75ff4ec22e1f72a"
+dependencies = [
+ "ecdsa",
+ "elliptic-curve",
+ "primefield",
+ "primeorder",
+ "sha2 0.11.1",
+]
 
 [[package]]
 name = "pem-rfc7468"
@@ -809,6 +823,7 @@ dependencies = [
  "ed25519-dalek",
  "hex",
  "k256",
+ "p256",
  "rsa",
  "secp256k1",
  "serde_json",

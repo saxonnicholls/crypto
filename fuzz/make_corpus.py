@@ -74,6 +74,9 @@ def main():
         key_line = next(l for l in open(os.path.join(ROOT, "tests", "fixtures", "wycheproof", name)) if l.startswith("key - "))
         rsa.append(bytes([3]) + b(key_line.split()[2]))
     n += write(out, "rsa", rsa)
+    n += write(out, "p256", [bytes([i % 128 & ~3]) + b(r[0]) + b(r[2]) + bytes([i % 7, i % 7, i % 64, i % 8])
+                             for i, r in enumerate(rows("p256_sign.txt"))] +
+               [bytes([3]) + b(r[0]) for r in rows("p256_sec1.txt") if r[0]])
     text = [b"\x00" + r[2].encode() for r in rows("base58check.txt") if r[0] == "ok" and r[2]]
     text += [b"\x01" + r[4].encode() for r in rows("segwit.txt") if r[0] == "ok"]
     text += [b"\x02" + r[1].replace("+", " ").encode() for r in rows("bip39.txt")]

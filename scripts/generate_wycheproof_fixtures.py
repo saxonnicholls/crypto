@@ -69,6 +69,17 @@ def x25519(data):
     return ["private", "public", "shared"], lines
 
 
+def ecdsa_p256(data):
+    """ecdsa_secp256r1_sha256*_test.json: a "key" line per group (the uncompressed SEC1 key), then its tests."""
+    lines = []
+    for g in data["testGroups"]:
+        assert g["publicKey"]["curve"] == "secp256r1" and g["sha"] == "SHA-256"
+        lines.append("key - %s" % g["publicKey"]["uncompressed"])
+        for t in g["tests"]:
+            lines.append("%d %s %s %s" % (t["tcId"], t["result"], field(t["msg"]), field(t["sig"])))
+    return ["msg", "sig (key lines: key - uncompressed_public_key)"], lines
+
+
 def ecdsa_secp256k1(data):
     """ecdsa_secp256k1_sha256*_test.json: a "key" line per group (the uncompressed SEC1 key), then its tests."""
     lines = []
@@ -108,6 +119,8 @@ CONVERTERS = {
     "ecdsa_secp256k1_sha256_test.json": ("ecdsa_secp256k1_sha256.txt", ecdsa_secp256k1),
     "ed25519_test.json": ("ed25519.txt", ed25519),
     "x25519_test.json": ("x25519.txt", x25519),
+    "ecdsa_secp256r1_sha256_test.json": ("ecdsa_p256_sha256.txt", ecdsa_p256),
+    "ecdsa_secp256r1_sha256_p1363_test.json": ("ecdsa_p256_sha256_p1363.txt", ecdsa_p256),
     "rsa_signature_2048_sha256_test.json": ("rsa_pkcs1_2048_sha256.txt", rsa),
     "rsa_signature_3072_sha256_test.json": ("rsa_pkcs1_3072_sha256.txt", rsa),
     "rsa_signature_4096_sha256_test.json": ("rsa_pkcs1_4096_sha256.txt", rsa),
