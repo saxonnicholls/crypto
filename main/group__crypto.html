@@ -26,7 +26,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">snicholls-crypto<span id="projectnumber">&#160;0.2.0</span>
+   <div id="projectname">snicholls-crypto<span id="projectnumber">&#160;0.3.0</span>
    </div>
    <div id="projectbrief">Elliptic curves, signatures and wallet key derivation for the snicholls libraries</div>
   </td>
@@ -125,6 +125,8 @@ Topics</h2></td></tr>
 <tr class="memdesc:group__address"><td class="mdescLeft">&#160;</td><td class="mdescRight">Address and key text: base58 (any alphabet), base58check, bech32 and bech32m, segwit addresses. <br /></td></tr>
 <tr class="memitem:curve25519" id="r_curve25519"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="group__curve25519.html">Curve25519</a></td></tr>
 <tr class="memdesc:group__curve25519"><td class="mdescLeft">&#160;</td><td class="mdescRight">The field and scalars of Curve25519, edwards25519, Ed25519 signatures and X25519 key agreement. <br /></td></tr>
+<tr class="memitem:p256" id="r_p256"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="group__p256.html">P-256</a></td></tr>
+<tr class="memdesc:group__p256"><td class="mdescLeft">&#160;</td><td class="mdescRight">P-256 (secp256r1): its field, scalars and points, and ECDSA with SHA-256 (ES256) with RFC 6979 nonces. <br /></td></tr>
 <tr class="memitem:rsa" id="r_rsa"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="group__rsa.html">RSA</a></td></tr>
 <tr class="memdesc:group__rsa"><td class="mdescLeft">&#160;</td><td class="mdescRight">RSA signature verification: RSASSA-PKCS1-v1_5 and RSASSA-PSS with SHA-256 (RS256, PS256). <br /></td></tr>
 <tr class="memitem:wallet" id="r_wallet"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="group__wallet.html">Wallets</a></td></tr>
@@ -152,7 +154,7 @@ Classes</h2></td></tr>
 Macros</h2></td></tr>
 <tr class="memitem:ga54161ed5eeea29786c330f33f17859a2" id="r_ga54161ed5eeea29786c330f33f17859a2"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ga54161ed5eeea29786c330f33f17859a2">SNICHOLLS_CRYPTO_VERSION_MAJOR</a>&#160;&#160;&#160;0</td></tr>
 <tr class="memdesc:ga54161ed5eeea29786c330f33f17859a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Major version of snicholls-crypto.  <br /></td></tr>
-<tr class="memitem:ga9f127f473a417f0e4670b9c9e8b874cd" id="r_ga9f127f473a417f0e4670b9c9e8b874cd"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ga9f127f473a417f0e4670b9c9e8b874cd">SNICHOLLS_CRYPTO_VERSION_MINOR</a>&#160;&#160;&#160;2</td></tr>
+<tr class="memitem:ga9f127f473a417f0e4670b9c9e8b874cd" id="r_ga9f127f473a417f0e4670b9c9e8b874cd"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ga9f127f473a417f0e4670b9c9e8b874cd">SNICHOLLS_CRYPTO_VERSION_MINOR</a>&#160;&#160;&#160;3</td></tr>
 <tr class="memdesc:ga9f127f473a417f0e4670b9c9e8b874cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Minor version of snicholls-crypto.  <br /></td></tr>
 <tr class="memitem:ga46adf5d826fcc6e97324b882df225091" id="r_ga46adf5d826fcc6e97324b882df225091"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ga46adf5d826fcc6e97324b882df225091">SNICHOLLS_CRYPTO_VERSION_PATCH</a>&#160;&#160;&#160;0</td></tr>
 <tr class="memdesc:ga46adf5d826fcc6e97324b882df225091"><td class="mdescLeft">&#160;</td><td class="mdescRight">Patch version of snicholls-crypto.  <br /></td></tr>
@@ -344,7 +346,7 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define SNICHOLLS_CRYPTO_VERSION_MINOR&#160;&#160;&#160;2</td>
+          <td class="memname">#define SNICHOLLS_CRYPTO_VERSION_MINOR&#160;&#160;&#160;3</td>
         </tr>
       </table>
 </div><div class="memdoc">

@@ -1,9 +1,9 @@
 var group__secp256k1 =
 [
-    [ "ecdsa.hpp", "ecdsa_8hpp.html", null ],
+    [ "ecdsa.hpp", "secp256k1_2ecdsa_8hpp.html", null ],
     [ "field.hpp", "secp256k1_2field_8hpp.html", null ],
     [ "keys.hpp", "keys_8hpp.html", null ],
-    [ "point.hpp", "point_8hpp.html", null ],
+    [ "point.hpp", "secp256k1_2point_8hpp.html", null ],
     [ "rfc6979.hpp", "rfc6979_8hpp.html", null ],
     [ "scalar.hpp", "secp256k1_2scalar_8hpp.html", null ],
     [ "schnorr.hpp", "schnorr_8hpp.html", null ],

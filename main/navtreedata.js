@@ -46,7 +46,7 @@ var NAVTREE =
       [ "Class Index", "classes.html", null ],
       [ "Class Members", "functions.html", [
         [ "All", "functions.html", "functions_dup" ],
-        [ "Functions", "functions_func.html", null ],
+        [ "Functions", "functions_func.html", "functions_func" ],
         [ "Variables", "functions_vars.html", null ],
         [ "Typedefs", "functions_type.html", null ],
         [ "Related Symbols", "functions_rela.html", null ]
@@ -65,7 +65,8 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "annotated.html",
-"group__crypto.html#ggaa314007c5b3658974966bfdaeb2c3625a4fb02bf2c940dc25d766248c7c0d9f21"
+"functions_func_d.html",
+"structsnicholls_1_1crypto_1_1ed25519_1_1public__key.html#aff07f9b4755dafa65084f7c4d5234241"
 ];
 
 const SYNCONMSG = 'click to disable panel synchronization';

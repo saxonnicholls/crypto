@@ -1,4 +1,4 @@
-var ecdsa_8hpp =
+var secp256k1_2ecdsa_8hpp =
 [
     [ "snicholls::crypto::secp256k1::high_s", "group__secp256k1.html#ga6726eb06ac57cdc0f6062064d0f82b9d", [
       [ "snicholls::crypto::secp256k1::high_s::accept", "group__secp256k1.html#gga6726eb06ac57cdc0f6062064d0f82b9da4abe77c201ff11663ccdf52fd6ecea86", null ],

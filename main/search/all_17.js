@@ -1,6 +1,9 @@
 var searchData=
 [
-  ['_7emnemonic_0',['~mnemonic',['../classsnicholls_1_1crypto_1_1bip39_1_1mnemonic.html#a698ff159a3837d98172be5e2a579580b',1,'snicholls::crypto::bip39::mnemonic']]],
-  ['_7erfc6979_1',['~rfc6979',['../classsnicholls_1_1crypto_1_1secp256k1_1_1rfc6979.html#a2a3e4b7b648e2be7952077bf5fef061d',1,'snicholls::crypto::secp256k1::rfc6979']]],
-  ['_7esecret_5fbytes_2',['~secret_bytes',['../classsnicholls_1_1crypto_1_1secret__bytes.html#a9a42b2ba9900dab6f2242824642a937b',1,'snicholls::crypto::secret_bytes']]]
+  ['x_0',['x',['../structsnicholls_1_1crypto_1_1p256_1_1affine__point.html#a4e7c9fba55d53358ada5cc7dc6428bc5',1,'snicholls::crypto::p256::affine_point::x'],['../structsnicholls_1_1crypto_1_1secp256k1_1_1affine__point.html#a7e05c40c3e2c2b47a1bbdfb5dd7fca7b',1,'snicholls::crypto::secp256k1::affine_point::x']]],
+  ['x25519_2ehpp_1',['x25519.hpp',['../x25519_8hpp.html',1,'']]],
+  ['xonly_5fpublic_5fkey_2',['xonly_public_key',['../structsnicholls_1_1crypto_1_1secp256k1_1_1xonly__public__key.html',1,'snicholls::crypto::secp256k1']]],
+  ['xonly_5fpublic_5fkey_5fof_3',['xonly_public_key_of',['../group__secp256k1.html#ga87b583811640ab2bcfd13dcd3ed03418',1,'snicholls::crypto::secp256k1']]],
+  ['xrpl_5fbase58_4',['xrpl_base58',['../namespacesnicholls_1_1crypto_1_1address.html#a95acf08c795b98ab31994bf6bfcb37a8',1,'snicholls::crypto::address']]],
+  ['xy_5',['xy',['../classsnicholls_1_1crypto_1_1secp256k1_1_1public__key.html#a1a9291eb4bc819ecee694ff6a4712c1b',1,'snicholls::crypto::secp256k1::public_key']]]
 ];

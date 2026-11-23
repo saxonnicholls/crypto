@@ -1,17 +1,17 @@
 var searchData=
 [
-  ['table_0',['table',['../classsnicholls_1_1crypto_1_1curve25519_1_1point.html#a7aadfd5f323849c43d34d0ba601d87b2',1,'snicholls::crypto::curve25519::point']]],
-  ['test_20vectors_1',['Test vectors',['../index.html#autotoc_md1',1,'']]],
-  ['testing_20against_20other_20implementations_2',['Testing against other implementations',['../index.html#autotoc_md2',1,'']]],
-  ['testnet_3',['testnet',['../namespacesnicholls_1_1crypto_1_1hd_1_1coin__type.html#a6da0ae0378bd85e4e2400c31b2df1986',1,'snicholls::crypto::hd::coin_type']]],
-  ['time_4',['Constant time',['../index.html#autotoc_md3',1,'']]],
-  ['to_5faffine_5',['to_affine',['../classsnicholls_1_1crypto_1_1secp256k1_1_1point.html#a8f5628cdfd42be1ea421be0ee37fc9da',1,'snicholls::crypto::secp256k1::point']]],
-  ['to_5faffine_5fct_6',['to_affine_ct',['../classsnicholls_1_1crypto_1_1secp256k1_1_1point.html#a69802dd52a49520cd5ff6c5ff468f8ae',1,'snicholls::crypto::secp256k1::point']]],
-  ['to_5fbytes_7',['to_bytes',['../classsnicholls_1_1crypto_1_1curve25519_1_1field__element.html#a313ef8249ac7d605c56aa99342d2f467',1,'snicholls::crypto::curve25519::field_element::to_bytes()'],['../classsnicholls_1_1crypto_1_1curve25519_1_1scalar.html#a8e1c3d0165ad46ad0e41fd06d2bc9be9',1,'snicholls::crypto::curve25519::scalar::to_bytes()'],['../classsnicholls_1_1crypto_1_1secp256k1_1_1field__element.html#a1554f3d74f1034434b887c0e357aecb2',1,'snicholls::crypto::secp256k1::field_element::to_bytes()'],['../classsnicholls_1_1crypto_1_1secp256k1_1_1scalar.html#a4da7bb518f3514530cabe42af6d74518',1,'snicholls::crypto::secp256k1::scalar::to_bytes()']]],
-  ['to_5fentropy_8',['to_entropy',['../namespacesnicholls_1_1crypto_1_1bip39.html#a931e33886927ce15b1862cffeee8ac6f',1,'snicholls::crypto::bip39']]],
-  ['to_5fscalar_9',['to_scalar',['../classsnicholls_1_1crypto_1_1secp256k1_1_1private__key.html#ad5a9154ff4d66127a6c670583bde4329',1,'snicholls::crypto::secp256k1::private_key']]],
-  ['to_5fseed_10',['to_seed',['../namespacesnicholls_1_1crypto_1_1bip39.html#a8932a6a79a1db7d46fac5d08af999bf2',1,'snicholls::crypto::bip39']]],
-  ['to_5fstring_11',['to_string',['../namespacesnicholls_1_1crypto.html#a62cbc3205a6e6e1bc673319f2d277e74',1,'snicholls::crypto']]],
-  ['to_5ftext_12',['to_text',['../classsnicholls_1_1crypto_1_1bip39_1_1mnemonic.html#af0a59a7638f0417517a15748c5be4ed1',1,'snicholls::crypto::bip39::mnemonic::to_text()'],['../structsnicholls_1_1crypto_1_1hd_1_1extended__public__key.html#a4aad66150d927bd19963c3393e7a75fc',1,'snicholls::crypto::hd::extended_public_key::to_text()'],['../classsnicholls_1_1crypto_1_1hd_1_1extended__private__key.html#ad1bc86e91d07057c4412b6b56af1bdce',1,'snicholls::crypto::hd::extended_private_key::to_text()']]],
-  ['tron_13',['tron',['../namespacesnicholls_1_1crypto_1_1hd_1_1coin__type.html#a5e31313671fa5d0e24005953f0d5a7b2',1,'snicholls::crypto::hd::coin_type']]]
+  ['r_0',['r',['../structsnicholls_1_1crypto_1_1p256_1_1signature.html#a7a9dc4d1bfc11dd91e5e60a69e4d64a5',1,'snicholls::crypto::p256::signature::r'],['../structsnicholls_1_1crypto_1_1secp256k1_1_1signature.html#a5c07c9cc2288be281af583c30888a17d',1,'snicholls::crypto::secp256k1::signature::r']]],
+  ['recover_1',['recover',['../group__secp256k1.html#ga747c7222170a44e38d1c0148fee3ba49',1,'snicholls::crypto::secp256k1']]],
+  ['recover_5fethereum_2',['recover_ethereum',['../group__secp256k1.html#ga0af593f07b6635ce0eb7e53ccc660376',1,'snicholls::crypto::secp256k1']]],
+  ['recoverable_5fsignature_3',['recoverable_signature',['../structsnicholls_1_1crypto_1_1secp256k1_1_1recoverable__signature.html',1,'snicholls::crypto::secp256k1']]],
+  ['recovery_5ffailed_4',['recovery_failed',['../group__crypto.html#ggaa314007c5b3658974966bfdaeb2c3625a028938ebaa01571573462ff99b7b43ab',1,'snicholls::crypto']]],
+  ['recovery_5fid_5',['recovery_id',['../structsnicholls_1_1crypto_1_1secp256k1_1_1recoverable__signature.html#acad513dd6146f87dfcc7afadfcbc06ac',1,'snicholls::crypto::secp256k1::recoverable_signature']]],
+  ['reduce_6',['reduce',['../classsnicholls_1_1crypto_1_1curve25519_1_1scalar.html#a325cbc5bec697087c3c8dab4c850cec1',1,'snicholls::crypto::curve25519::scalar']]],
+  ['reject_7',['reject',['../group__secp256k1.html#gga6726eb06ac57cdc0f6062064d0f82b9da6bfaf02d9f3b165809fb7f056665a6bd',1,'snicholls::crypto::secp256k1']]],
+  ['reveal_8',['reveal',['../classsnicholls_1_1crypto_1_1p256_1_1private__key.html#a7f1a793d7d8c3a7412f506d238efe9ff',1,'snicholls::crypto::p256::private_key::reveal()'],['../classsnicholls_1_1crypto_1_1secp256k1_1_1private__key.html#a25f871e799cfa3115111a255dfe6a6fe',1,'snicholls::crypto::secp256k1::private_key::reveal()'],['../classsnicholls_1_1crypto_1_1secret__bytes.html#a294731b2f5a603bcf724b4675934a711',1,'snicholls::crypto::secret_bytes::reveal() const noexcept']]],
+  ['reveal_5fmutable_9',['reveal_mutable',['../classsnicholls_1_1crypto_1_1secret__bytes.html#af00215e26f720893561b037b0bbb4387',1,'snicholls::crypto::secret_bytes']]],
+  ['rfc6979_10',['rfc6979',['../classsnicholls_1_1crypto_1_1secp256k1_1_1rfc6979.html',1,'snicholls::crypto::secp256k1::rfc6979'],['../classsnicholls_1_1crypto_1_1secp256k1_1_1rfc6979.html#aa064be14d9cb97c490c8439167f18a63',1,'snicholls::crypto::secp256k1::rfc6979::rfc6979()']]],
+  ['rfc6979_2ehpp_11',['rfc6979.hpp',['../rfc6979_8hpp.html',1,'']]],
+  ['rsa_12',['RSA',['../group__rsa.html',1,'']]],
+  ['rsa_2ehpp_13',['rsa.hpp',['../rsa_8hpp.html',1,'']]]
 ];

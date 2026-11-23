@@ -1,7 +1,5 @@
 var searchData=
 [
-  ['next_0',['next',['../classsnicholls_1_1crypto_1_1secp256k1_1_1rfc6979.html#aa635741c9abb24996bff63f70b5297b6',1,'snicholls::crypto::secp256k1::rfc6979']]],
-  ['nfkd_1',['nfkd',['../namespacesnicholls_1_1crypto_1_1bip39.html#aebe7dfdffb7a246853f74b73d877a923aab8f11bc27de34d47453c3a2e7d2f393',1,'snicholls::crypto::bip39']]],
-  ['nibble_2',['nibble',['../classsnicholls_1_1crypto_1_1curve25519_1_1scalar.html#ab07b5780e2a52f3dfc686e83b4426fe0',1,'snicholls::crypto::curve25519::scalar::nibble()'],['../classsnicholls_1_1crypto_1_1secp256k1_1_1scalar.html#a63391c4ce128e866bb9ee94ac91a8308',1,'snicholls::crypto::secp256k1::scalar::nibble()']]],
-  ['non_5fcanonical_3',['non_canonical',['../group__crypto.html#ggaa314007c5b3658974966bfdaeb2c3625a39f5fe7a168fb5d4d3afa3bd967faf69',1,'snicholls::crypto']]]
+  ['limbs_0',['limbs',['../classsnicholls_1_1crypto_1_1curve25519_1_1field__element.html#a01c56619b908439a956c5ddd3daf3604',1,'snicholls::crypto::curve25519::field_element::limbs()'],['../classsnicholls_1_1crypto_1_1secp256k1_1_1field__element.html#afad8903e0728e3ce2de7096ca50e4d3f',1,'snicholls::crypto::secp256k1::field_element::limbs()'],['../classsnicholls_1_1crypto_1_1secp256k1_1_1scalar.html#a44a710cd5a2b9223de10ae1ece319433',1,'snicholls::crypto::secp256k1::scalar::limbs()']]],
+  ['limbs_5ftype_1',['limbs_type',['../classsnicholls_1_1crypto_1_1curve25519_1_1field__element.html#a1098cb8adb4000c64778be1446fe774d',1,'snicholls::crypto::curve25519::field_element']]]
 ];

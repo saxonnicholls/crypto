@@ -26,7 +26,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">snicholls-crypto<span id="projectnumber">&#160;0.2.0</span>
+   <div id="projectname">snicholls-crypto<span id="projectnumber">&#160;0.3.0</span>
    </div>
    <div id="projectbrief">Elliptic curves, signatures and wallet key derivation for the snicholls libraries</div>
   </td>
@@ -140,11 +140,11 @@ Namespaces</h2></td></tr>
 <div class="textblock"><p><span class="tt">secp256k1::field_element</span>: arithmetic modulo p = 2^256 - 2^32 - 977, constant-time and <span class="tt">constexpr</span>. </p>
 <dl class="section user"><dt>Overview</dt><dd></dd></dl>
 <p>The coordinates of secp256k1 points. Four 64-bit limbs, always fully reduced; addition, subtraction, multiplication, inversion and square roots with no branch or memory index that depends on the value. Every operation is <span class="tt">constexpr</span>, so tables of points (the multiples of G) are built by the compiler.</p>
-<p>Use it through <span class="tt"><a class="el" href="point_8hpp.html" title="secp256k1::point: the curve y^2 = x^3 + 7, complete addition, and constant-time scalar multiplication...">point.hpp</a></span>; it is public so that callers can check coordinates and tests can pin identities.</p>
+<p>Use it through <span class="tt">point.hpp</span>; it is public so that callers can check coordinates and tests can pin identities.</p>
 <dl class="section user"><dt>Relationships</dt><dd></dd></dl>
 <ul>
 <li><span class="tt"><a class="el" href="secp256k1_2scalar_8hpp.html" title="secp256k1::scalar: arithmetic modulo the group order n, constant-time and constexpr.">secp256k1/scalar.hpp</a></span>: the same arithmetic modulo the group order n.</li>
-<li><span class="tt"><a class="el" href="point_8hpp.html" title="secp256k1::point: the curve y^2 = x^3 + 7, complete addition, and constant-time scalar multiplication...">secp256k1/point.hpp</a></span>: the curve y^2 = x^3 + 7 over this field.</li>
+<li><span class="tt"><a class="el" href="secp256k1_2point_8hpp.html" title="secp256k1::point: the curve y^2 = x^3 + 7, complete addition, and constant-time scalar multiplication...">secp256k1/point.hpp</a></span>: the curve y^2 = x^3 + 7 over this field.</li>
 <li>Group: <a class="el" href="group__secp256k1.html" title="secp256k1">secp256k1</a>.</li>
 </ul>
 <dl class="section user"><dt>Implementations and variants</dt><dd></dd></dl>

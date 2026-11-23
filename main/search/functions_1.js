@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['base_0',['base',['../classsnicholls_1_1crypto_1_1curve25519_1_1point.html#a42a1d3b49a8257cf57469bc4d06ab4f9',1,'snicholls::crypto::curve25519::point::base()'],['../classsnicholls_1_1crypto_1_1secp256k1_1_1point.html#a89cd58ded47edd440799678c24a51f6f',1,'snicholls::crypto::secp256k1::point::base()']]],
+  ['base_0',['base',['../classsnicholls_1_1crypto_1_1curve25519_1_1point.html#a42a1d3b49a8257cf57469bc4d06ab4f9',1,'snicholls::crypto::curve25519::point::base()'],['../classsnicholls_1_1crypto_1_1p256_1_1point.html#aac47ad352408e1a56c086a03e270d40d',1,'snicholls::crypto::p256::point::base()'],['../classsnicholls_1_1crypto_1_1secp256k1_1_1point.html#a89cd58ded47edd440799678c24a51f6f',1,'snicholls::crypto::secp256k1::point::base()']]],
   ['base58_5fdecode_1',['base58_decode',['../namespacesnicholls_1_1crypto_1_1address.html#a5b2845daf076c873672456e2d5c07214',1,'snicholls::crypto::address']]],
   ['base58_5fdecode_5fto_2',['base58_decode_to',['../namespacesnicholls_1_1crypto_1_1address.html#af1fca5676b0fd983ead1b7be660ee39c',1,'snicholls::crypto::address']]],
   ['base58_5fencode_3',['base58_encode',['../namespacesnicholls_1_1crypto_1_1address.html#a6ab5e3df10f2dc2949d43c844756d1b1',1,'snicholls::crypto::address']]],

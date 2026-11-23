@@ -26,7 +26,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">snicholls-crypto<span id="projectnumber">&#160;0.2.0</span>
+   <div id="projectname">snicholls-crypto<span id="projectnumber">&#160;0.3.0</span>
    </div>
    <div id="projectbrief">Elliptic curves, signatures and wallet key derivation for the snicholls libraries</div>
   </td>
@@ -126,37 +126,39 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('crypto_8hpp_so
 <div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span></div>
 <div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span></div>
 <div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span></div>
-<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span> </div>
-<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span><span class="preprocessor">#ifndef snicholls_crypto_crypto_hpp</span></div>
-<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span><span class="preprocessor">#define snicholls_crypto_crypto_hpp</span></div>
-<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span> </div>
-<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span><span class="preprocessor">#include &lt;<a class="code" href="constant__time_8hpp.html">snicholls/crypto/constant_time.hpp</a>&gt;</span></div>
-<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span><span class="preprocessor">#include &lt;<a class="code" href="error_8hpp.html">snicholls/crypto/error.hpp</a>&gt;</span></div>
-<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span><span class="preprocessor">#include &lt;<a class="code" href="secret_8hpp.html">snicholls/crypto/secret.hpp</a>&gt;</span></div>
-<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span><span class="preprocessor">#include &lt;<a class="code" href="version_8hpp.html">snicholls/crypto/version.hpp</a>&gt;</span></div>
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span><span class="preprocessor">#include &lt;<a class="code" href="base58_8hpp.html">snicholls/crypto/address/base58.hpp</a>&gt;</span></div>
-<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span><span class="preprocessor">#include &lt;<a class="code" href="base58check_8hpp.html">snicholls/crypto/address/base58check.hpp</a>&gt;</span></div>
-<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span><span class="preprocessor">#include &lt;<a class="code" href="bech32_8hpp.html">snicholls/crypto/address/bech32.hpp</a>&gt;</span></div>
-<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span><span class="preprocessor">#include &lt;<a class="code" href="mnemonic_8hpp.html">snicholls/crypto/bip39/mnemonic.hpp</a>&gt;</span></div>
-<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span><span class="preprocessor">#include &lt;<a class="code" href="wordlist_8hpp.html">snicholls/crypto/bip39/wordlist.hpp</a>&gt;</span></div>
-<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span><span class="preprocessor">#include &lt;<a class="code" href="ed25519_8hpp.html">snicholls/crypto/curve25519/ed25519.hpp</a>&gt;</span></div>
-<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span><span class="preprocessor">#include &lt;<a class="code" href="edwards_8hpp.html">snicholls/crypto/curve25519/edwards.hpp</a>&gt;</span></div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span><span class="preprocessor">#include &lt;<a class="code" href="curve25519_2field_8hpp.html">snicholls/crypto/curve25519/field.hpp</a>&gt;</span></div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span><span class="preprocessor">#include &lt;<a class="code" href="curve25519_2scalar_8hpp.html">snicholls/crypto/curve25519/scalar.hpp</a>&gt;</span></div>
-<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span><span class="preprocessor">#include &lt;<a class="code" href="x25519_8hpp.html">snicholls/crypto/curve25519/x25519.hpp</a>&gt;</span></div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span><span class="preprocessor">#include &lt;<a class="code" href="bip32_8hpp.html">snicholls/crypto/hd/bip32.hpp</a>&gt;</span></div>
-<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span><span class="preprocessor">#include &lt;<a class="code" href="path_8hpp.html">snicholls/crypto/hd/path.hpp</a>&gt;</span></div>
-<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span><span class="preprocessor">#include &lt;<a class="code" href="slip10_8hpp.html">snicholls/crypto/hd/slip10.hpp</a>&gt;</span></div>
-<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span><span class="preprocessor">#include &lt;<a class="code" href="rsa_8hpp.html">snicholls/crypto/rsa/rsa.hpp</a>&gt;</span></div>
-<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span><span class="preprocessor">#include &lt;<a class="code" href="ecdsa_8hpp.html">snicholls/crypto/secp256k1/ecdsa.hpp</a>&gt;</span></div>
-<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span><span class="preprocessor">#include &lt;<a class="code" href="secp256k1_2field_8hpp.html">snicholls/crypto/secp256k1/field.hpp</a>&gt;</span></div>
-<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span><span class="preprocessor">#include &lt;<a class="code" href="keys_8hpp.html">snicholls/crypto/secp256k1/keys.hpp</a>&gt;</span></div>
-<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span><span class="preprocessor">#include &lt;<a class="code" href="point_8hpp.html">snicholls/crypto/secp256k1/point.hpp</a>&gt;</span></div>
-<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span><span class="preprocessor">#include &lt;<a class="code" href="rfc6979_8hpp.html">snicholls/crypto/secp256k1/rfc6979.hpp</a>&gt;</span></div>
-<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span><span class="preprocessor">#include &lt;<a class="code" href="secp256k1_2scalar_8hpp.html">snicholls/crypto/secp256k1/scalar.hpp</a>&gt;</span></div>
-<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span><span class="preprocessor">#include &lt;<a class="code" href="schnorr_8hpp.html">snicholls/crypto/secp256k1/schnorr.hpp</a>&gt;</span></div>
-<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span> </div>
-<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span><span class="preprocessor">#endif </span><span class="comment">/* snicholls_crypto_crypto_hpp */</span><span class="preprocessor"></span></div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span></div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span> </div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span><span class="preprocessor">#ifndef snicholls_crypto_crypto_hpp</span></div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span><span class="preprocessor">#define snicholls_crypto_crypto_hpp</span></div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span> </div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span><span class="preprocessor">#include &lt;<a class="code" href="constant__time_8hpp.html">snicholls/crypto/constant_time.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span><span class="preprocessor">#include &lt;<a class="code" href="error_8hpp.html">snicholls/crypto/error.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span><span class="preprocessor">#include &lt;<a class="code" href="secret_8hpp.html">snicholls/crypto/secret.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span><span class="preprocessor">#include &lt;<a class="code" href="version_8hpp.html">snicholls/crypto/version.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span><span class="preprocessor">#include &lt;<a class="code" href="base58_8hpp.html">snicholls/crypto/address/base58.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span><span class="preprocessor">#include &lt;<a class="code" href="base58check_8hpp.html">snicholls/crypto/address/base58check.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span><span class="preprocessor">#include &lt;<a class="code" href="bech32_8hpp.html">snicholls/crypto/address/bech32.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span><span class="preprocessor">#include &lt;<a class="code" href="mnemonic_8hpp.html">snicholls/crypto/bip39/mnemonic.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span><span class="preprocessor">#include &lt;<a class="code" href="wordlist_8hpp.html">snicholls/crypto/bip39/wordlist.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span><span class="preprocessor">#include &lt;<a class="code" href="ed25519_8hpp.html">snicholls/crypto/curve25519/ed25519.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span><span class="preprocessor">#include &lt;<a class="code" href="edwards_8hpp.html">snicholls/crypto/curve25519/edwards.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span><span class="preprocessor">#include &lt;<a class="code" href="curve25519_2field_8hpp.html">snicholls/crypto/curve25519/field.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span><span class="preprocessor">#include &lt;<a class="code" href="curve25519_2scalar_8hpp.html">snicholls/crypto/curve25519/scalar.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span><span class="preprocessor">#include &lt;<a class="code" href="x25519_8hpp.html">snicholls/crypto/curve25519/x25519.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span><span class="preprocessor">#include &lt;<a class="code" href="bip32_8hpp.html">snicholls/crypto/hd/bip32.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span><span class="preprocessor">#include &lt;<a class="code" href="path_8hpp.html">snicholls/crypto/hd/path.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span><span class="preprocessor">#include &lt;<a class="code" href="slip10_8hpp.html">snicholls/crypto/hd/slip10.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span><span class="preprocessor">#include &lt;<a class="code" href="p256_2ecdsa_8hpp.html">snicholls/crypto/p256/ecdsa.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span><span class="preprocessor">#include &lt;<a class="code" href="rsa_8hpp.html">snicholls/crypto/rsa/rsa.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span><span class="preprocessor">#include &lt;<a class="code" href="secp256k1_2ecdsa_8hpp.html">snicholls/crypto/secp256k1/ecdsa.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span><span class="preprocessor">#include &lt;<a class="code" href="secp256k1_2field_8hpp.html">snicholls/crypto/secp256k1/field.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span><span class="preprocessor">#include &lt;<a class="code" href="keys_8hpp.html">snicholls/crypto/secp256k1/keys.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span><span class="preprocessor">#include &lt;<a class="code" href="secp256k1_2point_8hpp.html">snicholls/crypto/secp256k1/point.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span><span class="preprocessor">#include &lt;<a class="code" href="rfc6979_8hpp.html">snicholls/crypto/secp256k1/rfc6979.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span><span class="preprocessor">#include &lt;<a class="code" href="secp256k1_2scalar_8hpp.html">snicholls/crypto/secp256k1/scalar.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span><span class="preprocessor">#include &lt;<a class="code" href="schnorr_8hpp.html">snicholls/crypto/secp256k1/schnorr.hpp</a>&gt;</span></div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span> </div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span><span class="preprocessor">#endif </span><span class="comment">/* snicholls_crypto_crypto_hpp */</span><span class="preprocessor"></span></div>
 <div class="ttc" id="abase58_8hpp_html"><div class="ttname"><a href="base58_8hpp.html">base58.hpp</a></div><div class="ttdoc">Base58 with any 58-symbol alphabet (Bitcoin, XRPL, Flickr): strict, allocation-free,...</div></div>
 <div class="ttc" id="abase58check_8hpp_html"><div class="ttname"><a href="base58check_8hpp.html">base58check.hpp</a></div><div class="ttdoc">Base58check: base58 of a payload and the first four bytes of its double SHA-256.</div></div>
 <div class="ttc" id="abech32_8hpp_html"><div class="ttname"><a href="bech32_8hpp.html">bech32.hpp</a></div><div class="ttdoc">Bech32 (BIP-173), bech32m (BIP-350), 8-to-5-bit regrouping, and segwit addresses.</div></div>
@@ -164,18 +166,19 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('crypto_8hpp_so
 <div class="ttc" id="aconstant__time_8hpp_html"><div class="ttname"><a href="constant__time_8hpp.html">constant_time.hpp</a></div><div class="ttdoc">snicholls::crypto::ct: masks, selection, swaps and comparisons whose timing does not depend on the da...</div></div>
 <div class="ttc" id="acurve25519_2field_8hpp_html"><div class="ttname"><a href="curve25519_2field_8hpp.html">field.hpp</a></div><div class="ttdoc">curve25519::field_element: arithmetic modulo p = 2^255 - 19, constant-time and constexpr.</div></div>
 <div class="ttc" id="acurve25519_2scalar_8hpp_html"><div class="ttname"><a href="curve25519_2scalar_8hpp.html">scalar.hpp</a></div><div class="ttdoc">curve25519::scalar: integers modulo L = 2^252 + 27742317777372353535851937790883648493,...</div></div>
-<div class="ttc" id="aecdsa_8hpp_html"><div class="ttname"><a href="ecdsa_8hpp.html">ecdsa.hpp</a></div><div class="ttdoc">ECDSA over secp256k1: RFC 6979 signing with low-S and a recovery id, verification,...</div></div>
 <div class="ttc" id="aed25519_8hpp_html"><div class="ttname"><a href="ed25519_8hpp.html">ed25519.hpp</a></div><div class="ttdoc">Ed25519 (RFC 8032): key pairs from a 32-byte seed, deterministic signatures, and verification.</div></div>
 <div class="ttc" id="aedwards_8hpp_html"><div class="ttname"><a href="edwards_8hpp.html">edwards.hpp</a></div><div class="ttdoc">curve25519::point: edwards25519, -x^2 + y^2 = 1 + d x^2 y^2, with complete addition,...</div></div>
 <div class="ttc" id="aerror_8hpp_html"><div class="ttname"><a href="error_8hpp.html">error.hpp</a></div><div class="ttdoc">snicholls::crypto::errc: every expected failure in snicholls-crypto, one enumeration.</div></div>
 <div class="ttc" id="akeys_8hpp_html"><div class="ttname"><a href="keys_8hpp.html">keys.hpp</a></div><div class="ttdoc">secp256k1::private_key and secp256k1::public_key: validated keys, SEC1 encodings, constant-time deriv...</div></div>
 <div class="ttc" id="amnemonic_8hpp_html"><div class="ttname"><a href="mnemonic_8hpp.html">mnemonic.hpp</a></div><div class="ttdoc">bip39::mnemonic: entropy to words and back with the checksum, canonical text, and the BIP-39 seed.</div></div>
+<div class="ttc" id="ap256_2ecdsa_8hpp_html"><div class="ttname"><a href="p256_2ecdsa_8hpp.html">ecdsa.hpp</a></div><div class="ttdoc">ECDSA on P-256 with SHA-256 (JOSE&#39;s ES256): keys, RFC 6979 signing, verification, JOSE and DER forms.</div></div>
 <div class="ttc" id="apath_8hpp_html"><div class="ttname"><a href="path_8hpp.html">path.hpp</a></div><div class="ttdoc">hd::derivation_path: BIP-32 paths (&quot;m/44&#39;/60&#39;/0&#39;/0/0&quot;), strict parsing, formatting,...</div></div>
-<div class="ttc" id="apoint_8hpp_html"><div class="ttname"><a href="point_8hpp.html">point.hpp</a></div><div class="ttdoc">secp256k1::point: the curve y^2 = x^3 + 7, complete addition, and constant-time scalar multiplication...</div></div>
 <div class="ttc" id="arfc6979_8hpp_html"><div class="ttname"><a href="rfc6979_8hpp.html">rfc6979.hpp</a></div><div class="ttdoc">secp256k1::rfc6979: deterministic ECDSA nonces (RFC 6979, HMAC-SHA256), for any 256-bit group order.</div></div>
 <div class="ttc" id="arsa_8hpp_html"><div class="ttname"><a href="rsa_8hpp.html">rsa.hpp</a></div><div class="ttdoc">RSA signature verification (RFC 8017): RSASSA-PKCS1-v1_5 and RSASSA-PSS with SHA-256 (RS256,...</div></div>
 <div class="ttc" id="aschnorr_8hpp_html"><div class="ttname"><a href="schnorr_8hpp.html">schnorr.hpp</a></div><div class="ttdoc">BIP-340 Schnorr signatures over secp256k1: x-only public keys, signing with auxiliary randomness,...</div></div>
+<div class="ttc" id="asecp256k1_2ecdsa_8hpp_html"><div class="ttname"><a href="secp256k1_2ecdsa_8hpp.html">ecdsa.hpp</a></div><div class="ttdoc">ECDSA over secp256k1: RFC 6979 signing with low-S and a recovery id, verification,...</div></div>
 <div class="ttc" id="asecp256k1_2field_8hpp_html"><div class="ttname"><a href="secp256k1_2field_8hpp.html">field.hpp</a></div><div class="ttdoc">secp256k1::field_element: arithmetic modulo p = 2^256 - 2^32 - 977, constant-time and constexpr.</div></div>
+<div class="ttc" id="asecp256k1_2point_8hpp_html"><div class="ttname"><a href="secp256k1_2point_8hpp.html">point.hpp</a></div><div class="ttdoc">secp256k1::point: the curve y^2 = x^3 + 7, complete addition, and constant-time scalar multiplication...</div></div>
 <div class="ttc" id="asecp256k1_2scalar_8hpp_html"><div class="ttname"><a href="secp256k1_2scalar_8hpp.html">scalar.hpp</a></div><div class="ttdoc">secp256k1::scalar: arithmetic modulo the group order n, constant-time and constexpr.</div></div>
 <div class="ttc" id="asecret_8hpp_html"><div class="ttname"><a href="secret_8hpp.html">secret.hpp</a></div><div class="ttdoc">secret_bytes&lt;N&gt;: a fixed-size buffer for key material that is wiped when it dies, and secure_wipe.</div></div>
 <div class="ttc" id="aslip10_8hpp_html"><div class="ttname"><a href="slip10_8hpp.html">slip10.hpp</a></div><div class="ttdoc">SLIP-10 key derivation for Ed25519: the master key from a seed and hardened child derivation.</div></div>

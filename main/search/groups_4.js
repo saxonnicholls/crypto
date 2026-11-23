@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['wallets_0',['Wallets',['../group__wallet.html',1,'']]]
+  ['rsa_0',['RSA',['../group__rsa.html',1,'']]]
 ];

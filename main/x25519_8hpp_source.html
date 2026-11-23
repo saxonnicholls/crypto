@@ -26,7 +26,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">snicholls-crypto<span id="projectnumber">&#160;0.2.0</span>
+   <div id="projectname">snicholls-crypto<span id="projectnumber">&#160;0.3.0</span>
    </div>
    <div id="projectbrief">Elliptic curves, signatures and wallet key derivation for the snicholls libraries</div>
   </td>
@@ -176,7 +176,7 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('x25519_8hpp_so
 <div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>        field_element::conditional_swap(mask, x2, x3);</div>
 <div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>        field_element::conditional_swap(mask, z2, z3);</div>
 <div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>        swap = bit;</div>
-<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>        <span class="keyword">const</span> field_element a = x2 + z2, aa = a.square(), b = x2 - z2, bb = b.square(), ee = aa - bb;</div>
+<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>        <span class="keyword">const</span> field_element a = x2 + z2, aa = a.square(), b = x2 - z2, bb = b.<a class="code hl_function" href="classsnicholls_1_1crypto_1_1p256_1_1field__element.html#a82e0a4f56aa433ed702da9ee42b0e779">square</a>(), ee = aa - bb;</div>
 <div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>        <span class="keyword">const</span> field_element c = x3 + z3, d = x3 - z3, da = d * a, cb = c * b;</div>
 <div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>        x3 = (da + cb).square();</div>
 <div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span>        z3 = x1 * (da - cb).square();</div>
@@ -220,6 +220,7 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('x25519_8hpp_so
 <div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span> </div>
 <div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span><span class="preprocessor">#endif </span><span class="comment">/* snicholls_crypto_curve25519_x25519_hpp */</span><span class="preprocessor"></span></div>
 <div class="ttc" id="aclasssnicholls_1_1crypto_1_1curve25519_1_1field__element_html"><div class="ttname"><a href="classsnicholls_1_1crypto_1_1curve25519_1_1field__element.html">snicholls::crypto::curve25519::field_element</a></div><div class="ttdoc">An element of GF(2^255 - 19).</div><div class="ttdef"><b>Definition</b> <a href="curve25519_2field_8hpp_source.html#l00105">field.hpp:105</a></div></div>
+<div class="ttc" id="aclasssnicholls_1_1crypto_1_1p256_1_1field__element_html_a82e0a4f56aa433ed702da9ee42b0e779"><div class="ttname"><a href="classsnicholls_1_1crypto_1_1p256_1_1field__element.html#a82e0a4f56aa433ed702da9ee42b0e779">snicholls::crypto::p256::field_element::square</a></div><div class="ttdeci">constexpr field_element square() const noexcept</div><div class="ttdoc">Square.</div><div class="ttdef"><b>Definition</b> <a href="p256_2field_8hpp_source.html#l00156">field.hpp:156</a></div></div>
 <div class="ttc" id="aclasssnicholls_1_1crypto_1_1secret__bytes_html"><div class="ttname"><a href="classsnicholls_1_1crypto_1_1secret__bytes.html">snicholls::crypto::secret_bytes</a></div><div class="ttdoc">N bytes of key material: inline, wiped on destruction, copied only on request.</div><div class="ttdef"><b>Definition</b> <a href="secret_8hpp_source.html#l00110">secret.hpp:110</a></div></div>
 <div class="ttc" id="aconstant__time_8hpp_html"><div class="ttname"><a href="constant__time_8hpp.html">constant_time.hpp</a></div><div class="ttdoc">snicholls::crypto::ct: masks, selection, swaps and comparisons whose timing does not depend on the da...</div></div>
 <div class="ttc" id="acurve25519_2field_8hpp_html"><div class="ttname"><a href="curve25519_2field_8hpp.html">field.hpp</a></div><div class="ttdoc">curve25519::field_element: arithmetic modulo p = 2^255 - 19, constant-time and constexpr.</div></div>

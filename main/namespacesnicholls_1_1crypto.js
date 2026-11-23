@@ -18,6 +18,7 @@ var namespacesnicholls_1_1crypto =
     [ "curve25519", "namespacesnicholls_1_1crypto_1_1curve25519.html", "namespacesnicholls_1_1crypto_1_1curve25519" ],
     [ "ed25519", "namespacesnicholls_1_1crypto_1_1ed25519.html", "namespacesnicholls_1_1crypto_1_1ed25519" ],
     [ "hd", "namespacesnicholls_1_1crypto_1_1hd.html", "namespacesnicholls_1_1crypto_1_1hd" ],
+    [ "p256", "namespacesnicholls_1_1crypto_1_1p256.html", "namespacesnicholls_1_1crypto_1_1p256" ],
     [ "rsa", "namespacesnicholls_1_1crypto_1_1rsa.html", "namespacesnicholls_1_1crypto_1_1rsa" ],
     [ "secp256k1", "namespacesnicholls_1_1crypto_1_1secp256k1.html", "namespacesnicholls_1_1crypto_1_1secp256k1" ],
     [ "x25519", "namespacesnicholls_1_1crypto_1_1x25519.html", "namespacesnicholls_1_1crypto_1_1x25519" ],
