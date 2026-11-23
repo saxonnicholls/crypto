@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.1.1 (2026-11-23)
+
+Build fixes for the compilers of CI's first run; no change in behaviour. Pins snicholls-core at v0.21.0 and
+requires 0.17.0 or later.
+
+- Clang 21 with libstdc++ 15: the demos and benchmarks get the constexpr step limits the tests had
+  (`snicholls_crypto_constexpr_limits`); libstdc++ 15 checks its assertions in constant evaluation, and a field
+  inversion then exceeds Clang's default. `secp256k1/field.hpp` says which flags a consumer needs to evaluate an
+  inversion or a multiplication at compile time.
+- GCC 15 with AVX2 code: `signature::der()` appends each integer straight from r and s instead of copying
+  intermediate vectors, which GCC reported as a false `-Wstringop-overflow`; a new test covers the 8- and 72-byte
+  encodings.
+- GCC 13 on aarch64: base58 decoding's reversal is bounded by the buffer as well as the length, silencing a false
+  `-Wstringop-overflow`.
+- MSVC: `secp256k1::sign` and `schnorr_sign` retry without `continue` (C3615), and `convert_bits` no longer shifts
+  a byte by 8 (C4333).
+- The local gate: `make ubuntu` adds Clang 21 (Release, Debug, ASan+UBSan) and GCC 15 at `-march=x86-64-v3` in the
+  Ubuntu 26.04 image, built with GNU Make as CI builds them, and `UBUNTU_FLAGS=--arm64` adds ARM64 GCC 13; the
+  images' apt caches are their own and locked. The Valgrind secret-marking check now also runs under GCC 15 and
+  Clang 21.
+
 ## 0.1.0 (2026-11-23)
 
 First release. Experimental and not independently audited: not for securing funds yet (SECURITY.md). Pins

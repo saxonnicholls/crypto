@@ -22,7 +22,7 @@
 cmake_minimum_required(VERSION 3.20)
 
 project(snicholls_crypto
-    VERSION 0.1.0
+    VERSION 0.1.1
     DESCRIPTION "snicholls-crypto - elliptic curves, signatures and wallet key derivation"
     LANGUAGES CXX)
 
