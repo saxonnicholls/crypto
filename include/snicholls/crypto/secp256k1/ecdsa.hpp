@@ -73,6 +73,7 @@
 
 #include <snicholls/core/containers/inplace_vector.hpp>
 #include <snicholls/core/result.hpp>
+#include <snicholls/crypto/detail/ecdsa_der.hpp>
 #include <snicholls/crypto/error.hpp>
 #include <snicholls/crypto/secp256k1/keys.hpp>
 #include <snicholls/crypto/secp256k1/rfc6979.hpp>
@@ -125,29 +126,7 @@ struct signature {
     /// \return The bytes.
     [[nodiscard]] constexpr containers::inplace_vector<std::uint8_t, 72> der() const noexcept
     {
-        // Each integer appended straight from r or s. Appending them through intermediate vectors made GCC 15
-        // report false overflows (-Wstringop-overflow at -O3 with AVX2), and writing through a running index into a
-        // result sized to its capacity did the same under the sanitizers (-Warray-bounds): GCC cannot relate the two
-        // lengths to their sum of at most 72. Nothing here can find the result full: 2 + 35 + 35 bytes at most.
-        containers::inplace_vector<std::uint8_t, 72> out;
-        auto integer = [&out](const std::array<std::uint8_t, 32>& v) {
-            std::size_t i = 0;
-            while (i < 31 && v[i] == 0)
-                ++i;
-            const std::size_t sign = v[i] >> 7;   // a zero byte before a first byte with its top bit set
-            (void)out.try_push_back(0x02);
-            (void)out.try_push_back(static_cast<std::uint8_t>(sign + 32 - i));
-            if (sign != 0)
-                (void)out.try_push_back(0);
-            for (; i < 32; ++i)
-                (void)out.try_push_back(v[i]);
-        };
-        (void)out.try_push_back(0x30);
-        (void)out.try_push_back(0);   // the SEQUENCE's length, known at the end
-        integer(r);
-        integer(s);
-        out[1] = static_cast<std::uint8_t>(out.size() - 2);
-        return out;
+        return crypto::detail::ecdsa_der_encode(r, s);
     }
 
     /// \brief A strict DER signature (BIP-66's rules). Variable time; public data only.
@@ -155,38 +134,12 @@ struct signature {
     /// \return The signature (r and s not yet range-checked), or `errc::invalid_signature`.
     [[nodiscard]] static constexpr result<signature, errc> from_der(std::span<const std::uint8_t> der) noexcept
     {
-        const std::size_t n = der.size();
-        if (n < 8 || n > 72 || der[0] != 0x30 || der[1] != n - 2 || der[2] != 0x02)
+        const auto rs = crypto::detail::ecdsa_der_decode(der);
+        if (!rs)
             return err(errc::invalid_signature);
-        const std::size_t len_r = der[3];
-        if (len_r == 0 || 5 + len_r >= n || der[4 + len_r] != 0x02)
-            return err(errc::invalid_signature);
-        const std::size_t len_s = der[5 + len_r];
-        if (len_s == 0 || len_r + len_s + 6 != n)
-            return err(errc::invalid_signature);
-        signature sig;
-        auto integer = [](std::span<const std::uint8_t> v, std::array<std::uint8_t, 32>& out) {
-            if (v[0] & 0x80)
-                return false;   // negative
-            if (v.size() > 1 && v[0] == 0 && !(v[1] & 0x80))
-                return false;   // padding beyond the sign byte
-            if (v.size() > 33 || (v.size() == 33 && v[0] != 0))
-                return false;   // more than 256 bits
-            const std::size_t skip = v.size() == 33 ? 1 : 0;
-            const std::size_t pad = 32 - (v.size() - skip);
-            for (std::size_t i = 0; i < v.size() - skip; ++i)
-                out[pad + i] = v[skip + i];
-            return true;
-        };
-        if (!integer(der.subspan(4, len_r), sig.r) || !integer(der.subspan(6 + len_r, len_s), sig.s))
-            return err(errc::invalid_signature);
-        return ok(sig);
+        return ok(signature{rs->first, rs->second});
     }
 
-    /// \brief Equality of bytes.
-    /// \param a A signature.
-    /// \param b Another.
-    /// \return Whether r and s agree.
     [[nodiscard]] friend constexpr bool operator==(const signature& a, const signature& b) noexcept = default;
 };
 

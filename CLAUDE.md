@@ -180,6 +180,7 @@ constant-time**), `\errors`, `\examples` (a `\snippet` from a compiled demo), `\
     make check           # check_version.py, check_mirror.py, check_public.py
     make ubuntu          # Ubuntu 24.04 (GCC 13, Clang 18, Valgrind, Doxygen) and 26.04 (GCC 15, Clang 21) in Docker
     make ubuntu UBUNTU_FLAGS=--arm64   # the same, then ARM64 GCC 13 as CI's ARM64 leg (emulated on x86-64: slow)
+    make single-include  # single_include/snicholls_crypto.hpp for this commit (git-ignored; releases attach theirs)
     make oracles         # the differential gate: the oracle fixtures regenerated in docker/oracles and replayed
     make fuzz            # the differential fuzz harness, 30 seconds a target (fuzz/run.sh 3600: an hour each)
     make demos           # build and run every demo with its output shown (scripts/run_demos.sh)
@@ -224,6 +225,7 @@ template parameters; `SNICHOLLS_CRYPTO_` macros. `noexcept` is accurate.
 |---|---|---|---|
 | snicholls-core | `third_party/core` | `564d0c4` (development pin, to be `v0.17.0`) | the library |
 | GoogleTest | `third_party/googletest` | `v1.18.0` | tests only |
+| snicholls-tooling | `third_party/tooling` | `v0.2.1` | the single include and its check (`tooling.conf`); never the library |
 | Google Benchmark | `third_party/benchmark` | `v1.9.5` | benchmarks only |
 | The oracles | `docker/oracles`, `scripts/oracles/` (locks) | `tests/fixtures/oracles/manifest.json` | differential tests only |
 

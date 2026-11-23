@@ -16,6 +16,8 @@
 #                        (scripts/oracles/test.sh; scripts/generate_oracle_fixtures.py to rewrite them)
 #   make fuzz            the differential fuzz harness (fuzz/) in the oracle image, 30 seconds a target
 #                        (fuzz/run.sh; fuzz/run.sh 3600 for an hour each)
+#   make single-include  single_include/snicholls_crypto.hpp, the whole library (core included) in one file, for this
+#                        commit (git-ignored; each release attaches its own; every build also compiles one)
 #   make benchmarks      every benchmark in Release, results written to BENCHMARKS.md
 #                        (scripts/benchmarks_md.py; --filter for one file)
 #   make demos           build and run every demo, output shown (scripts/run_demos.sh --all;
@@ -31,7 +33,7 @@ CONFIG   ?= Release
 CMAKE_FLAGS ?=
 UBUNTU_FLAGS ?=
 
-.PHONY: all test test-werror asan docs check ubuntu oracles fuzz demos benchmarks clean
+.PHONY: all test test-werror asan docs check ubuntu oracles fuzz single-include demos benchmarks clean
 
 all: test
 
@@ -63,6 +65,9 @@ ubuntu:
 
 oracles:
 	scripts/oracles/test.sh
+
+single-include:
+	python3 third_party/tooling/scripts/single_include.py
 
 fuzz:
 	fuzz/run.sh

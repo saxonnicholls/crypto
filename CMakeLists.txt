@@ -160,6 +160,17 @@ if(SNICHOLLS_CRYPTO_BUILD_TESTS)
     target_link_libraries(snicholls_crypto_header_check PRIVATE snicholls::crypto)
     snicholls_crypto_compile_options(snicholls_crypto_header_check)
 
+    # tooling (third_party/tooling, a test-only submodule pinned to a tag): single_include/snicholls_crypto.hpp, core
+    # expanded in it, compiles on its own in every build, and the CTest check.single_include fails if a public header
+    # is missing from crypto.hpp (tooling.conf)
+    if(NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/third_party/tooling/cmake/SnichollsTooling.cmake)
+        message(FATAL_ERROR "third_party/tooling is empty - run: git submodule update --init --recursive")
+    endif()
+    include(${CMAKE_CURRENT_SOURCE_DIR}/third_party/tooling/cmake/SnichollsTooling.cmake)
+    snicholls_single_include_check(snicholls_crypto_single_include)
+    snicholls_crypto_compile_options(snicholls_crypto_single_include)
+    snicholls_tooling_add_checks(SINGLE_INCLUDE)
+
     if(NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest/CMakeLists.txt)
         message(FATAL_ERROR "third_party/googletest is empty - run: git submodule update --init --recursive")
     endif()

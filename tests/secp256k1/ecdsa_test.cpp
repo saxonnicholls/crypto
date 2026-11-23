@@ -12,6 +12,8 @@
 
 #include <gtest/gtest.h>
 
+#include <initializer_list>
+
 #include <map>
 #include <optional>
 #include <string>
@@ -130,7 +132,7 @@ TEST(CryptoSecp256k1Ecdsa, EthereumVIsTwentySevenOrTwentyEight)
     auto rsv = sig.ethereum();
     EXPECT_EQ(rsv[64], 27 + sig.recovery_id);
     EXPECT_EQ(recover_ethereum(hash, rsv).unwrap(), key.public_key());
-    for (const std::uint8_t v : {0, 1, 26, 29, 30, 255}) {
+    for (const std::uint8_t v : std::initializer_list<std::uint8_t>{0, 1, 26, 29, 30, 255}) {
         rsv[64] = v;
         EXPECT_EQ(recover_ethereum(hash, rsv).unwrap_err(), errc::invalid_recovery_id) << int(v);
     }

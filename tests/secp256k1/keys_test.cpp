@@ -10,6 +10,8 @@
 
 #include <gtest/gtest.h>
 
+#include <initializer_list>
+
 #include <type_traits>
 
 using namespace snicholls::crypto::secp256k1;
@@ -72,11 +74,11 @@ TEST(CryptoSecp256k1Keys, ParseRejectsEveryMalformedEncoding)
     auto u = g.uncompressed();
     EXPECT_EQ(public_key::parse(std::span<const std::uint8_t>(c).first(32)).unwrap_err(), errc::invalid_length);
     EXPECT_EQ(public_key::parse({}).unwrap_err(), errc::invalid_length);
-    for (const std::uint8_t prefix : {0x00, 0x01, 0x04, 0x05, 0x06, 0x07}) {
+    for (const std::uint8_t prefix : std::initializer_list<std::uint8_t>{0x00, 0x01, 0x04, 0x05, 0x06, 0x07}) {
         c[0] = prefix;
         EXPECT_EQ(public_key::parse(c).unwrap_err(), errc::invalid_public_key) << int(prefix);
     }
-    for (const std::uint8_t prefix : {0x00, 0x02, 0x03, 0x06, 0x07}) {   // hybrid forms are refused
+    for (const std::uint8_t prefix : std::initializer_list<std::uint8_t>{0x00, 0x02, 0x03, 0x06, 0x07}) {   // hybrid forms are refused
         u[0] = prefix;
         EXPECT_EQ(public_key::parse(u).unwrap_err(), errc::invalid_public_key) << int(prefix);
     }

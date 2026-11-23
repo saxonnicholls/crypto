@@ -2,6 +2,12 @@
 
 ## Unreleased (0.4.0)
 
+- The single include (the family's rule, tooling v0.2.1): `snicholls_crypto.hpp`, crypto with core expanded in it,
+  generated and compiled alone in every build, checked complete (`check.single_include`), never committed; each
+  release tag attaches it to the GitHub release. `make single-include` writes it for any commit.
+- secp256k1's DER now uses `detail/ecdsa_der.hpp`, as P-256's does: one encoder and one strict decoder.
+- MSVC: the tests' braced lists of byte values are `std::initializer_list<std::uint8_t>` (C4244).
+
 - ChaCha20-Poly1305 (RFC 8439) and XChaCha20-Poly1305 (`aead/chacha20_poly1305.hpp`): authenticated encryption
   with associated data, constant time in the key and the data, a constant-time tag check, output zeroed when the
   tag does not verify; in-place use; `constexpr`, no allocation. ChaCha20, HChaCha20 and Poly1305 in `detail/`.
