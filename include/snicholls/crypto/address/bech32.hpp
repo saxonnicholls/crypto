@@ -266,8 +266,10 @@ template <unsigned From, unsigned To, bool Pad, std::size_t N>
     unsigned bits = 0;
     containers::inplace_vector<std::uint8_t, N> out;
     for (const std::uint8_t v : in) {
-        if ((v >> From) != 0)
-            return err(errc::invalid_character);
+        if constexpr (From < 8) {   // a byte is always below 2^8 (and MSVC warns, C4333, on shifting it by 8)
+            if ((v >> From) != 0)
+                return err(errc::invalid_character);
+        }
         acc = ((acc << From) | v) & 0xffffffu;
         bits += From;
         while (bits >= To) {

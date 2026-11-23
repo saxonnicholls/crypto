@@ -158,30 +158,32 @@ constexpr scalar even_y_key(const private_key& key, affine_point& p) noexcept
         auto rand = hn.finish();
         scalar k = scalar::from_bytes_reduced(rand);
         secure_wipe(rand);
-        if (ct::declassify(k.is_zero_mask())) {   // probability about 2^-256; BIP-340 fails here, this library tries once more with aux'
-            t[0] ^= 1;
-            continue;
+        // k of zero, with probability about 2^-256: BIP-340 fails here, this library tries once more with aux'. The
+        // loop has no `continue`: MSVC takes one in an endless loop for control reaching the end of a constexpr
+        // function (C3615).
+        if (!ct::declassify(k.is_zero_mask())) {
+            std::uint64_t finite = 0;
+            const affine_point big_r = point::mul_base(k).to_affine_ct(finite);
+            k = scalar::select(ct::mask_from_bit(big_r.y.is_odd()), -k, k);
+            const auto rx = big_r.x.to_bytes();
+            auto he = detail::tagged("BIP0340/challenge");
+            he.update(rx);
+            he.update(px);
+            he.update(message);
+            const scalar e = scalar::from_bytes_reduced(he.finish());
+            const auto s = (k + e * d).to_bytes();
+            schnorr_signature sig;
+            for (std::size_t i = 0; i < 32; ++i) {
+                sig.bytes[i] = rx[i];
+                sig.bytes[32 + i] = s[i];
+            }
+            secure_wipe(k);
+            secure_wipe(d);
+            secure_wipe(t);
+            secure_wipe(db);
+            return sig;
         }
-        std::uint64_t finite = 0;
-        const affine_point big_r = point::mul_base(k).to_affine_ct(finite);
-        k = scalar::select(ct::mask_from_bit(big_r.y.is_odd()), -k, k);
-        const auto rx = big_r.x.to_bytes();
-        auto he = detail::tagged("BIP0340/challenge");
-        he.update(rx);
-        he.update(px);
-        he.update(message);
-        const scalar e = scalar::from_bytes_reduced(he.finish());
-        const auto s = (k + e * d).to_bytes();
-        schnorr_signature sig;
-        for (std::size_t i = 0; i < 32; ++i) {
-            sig.bytes[i] = rx[i];
-            sig.bytes[32 + i] = s[i];
-        }
-        secure_wipe(k);
-        secure_wipe(d);
-        secure_wipe(t);
-        secure_wipe(db);
-        return sig;
+        t[0] ^= 1;
     }
 }
 

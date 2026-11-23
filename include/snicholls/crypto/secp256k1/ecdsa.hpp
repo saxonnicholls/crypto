@@ -246,11 +246,13 @@ struct recoverable_signature {
         const auto id = static_cast<std::uint8_t>(parity | (overflow << 1));
         secure_wipe(k);
         secure_wipe(k_inverse);
-        if (ct::declassify(r.is_zero_mask() | s.is_zero_mask()))   // probability about 2^-256: the next RFC 6979 nonce
-            continue;
-        secure_wipe(d);
-        secure_wipe(z);
-        return {{r.to_bytes(), s.to_bytes()}, id};
+        // r or s of zero, with probability about 2^-256: round again with the next RFC 6979 nonce. The loop has no
+        // `continue`: MSVC takes one in an endless loop for control reaching the end of a constexpr function (C3615).
+        if (!ct::declassify(r.is_zero_mask() | s.is_zero_mask())) {
+            secure_wipe(d);
+            secure_wipe(z);
+            return {{r.to_bytes(), s.to_bytes()}, id};
+        }
     }
 }
 
