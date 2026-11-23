@@ -1,0 +1,9 @@
+# The Python oracles (scripts/oracles/python/oracle.py). Exact versions; requirements.txt is this file compiled
+# with every distribution's SHA-256 (pip-compile --generate-hashes, scripts/oracles/lock.sh) and installed with
+# pip install --require-hashes in docker/oracles. Test-only: the library never uses any of these.
+coincurve==21.0.0       # libsecp256k1 (bundled)
+cryptography==50.0.2    # OpenSSL (bundled in the wheel)
+PyNaCl==1.6.2           # libsodium (bundled)
+mnemonic==0.21          # python-mnemonic, Trezor's BIP-39 reference
+slip10==1.1.0           # SLIP-10 reference implementation
+base58==2.1.1           # base58 and base58check

@@ -1,0 +1,301 @@
+{
+  "fixtures": {
+    "base58check.txt": {
+      "cases": 907,
+      "oracles": [
+        "base58",
+        "bitcoinjs",
+        "bs58_rs"
+      ]
+    },
+    "bip32.txt": {
+      "cases": 400,
+      "oracles": [
+        "bip32_rs",
+        "bitcoinjs",
+        "ethers",
+        "slip10"
+      ]
+    },
+    "bip340_sign.txt": {
+      "cases": 700,
+      "oracles": [
+        "coincurve",
+        "k256",
+        "noble_secp256k1",
+        "secp256k1_rs"
+      ]
+    },
+    "bip340_verify.txt": {
+      "cases": 2650,
+      "oracles": [
+        "coincurve",
+        "k256",
+        "noble_secp256k1",
+        "secp256k1_rs"
+      ]
+    },
+    "bip39.txt": {
+      "cases": 300,
+      "oracles": [
+        "bip39_rs",
+        "ethers",
+        "mnemonic",
+        "scure_bip39"
+      ]
+    },
+    "bip39_text.txt": {
+      "cases": 600,
+      "oracles": [
+        "bip39_rs",
+        "ethers",
+        "mnemonic",
+        "scure_bip39"
+      ]
+    },
+    "ecdsa_der.txt": {
+      "cases": 4054,
+      "oracles": [
+        "coincurve",
+        "k256",
+        "openssl",
+        "secp256k1_rs"
+      ]
+    },
+    "ecdsa_recover.txt": {
+      "cases": 1100,
+      "oracles": [
+        "coincurve",
+        "ethers",
+        "k256",
+        "noble_secp256k1",
+        "secp256k1_rs"
+      ]
+    },
+    "ecdsa_sign.txt": {
+      "cases": 1010,
+      "oracles": [
+        "coincurve",
+        "ethers",
+        "k256",
+        "noble_secp256k1",
+        "openssl",
+        "secp256k1_rs"
+      ]
+    },
+    "ecdsa_verify.txt": {
+      "cases": 6640,
+      "oracles": [
+        "coincurve",
+        "k256",
+        "noble_secp256k1",
+        "openssl",
+        "secp256k1_rs"
+      ]
+    },
+    "ed25519_sign.txt": {
+      "cases": 800,
+      "oracles": [
+        "dalek",
+        "noble_ed25519",
+        "openssl",
+        "pynacl"
+      ]
+    },
+    "ed25519_verify.txt": {
+      "cases": 906,
+      "oracles": [
+        "dalek",
+        "dalek_strict",
+        "noble_ed25519",
+        "noble_zip215",
+        "openssl",
+        "pynacl"
+      ]
+    },
+    "ethereum.txt": {
+      "cases": 450,
+      "oracles": [
+        "ethers"
+      ]
+    },
+    "key_addresses.txt": {
+      "cases": 400,
+      "oracles": [
+        "bitcoinjs",
+        "ethers"
+      ]
+    },
+    "sec1_parse.txt": {
+      "cases": 1717,
+      "oracles": [
+        "coincurve",
+        "k256",
+        "noble_secp256k1",
+        "secp256k1_rs"
+      ]
+    },
+    "secp256k1_keys.txt": {
+      "cases": 1015,
+      "oracles": [
+        "coincurve",
+        "ethers",
+        "k256",
+        "noble_secp256k1",
+        "secp256k1_rs"
+      ]
+    },
+    "segwit.txt": {
+      "cases": 1460,
+      "oracles": [
+        "bech32_rs",
+        "bip350_ref",
+        "bitcoinjs"
+      ]
+    },
+    "slip10_ed25519.txt": {
+      "cases": 300,
+      "oracles": [
+        "ed25519_hd_key",
+        "slip10",
+        "slip10_rs"
+      ]
+    },
+    "x25519.txt": {
+      "cases": 700,
+      "oracles": [
+        "dalek",
+        "noble_x25519",
+        "openssl",
+        "pynacl"
+      ]
+    }
+  },
+  "oracles": {
+    "base58": {
+      "answers": 907,
+      "program": "python",
+      "version": "2.1.1"
+    },
+    "bech32_rs": {
+      "answers": 1460,
+      "program": "rust",
+      "version": "bech32 0.12.0"
+    },
+    "bip32_rs": {
+      "answers": 307,
+      "program": "rust",
+      "version": "bip32 0.6.0"
+    },
+    "bip350_ref": {
+      "answers": 1460,
+      "program": "python",
+      "version": "sipa/bech32 7a7d7ab158db"
+    },
+    "bip39_rs": {
+      "answers": 1500,
+      "program": "rust",
+      "version": "bip39 3.0.0"
+    },
+    "bitcoinjs": {
+      "answers": 3101,
+      "program": "node",
+      "version": "bitcoinjs-lib 7.0.5, bip32 5.0.1, tiny-secp256k1 2.2.5, bs58check 4.0.0"
+    },
+    "bs58_rs": {
+      "answers": 907,
+      "program": "rust",
+      "version": "bs58 0.5.1"
+    },
+    "coincurve": {
+      "answers": 20806,
+      "program": "python",
+      "version": "21.0.0"
+    },
+    "dalek": {
+      "answers": 2406,
+      "program": "rust",
+      "version": "ed25519-dalek 3.0.0, x25519-dalek 3.0.0"
+    },
+    "dalek_strict": {
+      "answers": 906,
+      "program": "rust",
+      "version": "ed25519-dalek 3.0.0 (verify_strict)"
+    },
+    "ed25519_hd_key": {
+      "answers": 538,
+      "program": "node",
+      "version": "2.0.0"
+    },
+    "ethers": {
+      "answers": 6505,
+      "program": "node",
+      "version": "6.17.0"
+    },
+    "k256": {
+      "answers": 20906,
+      "program": "rust",
+      "version": "k256 0.14.0"
+    },
+    "mnemonic": {
+      "answers": 1500,
+      "program": "python",
+      "version": "0.21"
+    },
+    "noble_ed25519": {
+      "answers": 1706,
+      "program": "node",
+      "version": "2.4.0"
+    },
+    "noble_secp256k1": {
+      "answers": 15842,
+      "program": "node",
+      "version": "3.2.0"
+    },
+    "noble_x25519": {
+      "answers": 700,
+      "program": "node",
+      "version": "2.4.0"
+    },
+    "noble_zip215": {
+      "answers": 906,
+      "program": "node",
+      "version": "2.4.0"
+    },
+    "openssl": {
+      "answers": 10790,
+      "program": "python",
+      "version": "OpenSSL 4.0.3 29 Sep 2026 (cryptography 50.0.2)"
+    },
+    "pynacl": {
+      "answers": 2406,
+      "program": "python",
+      "version": "libsodium 1.0.19 or later, bundled (PyNaCl 1.6.2)"
+    },
+    "scure_bip39": {
+      "answers": 1500,
+      "program": "node",
+      "version": "2.4.0"
+    },
+    "secp256k1_rs": {
+      "answers": 20906,
+      "program": "rust",
+      "version": "secp256k1 0.33.1 (secp256k1-sys 0.14.1)"
+    },
+    "slip10": {
+      "answers": 1000,
+      "program": "python",
+      "version": "1.1.0"
+    },
+    "slip10_rs": {
+      "answers": 300,
+      "program": "rust",
+      "version": "slip10_ed25519 0.1.3"
+    }
+  },
+  "toolchains": {
+    "node": "v26.13.1",
+    "python": "3.12.3",
+    "rust": "rustc 1.100.0 (0ef1bc386 2026-11-09)"
+  }
+}

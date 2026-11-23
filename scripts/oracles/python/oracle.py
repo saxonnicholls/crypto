@@ -1,0 +1,385 @@
+#!/usr/bin/env python3
+#
+#  oracle.py
+#  snicholls-crypto
+#
+#  Copyright 2010-2026 Saxon Herschel Nicholls
+#
+#  The Python oracles: one JSON object per line on stdin, one answer per line on stdout, in order. Test-only, run
+#  in docker/oracles by scripts/generate_oracle_fixtures.py and by the fuzz harness; nothing here is part of the
+#  library. Every value is lower-case hex unless it is text (a mnemonic, a passphrase, a path, an address).
+#
+#      {"lib": "coincurve", "op": "ecdsa_sign", "sk": "...", "h": "..."}  ->  {"r": ..., "s": ..., "v": 0, "der": ...}
+#      {"op": "version"}  ->  {"oracle": "python", "libs": {"coincurve": {"version": ..., "ops": [...]}, ...}}
+#
+#  An answer is the result's fields, {"error": "<why>"} when the library refused the input, or
+#  {"unsupported": true} when the library has no such operation. The libraries:
+#
+#      coincurve      libsecp256k1 (bundled in the wheel): keys, ECDSA (RFC 6979, low-S), recovery, BIP-340
+#      openssl        OpenSSL through cryptography: ECDSA on secp256k1 (RFC 6979 when OpenSSL is 3.2 or later),
+#                     Ed25519, X25519
+#      pynacl         libsodium: Ed25519, X25519
+#      mnemonic       python-mnemonic, Trezor's BIP-39 reference
+#      slip10         the SLIP-10 reference: BIP-32 (SLIP-10 on secp256k1 is BIP-32) and SLIP-10 Ed25519
+#      base58         base58check
+#      bip350_ref     Pieter Wuille's BIP-173 / BIP-350 reference code (segwit_addr.py, from the image)
+#
+
+import json
+import os
+import sys
+import traceback
+
+sys.path.insert(0, os.path.join(os.environ.get("ORACLES_HOME", "/opt/oracles"), "python-ref"))
+
+import base58 as base58_lib                                               # noqa: E402
+import coincurve                                                          # noqa: E402
+import cryptography                                                       # noqa: E402
+import mnemonic as mnemonic_lib                                           # noqa: E402
+import nacl                                                               # noqa: E402
+import nacl.bindings                                                      # noqa: E402
+import nacl.exceptions                                                    # noqa: E402
+import segwit_addr                                                        # noqa: E402
+import slip10 as slip10_lib                                               # noqa: E402
+from cryptography.exceptions import InvalidSignature                     # noqa: E402
+from cryptography.hazmat.primitives import hashes                        # noqa: E402
+from cryptography.hazmat.primitives.asymmetric import ec, ed25519, x25519, utils as asym_utils  # noqa: E402
+
+N = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141
+
+
+def h(b):
+    return bytes(b).hex()
+
+
+def b(x):
+    return bytes.fromhex(x)
+
+
+class Refused(Exception):
+    pass
+
+
+# ---------------------------------------------------------------------------------------------------------------
+# coincurve (libsecp256k1)
+
+def _cc_lib():
+    from coincurve._libsecp256k1 import ffi, lib
+    from coincurve.context import GLOBAL_CONTEXT
+    return ffi, lib, GLOBAL_CONTEXT.ctx
+
+
+def _cc_sig(compact):
+    # A compact r || s into libsecp256k1's signature, as secp256k1_ecdsa_signature_parse_compact reads it: r or s
+    # at or above n is refused there (the library would otherwise reduce it)
+    ffi, lib, ctx = _cc_lib()
+    sig = ffi.new("secp256k1_ecdsa_signature *")
+    if not lib.secp256k1_ecdsa_signature_parse_compact(ctx, sig, compact):
+        raise Refused("parse_compact")
+    return sig
+
+
+def _cc_verify_raw(pub, hash32, sig):
+    ffi, lib, ctx = _cc_lib()
+    key = ffi.new("secp256k1_pubkey *")
+    if not lib.secp256k1_ec_pubkey_parse(ctx, key, pub, len(pub)):
+        raise Refused("pubkey_parse")
+    return bool(lib.secp256k1_ecdsa_verify(ctx, sig, hash32, key))
+
+
+def coincurve_op(q):
+    op = q["op"]
+    if op == "sec_pub":
+        try:
+            k = coincurve.PrivateKey(b(q["sk"]))
+        except Exception as e:
+            raise Refused(str(e))
+        return {"c": h(k.public_key.format(True)), "u": h(k.public_key.format(False))}
+    if op == "pub_parse":
+        try:
+            p = coincurve.PublicKey(b(q["pub"]))
+        except Exception as e:
+            raise Refused(str(e))
+        return {"c": h(p.format(True))}
+    if op == "ecdsa_sign":
+        k = coincurve.PrivateKey(b(q["sk"]))
+        rec = k.sign_recoverable(b(q["h"]), hasher=None)
+        der = k.sign(b(q["h"]), hasher=None)
+        return {"r": h(rec[:32]), "s": h(rec[32:64]), "v": rec[64], "der": h(der)}
+    if op == "ecdsa_verify":
+        # libsecp256k1 verifies only low-S; Bitcoin Core accepts a high-S signature where consensus allows it by
+        # normalising first, which is how "accept" is answered here
+        ffi, lib, ctx = _cc_lib()
+        sig = _cc_sig(b(q["sig"]))
+        if q.get("high_s") == "accept":
+            lib.secp256k1_ecdsa_signature_normalize(ctx, sig, sig)
+        return {"valid": _cc_verify_raw(b(q["pub"]), b(q["h"]), sig)}
+    if op == "ecdsa_verify_der":
+        ffi, lib, ctx = _cc_lib()
+        der = b(q["der"])
+        sig = ffi.new("secp256k1_ecdsa_signature *")
+        if not lib.secp256k1_ecdsa_signature_parse_der(ctx, sig, der, len(der)):
+            raise Refused("parse_der")
+        out = ffi.new("unsigned char[64]")
+        lib.secp256k1_ecdsa_signature_serialize_compact(ctx, out, sig)
+        return {"rs": h(ffi.buffer(out, 64)), "valid": _cc_verify_raw(b(q["pub"]), b(q["h"]), sig)}
+    if op == "ecdsa_recover":
+        try:
+            p = coincurve.PublicKey.from_signature_and_message(b(q["sig"]) + bytes([q["v"]]), b(q["h"]), hasher=None)
+        except Exception as e:
+            raise Refused(str(e))
+        return {"c": h(p.format(True))}
+    if op == "schnorr_sign":
+        if len(b(q["m"])) != 32:
+            return None   # coincurve signs 32-byte messages only (secp256k1_schnorrsig_sign32)
+        k = coincurve.PrivateKey(b(q["sk"]))
+        sig = k.sign_schnorr(b(q["m"]), b(q["aux"]))
+        return {"sig": h(sig), "x": h(k.public_key_xonly.format())}
+    if op == "schnorr_verify":
+        if len(b(q["m"])) != 32:
+            return None
+        try:
+            p = coincurve.PublicKeyXOnly(b(q["x"]))
+        except Exception as e:
+            raise Refused(str(e))
+        return {"valid": bool(p.verify(b(q["sig"]), b(q["m"])))}
+    return None
+
+
+# ---------------------------------------------------------------------------------------------------------------
+# OpenSSL, through cryptography
+
+def _openssl_version():
+    from cryptography.hazmat.backends.openssl.backend import backend
+    return backend.openssl_version_text()
+
+
+def _deterministic_available():
+    try:
+        ec.ECDSA(hashes.SHA256(), deterministic_signing=True)
+        return True
+    except TypeError:
+        return False
+
+
+def openssl_op(q):
+    op = q["op"]
+    if op == "ecdsa_sign":
+        if not _deterministic_available():
+            return None
+        k = ec.derive_private_key(int(q["sk"], 16), ec.SECP256K1())
+        der = k.sign(b(q["h"]), ec.ECDSA(asym_utils.Prehashed(hashes.SHA256()), deterministic_signing=True))
+        r, s = asym_utils.decode_dss_signature(der)
+        return {"r": "%064x" % r, "s": "%064x" % s, "der": h(der)}   # OpenSSL does not normalise s
+    if op in ("ecdsa_verify", "ecdsa_verify_der"):
+        try:
+            pub = ec.EllipticCurvePublicKey.from_encoded_point(ec.SECP256K1(), b(q["pub"]))
+        except Exception as e:
+            raise Refused(str(e))
+        if op == "ecdsa_verify":
+            rs = b(q["sig"])
+            r, s = int.from_bytes(rs[:32], "big"), int.from_bytes(rs[32:], "big")
+            if q.get("high_s") == "reject" and s > N // 2:
+                return {"valid": False}
+            if not (0 < r < N and 0 < s < N):
+                return {"valid": False}
+            der = asym_utils.encode_dss_signature(r, s)
+        else:
+            der = b(q["der"])
+        try:
+            pub.verify(der, b(q["h"]), ec.ECDSA(asym_utils.Prehashed(hashes.SHA256())))
+            return {"valid": True}
+        except InvalidSignature:
+            return {"valid": False}
+    if op == "ed25519_sign":
+        k = ed25519.Ed25519PrivateKey.from_private_bytes(b(q["seed"]))
+        from cryptography.hazmat.primitives import serialization as ser
+        pub = k.public_key().public_bytes(ser.Encoding.Raw, ser.PublicFormat.Raw)
+        return {"pub": h(pub), "sig": h(k.sign(b(q["m"])))}
+    if op == "ed25519_verify":
+        try:
+            pub = ed25519.Ed25519PublicKey.from_public_bytes(b(q["pub"]))
+        except Exception as e:
+            raise Refused(str(e))
+        try:
+            pub.verify(b(q["sig"]), b(q["m"]))
+            return {"valid": True}
+        except InvalidSignature:
+            return {"valid": False}
+    if op == "x25519":
+        try:
+            out = x25519.X25519PrivateKey.from_private_bytes(b(q["k"])).exchange(
+                x25519.X25519PublicKey.from_public_bytes(b(q["u"])))
+        except Exception as e:
+            raise Refused(str(e))
+        return {"out": h(out)}
+    return None
+
+
+# ---------------------------------------------------------------------------------------------------------------
+# libsodium, through PyNaCl
+
+def _sodium_version():
+    # PyNaCl links libsodium statically and exports neither sodium_version_string() nor the library version;
+    # the AEGIS functions it carries date it to libsodium 1.0.19 or later
+    from nacl._sodium import lib
+    return "1.0.19 or later, bundled" if hasattr(lib, "crypto_aead_aegis256_encrypt") else "bundled"
+
+
+def pynacl_op(q):
+    op = q["op"]
+    nb = nacl.bindings
+    if op == "ed25519_sign":
+        pk, sk = nb.crypto_sign_seed_keypair(b(q["seed"]))
+        return {"pub": h(pk), "sig": h(nb.crypto_sign(b(q["m"]), sk)[:64])}
+    if op == "ed25519_verify":
+        pub, sig, m = b(q["pub"]), b(q["sig"]), b(q["m"])
+        try:
+            nb.crypto_sign_open(sig + m, pub)
+            return {"valid": True}
+        except nacl.exceptions.BadSignatureError:
+            return {"valid": False}
+        except Exception as e:
+            raise Refused(str(e))
+    if op == "x25519":
+        try:
+            return {"out": h(nb.crypto_scalarmult(b(q["k"]), b(q["u"])))}
+        except Exception as e:
+            raise Refused(str(e))
+    return None
+
+
+# ---------------------------------------------------------------------------------------------------------------
+# python-mnemonic (BIP-39)
+
+_MN = mnemonic_lib.Mnemonic("english")
+
+
+def mnemonic_op(q):
+    op = q["op"]
+    if op == "bip39_from_entropy":
+        try:
+            return {"words": _MN.to_mnemonic(b(q["e"]))}
+        except Exception as e:
+            raise Refused(str(e))
+    if op == "bip39_to_entropy":
+        try:
+            if not _MN.check(q["words"]):
+                raise Refused("check")
+            return {"e": h(_MN.to_entropy(q["words"]))}
+        except Refused:
+            raise
+        except Exception as e:
+            raise Refused(str(e))
+    if op == "bip39_seed":
+        return {"seed": h(mnemonic_lib.Mnemonic.to_seed(q["words"], q.get("pass", "")))}
+    return None
+
+
+# ---------------------------------------------------------------------------------------------------------------
+# SLIP-10 reference (BIP-32 on secp256k1, SLIP-10 on Ed25519)
+
+def slip10_op(q):
+    op = q["op"]
+    if op == "bip32":
+        node = slip10_lib.SLIP10.from_seed(b(q["seed"]), curve_name="secp256k1")
+        try:
+            return {"xprv": node.get_xpriv_from_path(q["path"]), "xpub": node.get_xpub_from_path(q["path"])}
+        except Exception as e:
+            raise Refused(str(e))
+    if op == "slip10_ed25519":
+        node = slip10_lib.SLIP10.from_seed(b(q["seed"]), curve_name="ed25519")
+        try:
+            child = node.get_child_from_path(q["path"])
+        except Exception as e:
+            raise Refused(str(e))
+        return {"key": h(child.get_privkey_from_path("m")), "chain": h(child.chaincode),
+                "pub": h(child.get_pubkey_from_path("m")[-32:])}
+    return None
+
+
+# ---------------------------------------------------------------------------------------------------------------
+# base58check and the BIP-173 / BIP-350 reference
+
+def base58_op(q):
+    op = q["op"]
+    if op == "base58check_encode":
+        return {"t": base58_lib.b58encode_check(b(q["p"])).decode()}
+    if op == "base58check_decode":
+        try:
+            return {"p": h(base58_lib.b58decode_check(q["t"]))}
+        except Exception as e:
+            raise Refused(str(e))
+    return None
+
+
+def bip350_op(q):
+    op = q["op"]
+    if op == "segwit_encode":
+        a = segwit_addr.encode(q["hrp"], q["ver"], list(b(q["prog"])))
+        if a is None:
+            raise Refused("encode")
+        return {"addr": a}
+    if op == "segwit_decode":
+        ver, prog = segwit_addr.decode(q["hrp"], q["addr"])
+        if ver is None:
+            raise Refused("decode")
+        return {"ver": ver, "prog": h(prog)}
+    return None
+
+
+LIBS = {
+    "coincurve": (coincurve_op, lambda: coincurve.__version__,
+                  ["sec_pub", "pub_parse", "ecdsa_sign", "ecdsa_verify", "ecdsa_verify_der", "ecdsa_recover",
+                   "schnorr_sign", "schnorr_verify"]),
+    "openssl": (openssl_op, lambda: "%s (cryptography %s)" % (_openssl_version(), cryptography.__version__),
+                (["ecdsa_sign"] if _deterministic_available() else []) +
+                ["ecdsa_verify", "ecdsa_verify_der", "ed25519_sign", "ed25519_verify", "x25519"]),
+    "pynacl": (pynacl_op, lambda: "libsodium %s (PyNaCl %s)" % (_sodium_version(), nacl.__version__),
+               ["ed25519_sign", "ed25519_verify", "x25519"]),
+    "mnemonic": (mnemonic_op, lambda: mnemonic_lib.__version__ if hasattr(mnemonic_lib, "__version__") else "0.21",
+                 ["bip39_from_entropy", "bip39_to_entropy", "bip39_seed"]),
+    "slip10": (slip10_op, lambda: _dist_version("slip10"), ["bip32", "slip10_ed25519"]),
+    "base58": (base58_op, lambda: _dist_version("base58"), ["base58check_encode", "base58check_decode"]),
+    "bip350_ref": (bip350_op, lambda: "sipa/bech32 " + open(os.path.join(os.path.dirname(segwit_addr.__file__),
+                                                                         "COMMIT")).read().strip()[:12],
+                   ["segwit_encode", "segwit_decode"]),
+}
+
+
+def _dist_version(name):
+    from importlib.metadata import version
+    return version(name)
+
+
+def answer(q):
+    if q.get("op") == "version":
+        return {"oracle": "python", "libs": {k: {"version": v[1](), "ops": v[2]} for k, v in LIBS.items()}}
+    lib = LIBS.get(q.get("lib"))
+    if lib is None or q.get("op") not in lib[2]:
+        return {"unsupported": True}
+    try:
+        out = lib[0](q)
+    except Refused as e:
+        return {"error": str(e) or "refused"}
+    return {"unsupported": True} if out is None else out
+
+
+def main():
+    for line in sys.stdin:
+        line = line.strip()
+        if not line:
+            continue
+        q = json.loads(line)
+        try:
+            a = answer(q)
+        except Exception:
+            a = {"crash": traceback.format_exc(limit=3)}
+        if "id" in q:
+            a["id"] = q["id"]
+        sys.stdout.write(json.dumps(a, separators=(",", ":")) + "\n")
+        sys.stdout.flush()
+
+
+if __name__ == "__main__":
+    main()

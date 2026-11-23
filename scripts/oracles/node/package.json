@@ -1,0 +1,19 @@
+{
+  "name": "snicholls-crypto-oracles",
+  "private": true,
+  "description": "Test-only oracles for snicholls-crypto: scripts/oracles/node/oracle.mjs. Never a dependency of the library.",
+  "license": "MIT",
+  "type": "module",
+  "dependencies": {
+    "@noble/curves": "2.4.0",
+    "@noble/hashes": "2.4.0",
+    "@noble/secp256k1": "3.2.0",
+    "@scure/bip39": "2.4.0",
+    "bip32": "5.0.1",
+    "bitcoinjs-lib": "7.0.5",
+    "bs58check": "4.0.0",
+    "ed25519-hd-key": "2.0.0",
+    "ethers": "6.17.0",
+    "tiny-secp256k1": "2.2.5"
+  }
+}

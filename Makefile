@@ -10,6 +10,9 @@
 #   make check           the static checks CI runs first: version, mirror, nothing private
 #   make ubuntu          the full suite on Ubuntu 24.04 and 26.04 in Docker, GCC 13 and 15, Clang 18,
 #                        sanitizers and the Valgrind secret-marking check (scripts/test_ubuntu.sh)
+#   make oracles         the differential gate in the oracle image (docker/oracles): every fixture under
+#                        tests/fixtures/oracles regenerated from the pinned oracles, then replayed
+#                        (scripts/oracles/test.sh; scripts/generate_oracle_fixtures.py to rewrite them)
 #   make benchmarks      every benchmark in Release, results written to BENCHMARKS.md
 #                        (scripts/benchmarks_md.py; --filter for one file)
 #   make demos           build and run every demo, output shown (scripts/run_demos.sh --all;
@@ -24,7 +27,7 @@ BUILD    ?= build
 CONFIG   ?= Release
 CMAKE_FLAGS ?=
 
-.PHONY: all test test-werror asan docs check ubuntu demos benchmarks clean
+.PHONY: all test test-werror asan docs check ubuntu oracles demos benchmarks clean
 
 all: test
 
@@ -53,6 +56,9 @@ docs:
 
 ubuntu:
 	scripts/test_ubuntu.sh
+
+oracles:
+	scripts/oracles/test.sh
 
 benchmarks:
 	cmake -B build-bench -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=$(CXX) -DSNICHOLLS_CRYPTO_BUILD_BENCHMARKS=ON -DSNICHOLLS_CRYPTO_BUILD_TESTS=OFF

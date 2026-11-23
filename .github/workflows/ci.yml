@@ -183,6 +183,37 @@ jobs:
           path: bench-json/
           if-no-files-found: ignore
 
+  # The cross-implementation fixtures (tests/fixtures/oracles/): in the oracle image (docker/oracles, every
+  # toolchain and package pinned), each fixture is regenerated from the oracles and must match the committed one
+  # byte for byte, then replayed against the library. The image is rebuilt only when a pin moves (its tag is a hash
+  # of the Dockerfile and the locks; the layers are cached between runs).
+  oracles:
+    name: Differential (oracle fixtures)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: recursive
+
+      - name: The image's tag
+        id: image
+        run: echo "tag=$(scripts/oracles/image.sh --tag)" >> "$GITHUB_OUTPUT"
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build the oracle image (cached)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/oracles/Dockerfile
+          tags: ${{ steps.image.outputs.tag }}
+          load: true
+          cache-from: type=gha,scope=oracles
+          cache-to: type=gha,scope=oracles,mode=max
+
+      - name: Regenerate and compare the fixtures, then replay them (make oracles)
+        run: scripts/oracles/test.sh
+
   docs:
     name: Documentation (warnings are errors)
     runs-on: ubuntu-latest

@@ -1,0 +1,7 @@
+# The build context is the repository root; the image needs only the oracles' manifests
+*
+!scripts/oracles/python/requirements.txt
+!scripts/oracles/node/package.json
+!scripts/oracles/node/package-lock.json
+!scripts/oracles/rust/Cargo.toml
+!scripts/oracles/rust/Cargo.lock

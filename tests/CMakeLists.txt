@@ -8,26 +8,37 @@ add_executable(snicholls_crypto_tests
     version_test.cpp
     address/base58_test.cpp
     address/base58check_test.cpp
+    address/base58check_oracles_test.cpp
     address/bech32_test.cpp
+    address/bech32_oracles_test.cpp
     bip39/mnemonic_test.cpp
+    bip39/mnemonic_oracles_test.cpp
     bip39/wordlist_test.cpp
     curve25519/ed25519_test.cpp
+    curve25519/ed25519_oracles_test.cpp
     curve25519/edwards_test.cpp
     curve25519/field_test.cpp
     curve25519/scalar_test.cpp
     curve25519/x25519_test.cpp
+    curve25519/x25519_oracles_test.cpp
     detail/hashes_test.cpp
     detail/limbs_test.cpp
     hd/bip32_test.cpp
+    hd/bip32_oracles_test.cpp
     hd/path_test.cpp
     hd/slip10_test.cpp
+    hd/slip10_oracles_test.cpp
     secp256k1/ecdsa_test.cpp
+    secp256k1/ecdsa_oracles_test.cpp
     secp256k1/field_test.cpp
     secp256k1/keys_test.cpp
+    secp256k1/keys_oracles_test.cpp
     secp256k1/point_test.cpp
     secp256k1/rfc6979_test.cpp
     secp256k1/scalar_test.cpp
-    secp256k1/schnorr_test.cpp)
+    secp256k1/schnorr_test.cpp
+    secp256k1/schnorr_oracles_test.cpp
+)
 target_link_libraries(snicholls_crypto_tests PRIVATE snicholls::crypto GTest::gtest_main GTest::gmock)
 # The official test vectors (tests/fixtures/), read at run time; provenance in tests/fixtures/README.md
 target_compile_definitions(snicholls_crypto_tests PRIVATE SNICHOLLS_CRYPTO_FIXTURE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/fixtures")
@@ -59,6 +70,22 @@ find_package(Python3 COMPONENTS Interpreter REQUIRED)
 add_test(NAME generated.bip39_wordlist_is_official
     COMMAND Python3::Interpreter ${PROJECT_SOURCE_DIR}/scripts/generate_bip39_wordlist.py --check)
 set_tests_properties(generated.bip39_wordlist_is_official PROPERTIES LABELS boundary)
+
+# The cross-implementation fixtures (tests/fixtures/oracles/, replayed by the *_oracles_test.cpp tests above) must be
+# what the pinned oracles answer today: regenerated and compared, in the oracle image (docker/oracles), where
+# ORACLES_HOME holds the oracles' toolchains. Elsewhere the fixtures are replayed but not regenerated.
+if(DEFINED ENV{ORACLES_HOME} AND EXISTS "$ENV{ORACLES_HOME}/venv")
+    set(_crypto_oracles_default ON)
+else()
+    set(_crypto_oracles_default OFF)
+endif()
+option(SNICHOLLS_CRYPTO_TEST_ORACLES "Regenerate the oracle fixtures as a test (needs the docker/oracles image)"
+       ${_crypto_oracles_default})
+if(SNICHOLLS_CRYPTO_TEST_ORACLES)
+    add_test(NAME generated.oracle_fixtures_up_to_date
+        COMMAND Python3::Interpreter -I ${PROJECT_SOURCE_DIR}/scripts/generate_oracle_fixtures.py --check)
+    set_tests_properties(generated.oracle_fixtures_up_to_date PROPERTIES LABELS oracle TIMEOUT 1800)
+endif()
 
 # The constant-time check (tests/ct/secret_marking.cpp): every secret path run under Valgrind's memcheck with the
 # secrets marked undefined, so a branch or an index on a secret fails. Only where Valgrind and its header exist
