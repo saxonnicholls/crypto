@@ -41,7 +41,9 @@
 /// \snippet aead/aes256_gcm_demo.cpp gcm
 ///
 /// \perf
-/// See BENCHMARKS.md, `benchmarks/aead/chacha20_poly1305_benchmark.cpp` (AES-256-GCM beside ChaCha20-Poly1305).
+/// About 100 us for 64 bytes and 1 MB/s for longer messages (Release, Xeon W-3245): roughly 200 times slower than
+/// ChaCha20-Poly1305 here, the price of computing AES's S-box without tables or AES-NI. Fine for JWE's keys and short
+/// payloads; use XChaCha20-Poly1305 for cookies and bulk data. See `benchmarks/aead/aes256_gcm_benchmark.cpp`.
 ///
 /// \testing
 /// `tests/aead/aes256_gcm_test.cpp`: the GCM specification's test cases 13 to 16 (AES-256), every Wycheproof
