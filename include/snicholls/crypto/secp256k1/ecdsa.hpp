@@ -140,6 +140,10 @@ struct signature {
         return ok(signature{rs->first, rs->second});
     }
 
+    /// \brief Equality of r and s.
+    /// \param a A signature.
+    /// \param b Another.
+    /// \return Whether they are equal.
     [[nodiscard]] friend constexpr bool operator==(const signature& a, const signature& b) noexcept = default;
 };
 
