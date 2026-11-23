@@ -169,6 +169,30 @@ TEST(CryptoSecp256k1Ecdsa, DerRoundTripAndStrictness)
     EXPECT_FALSE(signature::from_der({}));
 }
 
+TEST(CryptoSecp256k1Ecdsa, DerAtItsShortestAndLongest)
+{
+    // r = s = 0: one zero byte each, 8 bytes in all
+    constexpr signature zero{};
+    static_assert(zero.der().size() == 8);
+    EXPECT_EQ(to_hex(zero.der()), "3006020100020100");
+    // Both with the top bit set: a sign byte each, the 72-byte maximum, computed at compile time too
+    signature top;
+    top.r.fill(0xff);
+    top.s[0] = 0x80;
+    constexpr auto top_der = [] {
+        signature t;
+        t.r.fill(0xff);
+        t.s[0] = 0x80;
+        return t.der();
+    }();
+    static_assert(top_der.size() == 72 && top_der[1] == 70 && top_der[3] == 33 && top_der[38] == 33);
+    EXPECT_EQ(to_hex(top.der()),
+              "3046"
+              "022100ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+              "0221008000000000000000000000000000000000000000000000000000000000000000");
+    EXPECT_EQ(signature::from_der(top.der()).unwrap(), top);
+}
+
 namespace {
 struct wycheproof_counts {
     int valid_accepted = 0, invalid_rejected = 0, wrong = 0;

@@ -125,29 +125,28 @@ struct signature {
     /// \return The bytes.
     [[nodiscard]] constexpr containers::inplace_vector<std::uint8_t, 72> der() const noexcept
     {
+        // Each integer appended straight from r or s. Appending them through intermediate vectors made GCC 15
+        // report false overflows (-Wstringop-overflow at -O3 with AVX2), and writing through a running index into a
+        // result sized to its capacity did the same under the sanitizers (-Warray-bounds): GCC cannot relate the two
+        // lengths to their sum of at most 72. Nothing here can find the result full: 2 + 35 + 35 bytes at most.
         containers::inplace_vector<std::uint8_t, 72> out;
-        auto integer = [](const std::array<std::uint8_t, 32>& v, containers::inplace_vector<std::uint8_t, 33>& w) {
+        auto integer = [&out](const std::array<std::uint8_t, 32>& v) {
             std::size_t i = 0;
             while (i < 31 && v[i] == 0)
                 ++i;
-            if (v[i] & 0x80)
-                w.push_back(0);
+            const std::size_t sign = v[i] >> 7;   // a zero byte before a first byte with its top bit set
+            (void)out.try_push_back(0x02);
+            (void)out.try_push_back(static_cast<std::uint8_t>(sign + 32 - i));
+            if (sign != 0)
+                (void)out.try_push_back(0);
             for (; i < 32; ++i)
-                w.push_back(v[i]);
+                (void)out.try_push_back(v[i]);
         };
-        containers::inplace_vector<std::uint8_t, 33> ri, si;
-        integer(r, ri);
-        integer(s, si);
-        out.push_back(0x30);
-        out.push_back(static_cast<std::uint8_t>(4 + ri.size() + si.size()));
-        out.push_back(0x02);
-        out.push_back(static_cast<std::uint8_t>(ri.size()));
-        for (const auto b : ri)
-            out.push_back(b);
-        out.push_back(0x02);
-        out.push_back(static_cast<std::uint8_t>(si.size()));
-        for (const auto b : si)
-            out.push_back(b);
+        (void)out.try_push_back(0x30);
+        (void)out.try_push_back(0);   // the SEQUENCE's length, known at the end
+        integer(r);
+        integer(s);
+        out[1] = static_cast<std::uint8_t>(out.size() - 2);
         return out;
     }
 
