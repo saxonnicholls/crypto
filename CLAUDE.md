@@ -135,9 +135,14 @@ Every public entity has tests; a change without tests is not done. GoogleTest (`
   `<area>/<name>_oracles_test.cpp`. Agreement is byte for byte where the operation is deterministic; where
   implementations' rules differ, each oracle's rule is stated in the generator and checked, never decided by a vote.
   A fixture is regenerated, never edited; `make oracles` is the differential gate.
+- **Differential fuzzing**: `fuzz/` (`-DSNICHOLLS_CRYPTO_BUILD_FUZZ=ON`, Clang, in the oracle image) compares the
+  library with libsecp256k1, libsodium, OpenSSL and the JSON-lines oracles on random and adversarial input; a
+  divergence beyond a stated rule aborts, `fuzz/run.sh` minimises it into `fuzz/regressions/<target>/`, and it is
+  committed with the fix as a regression (CTest `fuzz.<target>.regressions`). `fuzz/cryptofuzz/` is the Cryptofuzz
+  module for OSS-Fuzz. The C oracles are test-only: `snicholls::crypto` never includes or links them.
 - Test names `TEST(<Unit><Aspect>, <BehaviourInPlainWords>)`. CTest labels: `unit`, `demo`, `boundary`, `docs`,
   `benchmark`, `ct` (the Valgrind secret-marking check, where Valgrind is installed), `oracle` (the oracle
-  fixtures regenerated and compared, in the oracle image).
+  fixtures regenerated and compared, in the oracle image), `fuzz` (the fuzz build's regressions and controls).
 
 ## Demos (MUST)
 
@@ -172,6 +177,7 @@ constant-time**), `\errors`, `\examples` (a `\snippet` from a compiled demo), `\
     make check           # check_version.py, check_mirror.py, check_public.py
     make ubuntu          # Ubuntu 24.04 (GCC 13, Clang 18, Valgrind, Doxygen) and 26.04 (GCC 15) in Docker
     make oracles         # the differential gate: the oracle fixtures regenerated in docker/oracles and replayed
+    make fuzz            # the differential fuzz harness, 30 seconds a target (fuzz/run.sh 3600: an hour each)
     make demos           # build and run every demo with its output shown (scripts/run_demos.sh)
     make benchmarks      # every benchmark in Release; rewrites BENCHMARKS.md
 

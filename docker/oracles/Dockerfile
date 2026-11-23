@@ -10,7 +10,8 @@
 #   - Node by version and SHA-256 of the official tarball, the packages by node/package-lock.json (npm ci);
 #   - Rust by rustup-init's SHA-256 and an exact toolchain, the crates by rust/Cargo.lock (--locked);
 #   - the Python packages by python/requirements.txt, every distribution's SHA-256 (--require-hashes);
-#   - the BIP-173 / BIP-350 reference code by commit and SHA-256.
+#   - the BIP-173 / BIP-350 reference code by commit and SHA-256;
+#   - for the fuzz harness, libsecp256k1 and libsodium from their release tarballs by SHA-256, and OpenSSL.
 #
 # Built from the repository root, which is the context, by scripts/oracles/image.sh:
 #
@@ -98,6 +99,34 @@ ENV CARGO_TARGET_DIR=$ORACLES_HOME/rust-target
 RUN cd "$ORACLES_HOME/rust" && mkdir -p src && echo 'fn main() {}' > src/main.rs && \
     cargo build --release --locked && \
     cargo clean --release --locked -p snicholls-crypto-oracle && rm -rf src
+
+# The C oracles for the fuzz harness (fuzz/, -DSNICHOLLS_CRYPTO_BUILD_FUZZ=ON): libsecp256k1 and libsodium from
+# their release tarballs by SHA-256, into $ORACLES_HOME/c with pkg-config files; OpenSSL is the image's package
+# (Ubuntu 24.04's 3.0 series). None of them is reachable from the snicholls::crypto target.
+ARG SECP256K1_VERSION=0.8.0
+ARG SECP256K1_SHA256=eb52b0e9239dff7dc26be5f9623567141b8720ec47da29eb3c1e0a660d17c8bb
+ARG SODIUM_VERSION=1.0.22
+ARG SODIUM_SHA256=adbdd8f16149e81ac6078a03aca6fc03b592b89ef7b5ed83841c086191be3349
+RUN --mount=type=cache,target=/var/cache/apt \
+    --mount=type=cache,target=/var/lib/apt \
+    apt-get update && apt-get install -y --no-install-recommends libssl-dev && rm -rf /var/lib/apt/lists/* && \
+    curl -fsSL -o /tmp/secp.tgz "https://github.com/bitcoin-core/secp256k1/archive/refs/tags/v${SECP256K1_VERSION}.tar.gz" && \
+    echo "${SECP256K1_SHA256}  /tmp/secp.tgz" | sha256sum -c - && \
+    mkdir /tmp/secp && tar -xzf /tmp/secp.tgz -C /tmp/secp --strip-components=1 && \
+    cmake -S /tmp/secp -B /tmp/secp/build -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_C_COMPILER=clang \
+      -DCMAKE_INSTALL_PREFIX="$ORACLES_HOME/c" -DSECP256K1_ENABLE_MODULE_RECOVERY=ON \
+      -DSECP256K1_ENABLE_MODULE_EXTRAKEYS=ON -DSECP256K1_ENABLE_MODULE_SCHNORRSIG=ON \
+      -DSECP256K1_BUILD_TESTS=OFF -DSECP256K1_BUILD_EXHAUSTIVE_TESTS=OFF -DSECP256K1_BUILD_BENCHMARK=OFF \
+      -DBUILD_SHARED_LIBS=OFF && \
+    cmake --build /tmp/secp/build && cmake --install /tmp/secp/build && \
+    curl -fsSL -o /tmp/sodium.tgz "https://github.com/jedisct1/libsodium/releases/download/${SODIUM_VERSION}-RELEASE/libsodium-${SODIUM_VERSION}.tar.gz" && \
+    echo "${SODIUM_SHA256}  /tmp/sodium.tgz" | sha256sum -c - && \
+    mkdir /tmp/sodium && tar -xzf /tmp/sodium.tgz -C /tmp/sodium --strip-components=1 && \
+    cd /tmp/sodium && CC=clang ./configure --quiet --prefix="$ORACLES_HOME/c" --disable-shared --with-pic && \
+    make -s -j"$(nproc)" && make -s install && \
+    rm -rf /tmp/secp /tmp/secp.tgz /tmp/sodium /tmp/sodium.tgz && \
+    echo "libsecp256k1 ${SECP256K1_VERSION}, libsodium ${SODIUM_VERSION}" > "$ORACLES_HOME/c/VERSIONS"
+ENV PKG_CONFIG_PATH=$ORACLES_HOME/c/lib/pkgconfig
 
 WORKDIR /work
 CMD ["bash"]

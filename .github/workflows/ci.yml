@@ -214,6 +214,45 @@ jobs:
       - name: Regenerate and compare the fixtures, then replay them (make oracles)
         run: scripts/oracles/test.sh
 
+  # The differential fuzz harness (fuzz/), a short run on every push: each target for 30 seconds in the oracle image
+  # against libsecp256k1, libsodium, OpenSSL and the JSON-lines oracles, after replaying fuzz/regressions/. A
+  # divergence fails the job and its minimised reproducer is kept as an artifact, to be committed under
+  # fuzz/regressions/<target>/ with the fix. The long runs are fuzz-nightly.yml.
+  fuzz:
+    name: Differential fuzzing (short)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: recursive
+
+      - name: The image's tag
+        id: image
+        run: echo "tag=$(scripts/oracles/image.sh --tag)" >> "$GITHUB_OUTPUT"
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build the oracle image (cached)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/oracles/Dockerfile
+          tags: ${{ steps.image.outputs.tag }}
+          load: true
+          cache-from: type=gha,scope=oracles
+          cache-to: type=gha,scope=oracles,mode=max
+
+      - name: Fuzz each target for 30 seconds
+        run: fuzz/run.sh 30
+
+      - name: Keep any reproducer
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fuzz-regressions
+          path: fuzz/regressions/
+          if-no-files-found: ignore
+
   docs:
     name: Documentation (warnings are errors)
     runs-on: ubuntu-latest

@@ -13,6 +13,8 @@
 #   make oracles         the differential gate in the oracle image (docker/oracles): every fixture under
 #                        tests/fixtures/oracles regenerated from the pinned oracles, then replayed
 #                        (scripts/oracles/test.sh; scripts/generate_oracle_fixtures.py to rewrite them)
+#   make fuzz            the differential fuzz harness (fuzz/) in the oracle image, 30 seconds a target
+#                        (fuzz/run.sh; fuzz/run.sh 3600 for an hour each)
 #   make benchmarks      every benchmark in Release, results written to BENCHMARKS.md
 #                        (scripts/benchmarks_md.py; --filter for one file)
 #   make demos           build and run every demo, output shown (scripts/run_demos.sh --all;
@@ -27,7 +29,7 @@ BUILD    ?= build
 CONFIG   ?= Release
 CMAKE_FLAGS ?=
 
-.PHONY: all test test-werror asan docs check ubuntu oracles demos benchmarks clean
+.PHONY: all test test-werror asan docs check ubuntu oracles fuzz demos benchmarks clean
 
 all: test
 
@@ -59,6 +61,9 @@ ubuntu:
 
 oracles:
 	scripts/oracles/test.sh
+
+fuzz:
+	fuzz/run.sh
 
 benchmarks:
 	cmake -B build-bench -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=$(CXX) -DSNICHOLLS_CRYPTO_BUILD_BENCHMARKS=ON -DSNICHOLLS_CRYPTO_BUILD_TESTS=OFF

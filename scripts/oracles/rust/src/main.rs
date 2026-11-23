@@ -206,6 +206,11 @@ fn dalek_op(op: &str, q: &Value, strict: bool) -> Option<Answer> {
 
 fn bip32_op(op: &str, q: &Value) -> Option<Answer> {
     Some((|| -> Answer {
+        if op == "path_parse" {
+            let path = bip32::DerivationPath::from_str(text(q, "path")).map_err(r)?;
+            let indices: Vec<String> = path.iter().map(|c| u32::from(c).to_string()).collect();
+            return Ok(json!({"indices": indices.join(",")}));
+        }
         if op != "bip32" {
             return Err(Refused("unsupported".into()));
         }
@@ -302,7 +307,7 @@ const LIBS: &[(&str, &str, OpFn, &[&str])] = &[
     ("dalek", "ed25519-dalek 3.0.0, x25519-dalek 3.0.0", |op, q| dalek_op(op, q, false),
      &["ed25519_sign", "ed25519_verify", "x25519"]),
     ("dalek_strict", "ed25519-dalek 3.0.0 (verify_strict)", |op, q| dalek_op(op, q, true), &["ed25519_verify"]),
-    ("bip32_rs", "bip32 0.6.0", bip32_op, &["bip32"]),
+    ("bip32_rs", "bip32 0.6.0", bip32_op, &["bip32", "path_parse"]),
     ("bip39_rs", "bip39 3.0.0", bip39_op, &["bip39_from_entropy", "bip39_to_entropy", "bip39_seed"]),
     ("slip10_rs", "slip10_ed25519 0.1.3", slip10_op, &["slip10_ed25519"]),
     ("bech32_rs", "bech32 0.12.0", bech32_op, &["segwit_encode", "segwit_decode"]),
@@ -332,7 +337,9 @@ fn answer(q: &Value) -> Value {
 }
 
 fn main() {
-    std::panic::set_hook(Box::new(|_| {}));
+    // A panic inside an operation is answered {"crash": ...}; any panic is also reported on stderr, so an oracle
+    // that dies says why
+    std::panic::set_hook(Box::new(|info| eprintln!("rust oracle: {info}")));
     let stdin = io::stdin();
     let mut out = io::stdout().lock();
     for line in stdin.lock().lines() {

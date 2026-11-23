@@ -1,0 +1,98 @@
+name: Fuzz (nightly)
+
+on:
+  schedule:
+    - cron: '17 3 * * *'
+  workflow_dispatch:
+    inputs:
+      seconds:
+        description: 'Seconds per target'
+        default: '3600'
+
+permissions:
+  contents: read
+
+# The long runs of the differential harness (fuzz/), each target in its own job for an hour, and Cryptofuzz with
+# this library's module beside libsecp256k1's (fuzz/cryptofuzz/). A divergence fails the job and keeps its
+# minimised reproducer as an artifact, to be committed under fuzz/regressions/<target>/ with the fix.
+jobs:
+  differential:
+    name: ${{ matrix.target }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [secp256k1_ecdsa, secp256k1_parse, secp256k1_schnorr, ed25519, x25519, text]
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: recursive
+
+      - name: The image's tag
+        id: image
+        run: echo "tag=$(scripts/oracles/image.sh --tag)" >> "$GITHUB_OUTPUT"
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build the oracle image (cached)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/oracles/Dockerfile
+          tags: ${{ steps.image.outputs.tag }}
+          load: true
+          cache-from: type=gha,scope=oracles
+          cache-to: type=gha,scope=oracles,mode=max
+
+      - name: Fuzz
+        run: fuzz/run.sh "${{ github.event.inputs.seconds || '3600' }}" "${{ matrix.target }}"
+
+      - name: Keep any reproducer
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fuzz-regressions-${{ matrix.target }}
+          path: fuzz/regressions/
+          if-no-files-found: ignore
+
+  cryptofuzz:
+    name: Cryptofuzz (snicholls-crypto and libsecp256k1)
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: recursive
+          path: src/snicholls-crypto
+
+      - name: Clang, Boost
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends clang libboost-dev cmake
+
+      # Pinned: Cryptofuzz by commit, libsecp256k1 by release tarball and SHA-256 (v0.7.0: the internal API
+      # Cryptofuzz's secp256k1 module is written against)
+      - name: Cryptofuzz and libsecp256k1
+        run: |
+          git init -q src/cryptofuzz
+          git -C src/cryptofuzz fetch -q --depth 1 https://github.com/MozillaSecurity/cryptofuzz.git 6f1e4970288ecaf8d2fa34643fb4b19fa0adc626
+          git -C src/cryptofuzz checkout -q FETCH_HEAD
+          curl -fsSL -o secp.tgz https://github.com/bitcoin-core/secp256k1/archive/refs/tags/v0.7.0.tar.gz
+          echo "073d19064f3600014750d6949b31a0c957aa7b98920fb4aaa495be07e8e7cd00  secp.tgz" | sha256sum -c -
+          mkdir src/secp256k1 && tar -xzf secp.tgz -C src/secp256k1 --strip-components=1
+
+      - name: Build
+        run: SRC="$PWD/src" OUT="$PWD/out" src/snicholls-crypto/fuzz/cryptofuzz/build.sh
+
+      - name: Fuzz
+        run: |
+          mkdir -p artifacts
+          out/cryptofuzz-snicholls-crypto -max_total_time="${{ github.event.inputs.seconds || '3600' }}" \
+            -print_final_stats=1 -artifact_prefix=artifacts/
+
+      - name: Keep any reproducer
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cryptofuzz-artifacts
+          path: artifacts/
+          if-no-files-found: ignore

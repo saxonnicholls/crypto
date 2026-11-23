@@ -1,0 +1,14 @@
+# OSS-Fuzz project file for snicholls-crypto (fuzz/cryptofuzz/README.md, route 2). Not submitted. Fill in the
+# contacts before submitting: they receive reports while they are embargoed.
+homepage: "https://github.com/saxonnicholls/crypto"
+language: c++
+primary_contact: "<an address that may receive embargoed security reports>"
+auto_ccs: []
+main_repo: "https://github.com/saxonnicholls/crypto"
+fuzzing_engines:
+  - libfuzzer
+sanitizers:
+  - address
+  - undefined
+architectures:
+  - x86_64

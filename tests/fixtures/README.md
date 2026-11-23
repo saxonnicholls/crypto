@@ -118,4 +118,6 @@ The differences found and stated (each in the fixture's header too):
 | BIP-39 text | python-mnemonic, ethers, @scure/bip39, bip39 crate | normalise case or whitespace first | canonical text only (CLAUDE.md rule 8); all agree on every canonical text and every checksum, word or length error |
 | BIP-32 | bip32 crate 0.6 | seeds of 16, 32 or 64 bytes only | any length from 16 to 64, as BIP-32 |
 | BIP-32, SLIP-10 | bitcoinjs bip32, ed25519-hd-key | no derivation along the empty path `m` | the master key |
+| Paths (fuzzing) | bip32 crate | reads the hardened marks `'` and `h`, not `H` | reads all three, as its grammar states |
+| base58check (fuzzing) | python base58 | strips trailing whitespace before decoding | refuses it |
 | Segwit | bitcoinjs-lib `fromBech32` | no check of the version range or program length | refuses, as the reference code and the bech32 crate do |

@@ -90,6 +90,7 @@ set_property(GLOBAL PROPERTY SNICHOLLS_CRYPTO_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_
 option(SNICHOLLS_CRYPTO_BUILD_TESTS "Build the snicholls-crypto unit tests and demos" ${SNICHOLLS_CRYPTO_TOP_LEVEL})
 option(SNICHOLLS_CRYPTO_BUILD_BENCHMARKS "Build the snicholls-crypto benchmarks (Google Benchmark)" OFF)
 option(SNICHOLLS_CRYPTO_BUILD_DOCS "Build the Doxygen documentation; warnings are errors" OFF)
+option(SNICHOLLS_CRYPTO_BUILD_FUZZ "Build the differential fuzz harness (fuzz/; Clang, libFuzzer, and the C oracles of docker/oracles)" OFF)
 option(SNICHOLLS_CRYPTO_WERROR "Treat warnings as errors in everything this project compiles (CI turns this on)" OFF)
 set(SNICHOLLS_CRYPTO_SANITIZE "" CACHE STRING "Sanitizers for the tests and demos, e.g. address,undefined")
 
@@ -159,6 +160,12 @@ if(SNICHOLLS_CRYPTO_BUILD_BENCHMARKS)
     set(BENCHMARK_ENABLE_GTEST_TESTS OFF CACHE BOOL "" FORCE)
     add_subdirectory(third_party/benchmark EXCLUDE_FROM_ALL)
     add_subdirectory(benchmarks)
+endif()
+
+# The fuzz harness links libsecp256k1, libsodium and OpenSSL, test-only: its targets link them, snicholls::crypto
+# never does
+if(SNICHOLLS_CRYPTO_BUILD_FUZZ)
+    add_subdirectory(fuzz)
 endif()
 
 if(SNICHOLLS_CRYPTO_BUILD_DOCS)
