@@ -32,7 +32,7 @@ import bs58check from "bs58check";
 import * as hdkey from "ed25519-hd-key";
 import { ethers } from "ethers";
 import * as ecc from "tiny-secp256k1";
-import { constants, createPrivateKey, createPublicKey, sign as cryptoSign, verify as cryptoVerify } from "node:crypto";
+import { constants, createCipheriv, createDecipheriv, createPrivateKey, createPublicKey, sign as cryptoSign, verify as cryptoVerify } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { createInterface } from "node:readline";
@@ -273,6 +273,18 @@ const LIBS = {
       },
       rsa_verify_pkcs1: (q) => rsaVerify(q, { padding: constants.RSA_PKCS1_PADDING }),
       rsa_verify_pss: (q) => rsaVerify(q, { padding: constants.RSA_PKCS1_PSS_PADDING, saltLength: q.salt }),
+      chacha_seal: (q) => {
+        const c = createCipheriv("chacha20-poly1305", bytes(q.k), bytes(q.n), { authTagLength: 16 });
+        c.setAAD(bytes(q.ad), { plaintextLength: q.m.length / 2 });
+        const ct = Buffer.concat([c.update(bytes(q.m)), c.final()]);
+        return { ct: hex(ct), tag: hex(c.getAuthTag()) };
+      },
+      chacha_open: (q) => {
+        const d = createDecipheriv("chacha20-poly1305", bytes(q.k), bytes(q.n), { authTagLength: 16 });
+        d.setAAD(bytes(q.ad), { plaintextLength: q.ct.length / 2 });
+        d.setAuthTag(bytes(q.tag));
+        return { m: hex(refuse(() => Buffer.concat([d.update(bytes(q.ct)), d.final()]))) };
+      },
       // ES256 as JOSE signs it: Node hashes the message itself; the signature is r || s (IEEE P1363)
       p256_verify: (q) => {
         const u = bytes(q.pub);

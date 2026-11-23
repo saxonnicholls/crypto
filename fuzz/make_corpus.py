@@ -77,6 +77,16 @@ def main():
     n += write(out, "p256", [bytes([i % 128 & ~3]) + b(r[0]) + b(r[2]) + bytes([i % 7, i % 7, i % 64, i % 8])
                              for i, r in enumerate(rows("p256_sign.txt"))] +
                [bytes([3]) + b(r[0]) for r in rows("p256_sec1.txt") if r[0]])
+    aead = []
+    for name in ("chacha20_poly1305.txt", "xchacha20_poly1305.txt"):
+        for line in open(os.path.join(ROOT, "tests", "fixtures", "wycheproof", name)):
+            f = line.split()
+            if not f or f[0].startswith("#"):
+                continue
+            iv, key, ad, msg = (b"" if v == "-" else b(v) for v in (f[2], f[3], f[4], f[5]))
+            if len(iv) in (12, 24) and len(ad) <= 64:
+                aead.append(bytes([1 if len(iv) == 24 else 0]) + key + iv.ljust(24, b"\x00") + bytes([len(ad)]) + ad + msg)
+    n += write(out, "aead", aead)
     text = [b"\x00" + r[2].encode() for r in rows("base58check.txt") if r[0] == "ok" and r[2]]
     text += [b"\x01" + r[4].encode() for r in rows("segwit.txt") if r[0] == "ok"]
     text += [b"\x02" + r[1].replace("+", " ").encode() for r in rows("bip39.txt")]

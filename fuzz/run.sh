@@ -42,7 +42,7 @@ cargo build --release --locked --offline --quiet --manifest-path scripts/oracles
 cmake -S . -B /work/build -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_CXX_COMPILER=clang++ \
     -DSNICHOLLS_CRYPTO_WERROR=ON -DSNICHOLLS_CRYPTO_BUILD_FUZZ=ON >/work/configure.log 2>&1 ||
     { tail -30 /work/configure.log; exit 1; }
-targets="secp256k1_ecdsa secp256k1_parse secp256k1_schnorr ed25519 x25519 rsa p256 text"
+targets="secp256k1_ecdsa secp256k1_parse secp256k1_schnorr ed25519 x25519 rsa p256 aead text"
 [ -n "$ONLY" ] && targets="$ONLY"
 for t in $targets; do
     cmake --build /work/build --target snicholls_crypto_fuzz_$t >/work/build-$t.log 2>&1 ||

@@ -16,7 +16,7 @@ find_package(OpenSSL 3.0 REQUIRED)
 
 set(SNICHOLLS_CRYPTO_FUZZ_SANITIZE "fuzzer,address,undefined" CACHE STRING "The fuzz targets' -fsanitize= list")
 
-set(_fuzz_targets secp256k1_ecdsa secp256k1_parse secp256k1_schnorr ed25519 x25519 rsa p256 text)
+set(_fuzz_targets secp256k1_ecdsa secp256k1_parse secp256k1_schnorr ed25519 x25519 rsa p256 aead text)
 foreach(_t IN LISTS _fuzz_targets)
     add_executable(snicholls_crypto_fuzz_${_t} ${_t}_fuzz.cpp)
     target_link_libraries(snicholls_crypto_fuzz_${_t} PRIVATE snicholls::crypto

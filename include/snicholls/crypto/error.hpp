@@ -78,6 +78,7 @@ enum class errc : unsigned char {
     invalid_hrp,              ///< A bech32 human-readable part was empty, too long, out of range, missing, or not the one expected.
     invalid_witness_version,  ///< A segwit witness version above 16, or the wrong checksum variant for the version.
     invalid_witness_program,  ///< A segwit witness program outside 2 to 40 bytes, or not 20 or 32 bytes for version 0.
+    authentication_failed,    ///< An AEAD tag did not match: the ciphertext, the associated data, the nonce or the key differ.
 };
 
 /// \brief The name of an error, for logs and messages; never key material.
@@ -107,6 +108,7 @@ enum class errc : unsigned char {
     case errc::invalid_hrp: return "invalid_hrp";
     case errc::invalid_witness_version: return "invalid_witness_version";
     case errc::invalid_witness_program: return "invalid_witness_program";
+    case errc::authentication_failed: return "authentication_failed";
     }
     return "unknown";
 }

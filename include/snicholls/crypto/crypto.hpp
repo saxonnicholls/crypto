@@ -25,6 +25,10 @@
 /// \ingroup crypto
 /// \brief The field and scalars of Curve25519, edwards25519, Ed25519 signatures and X25519 key agreement.
 
+/// \defgroup aead Authenticated encryption
+/// \ingroup crypto
+/// \brief ChaCha20-Poly1305 (RFC 8439) and XChaCha20-Poly1305.
+
 /// \defgroup p256 P-256
 /// \ingroup crypto
 /// \brief P-256 (secp256r1): its field, scalars and points, and ECDSA with SHA-256 (ES256) with RFC 6979 nonces.
@@ -45,6 +49,7 @@
 #include <snicholls/crypto/secret.hpp>
 #include <snicholls/crypto/version.hpp>
 #include <snicholls/crypto/address/base58.hpp>
+#include <snicholls/crypto/aead/chacha20_poly1305.hpp>
 #include <snicholls/crypto/address/base58check.hpp>
 #include <snicholls/crypto/address/bech32.hpp>
 #include <snicholls/crypto/bip39/mnemonic.hpp>

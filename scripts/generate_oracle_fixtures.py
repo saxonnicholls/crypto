@@ -1435,6 +1435,47 @@ def gen_p256(pool, fx):
 
 
 # ---------------------------------------------------------------------------------------------------------------
+# ChaCha20-Poly1305 and XChaCha20-Poly1305
+
+def gen_aead(pool, fx):
+    rng = random.Random("aead v1")
+    for op, nlen, name in (("chacha", 12, "chacha20_poly1305.txt"), ("xchacha", 24, "xchacha20_poly1305.txt")):
+        cases = [{"k": hx(rand_bytes(rng, 32)), "n": hx(rand_bytes(rng, nlen)),
+                  "ad": hx(rand_bytes(rng, rng.choice([0, 1, 12, 64]))),
+                  "m": hx(rand_bytes(rng, rng.choice([0, 1, 15, 16, 17, 64, 65, 500])))} for _ in range(300)]
+        f = Fixture(name, "%s-Poly1305: seal byte for byte, and open of the sealed and of a tampered message" %
+                    ("ChaCha20" if op == "chacha" else "XChaCha20"),
+                    "key, nonce, associated data, message, ciphertext, tag, tampered (ciphertext or tag), opens (1 or 0)")
+        sealed = pool.ask(op + "_seal", cases)
+        rows = []
+        for case, ans in zip(cases, sealed):
+            v, libs = consensus(pool, f.name, case, ans, lambda lib, a: [a["ct"], a["tag"]])
+            if libs:
+                rows.append((case, v, libs))
+        opens = []
+        for i, (case, (ct, tag), _) in enumerate(rows):
+            which = i % 3   # 0: as sealed, 1: a ciphertext bit flipped, 2: a tag bit flipped
+            if which == 1 and ct:
+                b = bytearray(bytes.fromhex(ct))
+                b[rng.randrange(len(b))] ^= 1
+                ct = hx(b)
+            elif which == 2 or (which == 1 and not ct):
+                b = bytearray(bytes.fromhex(tag))
+                b[rng.randrange(16)] ^= 0x10
+                tag = hx(b)
+            opens.append(dict(case, ct=ct, tag=tag))
+        answers = pool.ask(op + "_open", [{k: o[k] for k in ("k", "n", "ad", "ct", "tag")} for o in opens])
+        for (case, (ct0, tag0), libs), o, ans in zip(rows, opens, answers):
+            v, libs2 = consensus(pool, f.name + " open", {"n": o["n"]}, ans, lambda lib, a: refused_or(a, "m"))
+            if libs2:
+                if v and v[0] != case["m"]:
+                    fail(f.name, {"n": o["n"]}, "opened to another message")
+                f.add([case["k"], case["n"], case["ad"] or None, case["m"] or None, ct0 or None, tag0,
+                       (o["ct"] or "-") + ":" + o["tag"], 1 if v else 0], set(libs) | set(libs2))
+        fx.append(f)
+
+
+# ---------------------------------------------------------------------------------------------------------------
 
 def generate():
     pool = Pool()
@@ -1452,6 +1493,7 @@ def generate():
         gen_addresses(pool, fx)
         gen_rsa(pool, fx)
         gen_p256(pool, fx)
+        gen_aead(pool, fx)
         files = {f.name: f.text(pool) for f in fx}
         manifest = pool.manifest()
         manifest["fixtures"] = {f.name: {"cases": len(f.rows), "oracles": sorted(f.libs)} for f in fx}

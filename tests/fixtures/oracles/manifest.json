@@ -53,6 +53,14 @@
         "scure_bip39"
       ]
     },
+    "chacha20_poly1305.txt": {
+      "cases": 300,
+      "oracles": [
+        "node_crypto",
+        "openssl",
+        "pynacl"
+      ]
+    },
     "ecdsa_der.txt": {
       "cases": 4054,
       "oracles": [
@@ -234,6 +242,12 @@
         "openssl",
         "pynacl"
       ]
+    },
+    "xchacha20_poly1305.txt": {
+      "cases": 300,
+      "oracles": [
+        "pynacl"
+      ]
     }
   },
   "oracles": {
@@ -333,12 +347,12 @@
       "version": "2.4.0"
     },
     "node_crypto": {
-      "answers": 3146,
+      "answers": 3746,
       "program": "node",
       "version": "Node v26.13.1, OpenSSL 3.5.9"
     },
     "openssl": {
-      "answers": 16913,
+      "answers": 17513,
       "program": "python",
       "version": "OpenSSL 4.0.3 29 Sep 2026 (cryptography 50.0.2)"
     },
@@ -348,7 +362,7 @@
       "version": "p256 0.14.0"
     },
     "pynacl": {
-      "answers": 2406,
+      "answers": 3606,
       "program": "python",
       "version": "libsodium 1.0.19 or later, bundled (PyNaCl 1.6.2)"
     },

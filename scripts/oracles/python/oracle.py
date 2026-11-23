@@ -208,6 +208,20 @@ def openssl_op(q):
             return {"valid": True}
         except InvalidSignature:
             return {"valid": False}
+    if op in ("chacha_seal", "chacha_open"):
+        from cryptography.hazmat.primitives.ciphers.aead import ChaCha20Poly1305
+        c = ChaCha20Poly1305(b(q["k"]))
+        if op == "chacha_seal":
+            out = c.encrypt(b(q["n"]), b(q["m"]), b(q["ad"]))
+            return {"ct": h(out[:-16]), "tag": h(out[-16:])}
+        try:
+            return {"m": h(c.decrypt(b(q["n"]), b(q["ct"]) + b(q["tag"]), b(q["ad"])))}
+        except InvalidSignature:
+            raise Refused("authentication")
+        except Exception as e:
+            if type(e).__name__ == "InvalidTag":
+                raise Refused("authentication")
+            raise
     if op == "p256_pub":
         try:
             k = ec.derive_private_key(int(q["sk"], 16), ec.SECP256R1())
@@ -300,6 +314,16 @@ def pynacl_op(q):
             return {"valid": False}
         except Exception as e:
             raise Refused(str(e))
+    if op in ("chacha_seal", "xchacha_seal"):
+        f = nb.crypto_aead_chacha20poly1305_ietf_encrypt if op == "chacha_seal" else nb.crypto_aead_xchacha20poly1305_ietf_encrypt
+        out = f(b(q["m"]), b(q["ad"]), b(q["n"]), b(q["k"]))
+        return {"ct": h(out[:-16]), "tag": h(out[-16:])}
+    if op in ("chacha_open", "xchacha_open"):
+        f = nb.crypto_aead_chacha20poly1305_ietf_decrypt if op == "chacha_open" else nb.crypto_aead_xchacha20poly1305_ietf_decrypt
+        try:
+            return {"m": h(f(b(q["ct"]) + b(q["tag"]), b(q["ad"]), b(q["n"]), b(q["k"])))}
+        except nacl.exceptions.CryptoError:
+            raise Refused("authentication")
     if op == "x25519":
         try:
             return {"out": h(nb.crypto_scalarmult(b(q["k"]), b(q["u"])))}
@@ -395,9 +419,9 @@ LIBS = {
                 (["ecdsa_sign"] if _deterministic_available() else []) +
                 ["ecdsa_verify", "ecdsa_verify_der", "ed25519_sign", "ed25519_verify", "x25519",
                  "rsa_sign_pkcs1", "rsa_verify_pkcs1", "rsa_verify_pss", "rsa_parse_spki",
-                 "p256_pub", "p256_sign", "p256_verify", "p256_pub_parse"]),
+                 "p256_pub", "p256_sign", "p256_verify", "p256_pub_parse", "chacha_seal", "chacha_open"]),
     "pynacl": (pynacl_op, lambda: "libsodium %s (PyNaCl %s)" % (_sodium_version(), nacl.__version__),
-               ["ed25519_sign", "ed25519_verify", "x25519"]),
+               ["ed25519_sign", "ed25519_verify", "x25519", "chacha_seal", "chacha_open", "xchacha_seal", "xchacha_open"]),
     "mnemonic": (mnemonic_op, lambda: mnemonic_lib.__version__ if hasattr(mnemonic_lib, "__version__") else "0.21",
                  ["bip39_from_entropy", "bip39_to_entropy", "bip39_seed"]),
     "slip10": (slip10_op, lambda: _dist_version("slip10"), ["bip32", "slip10_ed25519"]),

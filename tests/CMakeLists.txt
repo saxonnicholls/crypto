@@ -7,6 +7,8 @@ add_executable(snicholls_crypto_tests
     secret_test.cpp
     version_test.cpp
     address/base58_test.cpp
+    aead/chacha20_poly1305_test.cpp
+    aead/chacha20_poly1305_oracles_test.cpp
     address/base58check_test.cpp
     address/base58check_oracles_test.cpp
     address/bech32_test.cpp
@@ -22,9 +24,11 @@ add_executable(snicholls_crypto_tests
     curve25519/x25519_test.cpp
     curve25519/x25519_oracles_test.cpp
     detail/hashes_test.cpp
+    detail/chacha20_test.cpp
     detail/ecdsa_der_test.cpp
     detail/limbs_test.cpp
     detail/mont256_test.cpp
+    detail/poly1305_test.cpp
     detail/montgomery_test.cpp
     hd/bip32_test.cpp
     hd/bip32_oracles_test.cpp

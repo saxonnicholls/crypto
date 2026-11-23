@@ -22,6 +22,7 @@
 
 #define SNICHOLLS_CRYPTO_DECLASSIFY(pointer, size) VALGRIND_MAKE_MEM_DEFINED(pointer, size)
 
+#include <snicholls/crypto/aead/chacha20_poly1305.hpp>
 #include <snicholls/crypto/bip39/mnemonic.hpp>
 #include <snicholls/crypto/curve25519/ed25519.hpp>
 #include <snicholls/crypto/curve25519/x25519.hpp>
@@ -91,6 +92,26 @@ void secp256k1_paths()
     make_public(xonly);
     make_public(ssig);
     check(static_cast<bool>(schnorr_verify(xonly, hash, ssig)), "BIP-340 sign");
+}
+
+void aead_paths()
+{
+    namespace aead = snicholls::crypto::aead;
+    auto key = bytes32(5);
+    std::array<std::uint8_t, 100> msg{};
+    for (std::size_t i = 0; i < msg.size(); ++i)
+        msg[i] = static_cast<std::uint8_t>(i * 13);
+    mark_secret(key);
+    mark_secret(msg);
+    std::array<std::uint8_t, 24> nonce{};
+    std::array<std::uint8_t, 100> ct{}, back{};
+    auto tag = aead::xchacha20_poly1305_seal(key, nonce, {}, msg, ct).unwrap();
+    make_public(ct);
+    make_public(tag);
+    const bool opened = aead::xchacha20_poly1305_open(key, nonce, {}, ct, tag, back).is_ok();
+    make_public(back);
+    make_public(msg);
+    check(opened && back == msg, "XChaCha20-Poly1305 seal and open");
 }
 
 void p256_paths()
@@ -203,6 +224,7 @@ int main(int argc, char** argv)
     std::printf("secret marking: every secret input undefined for memcheck\n");
     secp256k1_paths();
     p256_paths();
+    aead_paths();
     hd_paths();
     curve25519_paths();
     bip39_paths();

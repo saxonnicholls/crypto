@@ -17,6 +17,8 @@ Project Wycheproof, <https://github.com/C2SP/wycheproof>, licensed under the Apa
 | `wycheproof/ecdsa_secp256k1_sha256.txt` | `ecdsa_secp256k1_sha256_test.json` (DER) | `43db761c0a2eae71fb0755d355d5130e28ce64a5b07846cf27e7072082597a81` | 476 |
 | `wycheproof/ecdsa_secp256k1_sha256_p1363.txt` | `ecdsa_secp256k1_sha256_p1363_test.json` | `7a339efc7134fb2495cd32afdbd692e0f86427d3c24e9073f6a7d858bb8788d2` | 252 |
 | `wycheproof/ecdsa_secp256k1_sha256_bitcoin.txt` | `ecdsa_secp256k1_sha256_bitcoin_test.json` (DER, low-S) | `d3729ce83ff9740c45e74921009a4061eff6c09185b8dd1225ccd06ac57048a4` | 464 |
+| `wycheproof/chacha20_poly1305.txt` | `chacha20_poly1305_test.json` | `fe61d25f90e1bde4461d00eafe61049e5f29bd999f36b766df9cda90906ad53d` | 325 |
+| `wycheproof/xchacha20_poly1305.txt` | `xchacha20_poly1305_test.json` | `a79de072571b90eb40c3a63ce0c7f75dcb4b62323c8870228e1f61dcc61d63a9` | 315 |
 | `wycheproof/ecdsa_p256_sha256.txt` | `ecdsa_secp256r1_sha256_test.json (DER)` | `182db4f3e230f6f9fa9f800d2a614dede30284b8e8438bbfe1171905402e9332` | 484 |
 | `wycheproof/ecdsa_p256_sha256_p1363.txt` | `ecdsa_secp256r1_sha256_p1363_test.json` | `c60de693930e386c3a5472d08081623ef8504decc54b38ac01ec6b2a2575c986` | 262 |
 | `wycheproof/rsa_pkcs1_2048_sha256.txt` | `rsa_signature_2048_sha256_test.json` | `94a917b01ff50fb874cfc05bf29b4af44868d944a6558201cf18380da93fb393` | 259 |

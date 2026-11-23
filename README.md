@@ -16,6 +16,7 @@ release at the root, every version under `/vX.Y.Z/`, the latest `main` under `/m
 |---|---|---|
 | shared | `constant_time.hpp`, `secret.hpp`, `error.hpp` | masks and selections, `ct::declassify`; `secret_bytes<N>` (wiped, move-only, `reveal()`); `errc` |
 | `secp256k1/` | `field`, `scalar`, `point`, `keys`, `rfc6979`, `ecdsa`, `schnorr` | keys and SEC1; ECDSA with RFC 6979, low-S and the recovery id; verification (high-S accepted or rejected); recovery and Ethereum's `ecrecover`; strict DER; BIP-340 |
+| `aead/` | `chacha20_poly1305` | ChaCha20-Poly1305 (RFC 8439) and XChaCha20-Poly1305 (random 24-byte nonces): authenticated encryption, constant time, constant-time tag check, nothing released before the tag verifies |
 | `p256/` | `field`, `scalar`, `point`, `ecdsa` | P-256 (secp256r1): keys and SEC1, ECDSA with SHA-256 (ES256) with RFC 6979 nonces in constant time, verification, JOSE r \|\| s and DER |
 | `rsa/` | `rsa` | RSA signature verification only: RSASSA-PKCS1-v1_5 and PSS with SHA-256 (RS256, PS256), keys from JWK `n` / `e`, SubjectPublicKeyInfo or RSAPublicKey, 2048 to 4096 bits |
 | `curve25519/` | `field`, `scalar`, `edwards`, `ed25519`, `x25519` | Ed25519 (RFC 8032, cofactorless verification with S < L) and X25519 (RFC 7748, refusing the all-zero secret) |
@@ -48,6 +49,7 @@ All from the standards or their reference suites; each fixture records its sourc
 | Source | Cases | Result |
 |---|---|---|
 | Wycheproof `ecdsa_secp256k1_sha256` (DER), `_p1363`, `_bitcoin` (low-S) | 476, 252, 464 | all as expected |
+| Wycheproof `chacha20_poly1305_test.json`, `xchacha20_poly1305_test.json`; RFC 8439 2.3.2, 2.4.2, 2.5.2, 2.8.2; the XChaCha draft | 325, 315; 5 | all as expected (sealed and opened) |
 | Wycheproof `ecdsa_secp256r1_sha256` (DER), `_p1363`; RFC 6979 A.2.5 (P-256, SHA-256) | 484, 262; 2 | all as expected |
 | Wycheproof `rsa_signature_{2048,3072,4096}_sha256`, `rsa_pss_{2048,3072,4096}_sha256_mgf1_32`, `rsa_pss_2048_sha256_mgf1_0` | 776, 324, 103 | all as expected (3 "acceptable" DigestInfos without NULL refused, stated) |
 | Wycheproof `ed25519_test.json`, `x25519_test.json` | 210, 518 | all as expected (29 "acceptable" small-order keys accepted, stated) |
@@ -82,6 +84,7 @@ listed in `tests/fixtures/README.md`.
 | libsodium, through PyNaCl 1.6.2 | bundled (1.0.19 or later) | Ed25519, X25519 |
 | OpenSSL (through cryptography), Node's crypto, RustCrypto's rsa | 4.0.3, Node 26.13.1 (OpenSSL 3.5.9), 0.10.0 | RSA: PKCS#1 v1.5 signatures byte for byte, verdicts on mutated signatures and malformed encodings, PSS at salt lengths 0, 20, 32 and 64, SubjectPublicKeyInfo |
 | OpenSSL (through cryptography), `@noble/curves` `p256`, RustCrypto's p256, Node's crypto | 4.0.3, 2.4.0, 0.14.0, Node 26.13.1 (OpenSSL 3.5.9) | P-256: keys, RFC 6979 ES256 signatures byte for byte, verification of mutated and out-of-range signatures (Node: the message, uncompressed keys), SEC1 parsing |
+| OpenSSL (through cryptography), libsodium (PyNaCl), Node's crypto | 4.0.3, bundled, Node 26.13.1 (OpenSSL 3.5.9) | ChaCha20-Poly1305 seal byte for byte and open of sealed and tampered messages; XChaCha20-Poly1305 against libsodium; a fuzz target against libsodium |
 | ed25519-dalek, x25519-dalek | 3.0.0, 3.0.0 | Ed25519 (`verify` and `verify_strict`), X25519 |
 | `@noble/curves` | 2.4.0 | Ed25519 (RFC 8032 and ZIP-215 modes), X25519 |
 | python-mnemonic (Trezor's BIP-39 reference) | 0.21 | BIP-39 words, entropy, seeds, non-canonical text |

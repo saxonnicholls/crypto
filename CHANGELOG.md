@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased (0.4.0)
+
+- ChaCha20-Poly1305 (RFC 8439) and XChaCha20-Poly1305 (`aead/chacha20_poly1305.hpp`): authenticated encryption
+  with associated data, constant time in the key and the data, a constant-time tag check, output zeroed when the
+  tag does not verify; in-place use; `constexpr`, no allocation. ChaCha20, HChaCha20 and Poly1305 in `detail/`.
+  `errc::authentication_failed`. Keys from a secret: core's `hkdf`.
+- Tests: RFC 8439 and the XChaCha draft's vectors; all 640 Wycheproof ChaCha20-Poly1305 and XChaCha20-Poly1305
+  cases; oracle fixtures from OpenSSL, libsodium and Node's crypto; a fuzz target against libsodium; the secret
+  paths in the Valgrind check.
+
 ## 0.3.0 (2026-11-24)
 
 P-256 (ES256). Pins snicholls-core at v0.22.0. Experimental and not independently audited.
