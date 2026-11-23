@@ -26,7 +26,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">snicholls-crypto<span id="projectnumber">&#160;0.1.0</span>
+   <div id="projectname">snicholls-crypto<span id="projectnumber">&#160;0.1.1</span>
    </div>
    <div id="projectbrief">Elliptic curves, signatures and wallet key derivation for the snicholls libraries</div>
   </td>
@@ -116,7 +116,7 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('index.html',''
 <div class="textblock"><p><a class="anchor" id="md__2home_2runner_2work_2crypto_2crypto_2README"></a></p>
 <p>Elliptic curves, signatures and wallet key derivation, header-only C++20, constant-time wherever a secret is involved. Part of the snicholls libraries; it depends on snicholls-core and nothing else.</p>
 <blockquote class="doxtable">
-<p><b>Status: experimental (0.1.0). Not independently audited. Do not use it to secure funds yet.</b> Scrutiny is welcome: report vulnerabilities privately as SECURITY.md describes. </p>
+<p><b>Status: experimental (0.1.1). Not independently audited. Do not use it to secure funds yet.</b> Scrutiny is welcome: report vulnerabilities privately as SECURITY.md describes. </p>
 </blockquote>
 <p><b>Documentation:</b> every public entity is documented in Doxygen, with the design, guarantees, errors, examples (compiled from the demos), performance and known issues of each header. Build it with <span class="tt">make docs</span> and open <span class="tt">build-docs/docs/html/index.html</span>. Once the repository is public, CI will publish it at <a href="https://saxonnicholls.github.io/crypto/">https://saxonnicholls.github.io/crypto/</a>, as core's is at <a href="https://saxonnicholls.github.io/core/">https://saxonnicholls.github.io/core/</a>: the newest release at the root, every version under <span class="tt">/vX.Y.Z/</span>, the latest <span class="tt">main</span> under <span class="tt">/main/</span>.</p>
 <table class="markdownTable">
@@ -135,7 +135,7 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('index.html',''
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">address/</span>  </td><td class="markdownTableBodyNone"><span class="tt">base58</span>, <span class="tt">base58check</span>, <span class="tt">bech32</span>  </td><td class="markdownTableBodyNone">base58 with any alphabet (Bitcoin, XRPL, Flickr), base58check, bech32 / bech32m and segwit addresses  </td></tr>
 </table>
-<p>Everything is <span class="tt">constexpr</span> (a whole RFC 6979 signature is a <span class="tt">static_assert</span> in the tests), allocation-free, and returns <span class="tt">snicholls::result&lt;V, errc&gt;</span> where it can fail. The hashes are core's (<span class="tt">hash/</span>); core is pinned at v0.21.0 and required at 0.17.0 or later. </p><pre class="fragment">#include &lt;snicholls/crypto/hd/bip32.hpp&gt;
+<p>Everything is <span class="tt">constexpr</span> (a whole RFC 6979 signature is a <span class="tt">static_assert</span> in the tests; evaluating one at compile time needs a raised step limit, <span class="tt"><a class="el" href="secp256k1_2field_8hpp.html" title="secp256k1::field_element: arithmetic modulo p = 2^256 - 2^32 - 977, constant-time and constexpr.">secp256k1/field.hpp</a></span> says which), allocation-free, and returns <span class="tt">snicholls::result&lt;V, errc&gt;</span> where it can fail. The hashes are core's (<span class="tt">hash/</span>); core is pinned at v0.21.0 and required at 0.17.0 or later. </p><pre class="fragment">#include &lt;snicholls/crypto/hd/bip32.hpp&gt;
 #include &lt;snicholls/crypto/bip39/mnemonic.hpp&gt;
 #include &lt;snicholls/crypto/secp256k1/ecdsa.hpp&gt;
 
@@ -218,7 +218,7 @@ Constant time</h1>
 rules"); the few results revealed on purpose go through <span class="tt">ct::declassify</span> (<span class="tt">grep declassify</span> lists them all: key and mnemonic validity, retries of probability below 2^-127, the published recovery id, a mnemonic's text length).</p>
 <p>Evidence:</p>
 <ol type="1">
-<li><b>Valgrind secret marking</b> (<span class="tt">tests/ct/secret_marking.cpp</span>, CTest <span class="tt">ct.secret_marking</span>, run by <span class="tt">make ubuntu</span>): every secret input is marked undefined for memcheck, which then reports any branch or address that depends on it. Clean for secp256k1 keys, ECDSA, BIP-340, BIP-32 (hardened and non-hardened), SLIP-10, Ed25519, X25519 and BIP-39 (entropy, text, seed), with GCC 13 and Clang 18 at -O0, -O2 and -O3 on x86-64. A control function that leaks on purpose is reported in every build (<span class="tt">ct.secret_marking.control</span>). The check earlier found a loop in <span class="tt">bip39::mnemonic::to_text</span> that GCC -O3 rewrote around a secret offset; it is fixed.</li>
+<li><b>Valgrind secret marking</b> (<span class="tt">tests/ct/secret_marking.cpp</span>, CTest <span class="tt">ct.secret_marking</span>, run by <span class="tt">make ubuntu</span>): every secret input is marked undefined for memcheck, which then reports any branch or address that depends on it. Clean for secp256k1 keys, ECDSA, BIP-340, BIP-32 (hardened and non-hardened), SLIP-10, Ed25519, X25519 and BIP-39 (entropy, text, seed), with GCC 13 and Clang 18 at -O0, -O2 and -O3, GCC 15 at -O3 with AVX2 and Clang 21 at -O0 and -O3, on x86-64. A control function that leaks on purpose is reported in every build (<span class="tt">ct.secret_marking.control</span>). The check earlier found a loop in <span class="tt">bip39::mnemonic::to_text</span> that GCC -O3 rewrote around a secret offset; it is fixed.</li>
 <li><b>Timing</b> (<span class="tt">benchmarks/ct/timing.cpp</span>, dudect-style: fixed against random secrets, Welch's t after cropping): at 20,000 samples per operation, |t| stays below 2.2 for the secp256k1 public key, ECDSA, Ed25519, X25519 and BIP-32 (4.5 would be evidence of a leak). The same statistic on a variable-time double-and-add gives |t| = 539.</li>
 </ol>
 <p>Limits: Valgrind sees the binaries it ran, for those compilers, flags and one architecture (x86-64), not every build a consumer makes; it cannot see timing differences inside instructions (a variable-latency multiplier on some processors). The timing test measures wall-clock time on a shared machine, so a small |t| is not proof. Not covered by design: verification and recovery (public data, variable time, documented), the base58 decoder on <span class="tt">xprv</span> / WIF text (variable time, documented), and a mnemonic's text length, which reaches PBKDF2's timing (about four or five bits of the words; documented in <span class="tt"><a class="el" href="mnemonic_8hpp.html" title="bip39::mnemonic: entropy to words and back with the checksum, canonical text, and the BIP-39 seed.">bip39/mnemonic.hpp</a></span>).</p>
