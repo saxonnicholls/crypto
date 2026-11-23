@@ -69,7 +69,7 @@ elseif(NOT TARGET snicholls::core)
     message(FATAL_ERROR "third_party/core is empty and no snicholls::core is in the build - "
                         "run: git submodule update --init third_party/core")
 endif()
-snicholls_core_require(0.16.0)
+snicholls_core_require(0.17.0)   # the first core with the hashes (hash/)
 
 # The library
 add_library(snicholls_crypto INTERFACE)

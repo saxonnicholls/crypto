@@ -22,8 +22,8 @@ release at the root, every version under `/vX.Y.Z/`, the latest `main` under `/m
 | `address/` | `base58`, `base58check`, `bech32` | base58 with any alphabet (Bitcoin, XRPL, Flickr), base58check, bech32 / bech32m and segwit addresses |
 
 Everything is `constexpr` (a whole RFC 6979 signature is a `static_assert` in the tests), allocation-free, and
-returns `snicholls::result<V, errc>` where it can fail. The hashes are core's (`hash/`); core is pinned for now at a
-development commit of its feature/hashes branch, to become v0.17.0.
+returns `snicholls::result<V, errc>` where it can fail. The hashes are core's (`hash/`); core is pinned at v0.21.0 and
+required at 0.17.0 or later.
 
     #include <snicholls/crypto/hd/bip32.hpp>
     #include <snicholls/crypto/bip39/mnemonic.hpp>
