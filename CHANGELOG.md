@@ -1,6 +1,9 @@
 # Changelog
 
-## Unreleased (0.4.0)
+## 0.4.0 (2026-11-24)
+
+Authenticated encryption, the single include, and snicholls-core v0.23.0 (required at 0.17.0 or later).
+Experimental and not independently audited.
 
 - The single include (the family's rule, tooling v0.2.1): `snicholls_crypto.hpp`, crypto with core expanded in it,
   generated and compiled alone in every build, checked complete (`check.single_include`), never committed; each
