@@ -112,9 +112,10 @@ Evidence:
 1. **Valgrind secret marking** (`tests/ct/secret_marking.cpp`, CTest `ct.secret_marking`, run by `make ubuntu`):
    every secret input is marked undefined for memcheck, which then reports any branch or address that depends on
    it. Clean for secp256k1 keys, ECDSA, BIP-340, BIP-32 (hardened and non-hardened), SLIP-10, Ed25519, X25519 and
-   BIP-39 (entropy, text, seed), with GCC 13 and Clang 18 at -O0, -O2 and -O3 on x86-64. A control function that
-   leaks on purpose is reported in every build (`ct.secret_marking.control`). The check earlier found a loop in
-   `bip39::mnemonic::to_text` that GCC -O3 rewrote around a secret offset; it is fixed.
+   BIP-39 (entropy, text, seed), with GCC 13 and Clang 18 at -O0, -O2 and -O3, GCC 15 at -O3 with AVX2 and Clang 21
+   at -O0 and -O3, on x86-64. A control function that leaks on purpose is reported in every build
+   (`ct.secret_marking.control`). The check earlier found a loop in `bip39::mnemonic::to_text` that GCC -O3 rewrote
+   around a secret offset; it is fixed.
 2. **Timing** (`benchmarks/ct/timing.cpp`, dudect-style: fixed against random secrets, Welch's t after cropping):
    at 20,000 samples per operation, |t| stays below 2.2 for the secp256k1 public key, ECDSA, Ed25519, X25519 and
    BIP-32 (4.5 would be evidence of a leak). The same statistic on a variable-time double-and-add gives |t| = 539.

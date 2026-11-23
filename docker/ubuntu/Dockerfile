@@ -17,10 +17,13 @@ LABEL org.opencontainers.image.title="snicholls-crypto Ubuntu builder" \
 
 ENV DEBIAN_FRONTEND=noninteractive
 
+# The apt caches are this repository's own (id) and locked: Docker's build cache
+# is shared with every project on the machine, and two apt-gets in one cache
+# directory at once take each other's lock and fail (exit 100).
 # libclang-rt-18-dev is compiler-rt: without it -fsanitize=address,undefined,thread
 # compiles with Clang and then fails to link.
-RUN --mount=type=cache,target=/var/cache/apt \
-    --mount=type=cache,target=/var/lib/apt \
+RUN --mount=type=cache,id=snicholls-crypto-ubuntu-apt-cache,sharing=locked,target=/var/cache/apt \
+    --mount=type=cache,id=snicholls-crypto-ubuntu-apt-lib,sharing=locked,target=/var/lib/apt \
     apt-get update && \
     apt-get install -y --no-install-recommends \
       build-essential g++-13 \
@@ -40,8 +43,8 @@ ARG DOXYGEN_VERSION=1.18.0
 ARG DOXYGEN_TAG=Release_1_18_0
 ARG DOXYGEN_SHA256=14fa81bdc34171edb5f1f02b1d60e74802f0439b77fa44e592565d517d72df90
 ARG TARGETARCH
-RUN --mount=type=cache,target=/var/cache/apt \
-    --mount=type=cache,target=/var/lib/apt \
+RUN --mount=type=cache,id=snicholls-crypto-ubuntu-apt-cache,sharing=locked,target=/var/cache/apt \
+    --mount=type=cache,id=snicholls-crypto-ubuntu-apt-lib,sharing=locked,target=/var/lib/apt \
     if [ "${TARGETARCH:-amd64}" = "amd64" ]; then \
       curl -fsSL -o /tmp/doxygen.tgz \
         "https://github.com/doxygen/doxygen/releases/download/${DOXYGEN_TAG}/doxygen-${DOXYGEN_VERSION}.linux.bin.tar.gz" && \

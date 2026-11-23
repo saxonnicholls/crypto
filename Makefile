@@ -8,8 +8,9 @@
 #   make asan            Address + UB sanitizers
 #   make docs            Doxygen, warnings as errors; opens nothing, writes build-docs/docs/html
 #   make check           the static checks CI runs first: version, mirror, nothing private
-#   make ubuntu          the full suite on Ubuntu 24.04 and 26.04 in Docker, GCC 13 and 15, Clang 18,
-#                        sanitizers and the Valgrind secret-marking check (scripts/test_ubuntu.sh)
+#   make ubuntu          the full suite on Ubuntu 24.04 and 26.04 in Docker, GCC 13 and 15, Clang 18 and 21,
+#                        sanitizers and the Valgrind secret-marking check (scripts/test_ubuntu.sh);
+#                        make ubuntu UBUNTU_FLAGS=--arm64 adds ARM64 GCC 13 (emulated on x86-64: slow)
 #   make oracles         the differential gate in the oracle image (docker/oracles): every fixture under
 #                        tests/fixtures/oracles regenerated from the pinned oracles, then replayed
 #                        (scripts/oracles/test.sh; scripts/generate_oracle_fixtures.py to rewrite them)
@@ -28,6 +29,7 @@ CXX      ?= c++
 BUILD    ?= build
 CONFIG   ?= Release
 CMAKE_FLAGS ?=
+UBUNTU_FLAGS ?=
 
 .PHONY: all test test-werror asan docs check ubuntu oracles fuzz demos benchmarks clean
 
@@ -57,7 +59,7 @@ docs:
 	cmake --build build-docs --target docs
 
 ubuntu:
-	scripts/test_ubuntu.sh
+	scripts/test_ubuntu.sh $(UBUNTU_FLAGS)
 
 oracles:
 	scripts/oracles/test.sh

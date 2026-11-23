@@ -175,14 +175,20 @@ constant-time**), `\errors`, `\examples` (a `\snippet` from a compiled demo), `\
     make asan            # Address + UB sanitizers
     make docs            # Doxygen, warnings are errors
     make check           # check_version.py, check_mirror.py, check_public.py
-    make ubuntu          # Ubuntu 24.04 (GCC 13, Clang 18, Valgrind, Doxygen) and 26.04 (GCC 15) in Docker
+    make ubuntu          # Ubuntu 24.04 (GCC 13, Clang 18, Valgrind, Doxygen) and 26.04 (GCC 15, Clang 21) in Docker
+    make ubuntu UBUNTU_FLAGS=--arm64   # the same, then ARM64 GCC 13 as CI's ARM64 leg (emulated on x86-64: slow)
     make oracles         # the differential gate: the oracle fixtures regenerated in docker/oracles and replayed
     make fuzz            # the differential fuzz harness, 30 seconds a target (fuzz/run.sh 3600: an hour each)
     make demos           # build and run every demo with its output shown (scripts/run_demos.sh)
     make benchmarks      # every benchmark in Release; rewrites BENCHMARKS.md
 
 **The local gate is macOS plus Ubuntu-in-Docker**: `make test-werror`, `make docs`, `make check` on the Mac and
-`make ubuntu` (and `make oracles` when a change touches what the oracles cover) before a change is done. `.github/workflows/ci.yml` runs the same legs when the repository is hosted.
+`make ubuntu` (and `make oracles` when a change touches what the oracles cover) before a change is done, with
+`UBUNTU_FLAGS=--arm64` when it touches loops over byte buffers, which GCC's vectoriser treats differently on aarch64.
+The Docker images carry CI's compilers: GCC 13 and Clang 18 (the ARM64 legs, ubuntu-24.04-arm); GCC 15 and Clang 21
+with libstdc++ 15 (the x86-64 legs, ubuntu-latest), configured as CI configures them, GNU Make included, and GCC 15
+at `-march=x86-64-v3`, because CI's g++ emits AVX2 code and GCC's overflow warnings change with the vector width.
+`.github/workflows/ci.yml` runs the same legs when the repository is hosted.
 Docker is shared with other projects: never stop a container or remove an image this repository did not create.
 
 ## The family
