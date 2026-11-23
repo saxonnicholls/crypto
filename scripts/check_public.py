@@ -13,6 +13,12 @@
 #      python3 scripts/check_public.py              tracked files
 #      python3 scripts/check_public.py --commits    tracked files and every commit message
 #
+#  Binary files are read too, as Latin-1 text (a fuzz reproducer is bytes, and bytes can spell a name). The
+#  directories that hold generated or third-party-shaped content (the oracle image and programs, their locks, the
+#  oracle fixtures, the fuzz harness and its reproducers, the workflows) are also checked for files not yet
+#  committed, so a reproducer that fuzz/run.sh has just written is checked before it is added; and every tracked
+#  file there must be readable, or the check fails rather than skip it.
+#
 #  Exit status is 0 when nothing private is found and 1 otherwise.
 #
 
@@ -57,18 +63,38 @@ def findings(text, where):
     return out
 
 
+# Directories checked for untracked files as well, and where no tracked file may go unread
+WATCHED = (".github/", "docker/", "scripts/oracles/", "tests/fixtures/oracles/", "fuzz/")
+
+
+def read_text(path):
+    data = open(path, "rb").read()
+    try:
+        return data.decode("utf-8")
+    except UnicodeDecodeError:
+        return data.decode("latin-1")
+
+
+def git_files(*args):
+    return subprocess.run(["git", "ls-files", "-z"] + list(args), cwd=ROOT, capture_output=True, text=True,
+                          check=True).stdout.split("\0")
+
+
 def main():
     errors = []
-    files = subprocess.run(["git", "ls-files"], cwd=ROOT, capture_output=True, text=True, check=True).stdout.split()
-    for f in files:
+    files = [f for f in git_files() if f]
+    untracked = [f for f in git_files("--others", "--exclude-standard") if f and f.startswith(WATCHED)]
+    for f in files + untracked:
         path = os.path.join(ROOT, f)
         if not os.path.isfile(path):
             continue   # a submodule
         try:
-            text = open(path, encoding="utf-8").read()
-        except UnicodeDecodeError:
+            text = read_text(path)
+        except OSError as e:
+            if f.startswith(WATCHED):
+                errors.append("%s: could not be read (%s)" % (f, e))
             continue
-        errors += findings(text, f)
+        errors += findings(text, f + (" (untracked)" if f in untracked else ""))
     if "--commits" in sys.argv[1:]:
         log = subprocess.run(["git", "log", "--format=%H%n%B%x00"], cwd=ROOT, capture_output=True, text=True).stdout
         for entry in log.split("\0"):
@@ -81,7 +107,8 @@ def main():
             print("check_public: " + e, file=sys.stderr)
         print("check_public: FAILED - nothing private in a repository that may become public", file=sys.stderr)
         return 1
-    print("public check: %d tracked files, nothing private" % len(files))
+    print("public check: %d tracked files and %d untracked in %s, nothing private"
+          % (len(files), len(untracked), ", ".join(d.rstrip("/") for d in WATCHED)))
     return 0
 
 

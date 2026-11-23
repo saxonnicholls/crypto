@@ -3,7 +3,8 @@
 Elliptic curves, signatures and wallet key derivation, header-only C++20, constant-time wherever a secret is
 involved. Part of the snicholls libraries; it depends on snicholls-core and nothing else.
 
-Status: experimental (0.1, unreleased).
+> **Status: experimental (0.1, unreleased). Not independently audited. Do not use it to secure funds yet.**
+> Scrutiny is welcome: report vulnerabilities privately as SECURITY.md describes.
 
 **Documentation:** every public entity is documented in Doxygen, with the design, guarantees, errors, examples
 (compiled from the demos), performance and known issues of each header. Build it with `make docs` and open
@@ -52,18 +53,51 @@ All from the standards or their reference suites; each fixture records its sourc
 | Trezor's BIP-39 `vectors.json` (English, "TREZOR"), with their BIP-32 master keys | 24 | pass |
 | BIP-173, BIP-350 (strings and addresses); Bitcoin Core `base58_encode_decode.json`; XRPL addresses | 79, 14, 3 | pass |
 
-## Cross-checks
+## Testing against other implementations
 
-Run from a scratch folder, not part of the repository's tests:
+Beyond the standards' vectors, the library is compared with other implementations in two ways, both test-only:
+nothing below is included or linked by the library.
 
-- **Against an earlier in-house implementation** (copies of its functions compiled in a scratch folder):
-  19,566 comparisons on a seeded random corpus (secp256k1 public keys, ECDSA r, s and recovery ids, its verifier on
-  our signatures and our recovery of its keys, BIP-32 private keys and chain codes on random paths, SLIP-10, Ed25519
-  public keys and signatures, BIP-39 words both ways and seeds with random ASCII passphrases): no disagreement.
-  The address codecs were compared on 57,334 cases, agreeing except on empty input, which the reference refuses and
-  Bitcoin Core's vectors require.
-- **Against `@noble/curves` 1.6.0 and `@scure/bip32` 1.5.0**: 4,000 random cases (BIP-340 signing, ECDSA with
-  recovery, X25519, BIP-32 on random paths), no disagreement.
+**Fixtures from pinned oracles** (`tests/fixtures/oracles/`, 19 fixtures, 26,109 cases): generated from fixed seeds
+by `scripts/generate_oracle_fixtures.py` in `docker/oracles` (the base image by digest; Python 3.12.3 with a hashed
+`requirements.txt`, Node 26.13.1 with `package-lock.json`, Rust 1.100.0 with `Cargo.lock`), replayed by the
+`*_oracles_test.cpp` tests on every build, and regenerated and compared byte for byte by `make oracles` and CI.
+Deterministic answers agree byte for byte with every oracle. Where implementations follow different rules, each
+oracle's rule is stated and every one of its verdicts checked, never decided by a vote; the differences found are
+listed in `tests/fixtures/README.md`.
+
+| Oracle | Pinned | Compared |
+|---|---|---|
+| libsecp256k1 through coincurve | 21.0.0 | keys, ECDSA (RFC 6979, low-S, recovery id), verification, recovery, SEC1 and DER parsing, BIP-340 |
+| libsecp256k1 through rust-secp256k1 | 0.33.1 (secp256k1-sys 0.14.1) | the same |
+| k256 (RustCrypto) | 0.14.0 | the same |
+| `@noble/secp256k1` (what ethers and viem build on) | 3.2.0 | keys, ECDSA, verification, recovery, SEC1, BIP-340 |
+| ethers | 6.17.0 | keys, ECDSA, recovery, Ethereum ecrecover and addresses, BIP-39, BIP-32 (HDNodeWallet) |
+| OpenSSL, through Python cryptography 50.0.2 | 4.0.3 | ECDSA on secp256k1 (its RFC 6979 mode, s compared after low-S normalisation) and verification, DER, Ed25519, X25519 |
+| libsodium, through PyNaCl 1.6.2 | bundled (1.0.19 or later) | Ed25519, X25519 |
+| ed25519-dalek, x25519-dalek | 3.0.0, 3.0.0 | Ed25519 (`verify` and `verify_strict`), X25519 |
+| `@noble/curves` | 2.4.0 | Ed25519 (RFC 8032 and ZIP-215 modes), X25519 |
+| python-mnemonic (Trezor's BIP-39 reference) | 0.21 | BIP-39 words, entropy, seeds, non-canonical text |
+| `@scure/bip39`, bip39 crate | 2.4.0, 3.0.0 | the same |
+| SLIP-10 reference (python slip10) | 1.1.0 | BIP-32 and SLIP-10 Ed25519 |
+| bitcoinjs: bip32, bitcoinjs-lib, bs58check | 5.0.1, 7.0.5, 4.0.0 | BIP-32, P2PKH, P2SH-P2WPKH, P2WPKH and P2TR addresses, base58check, segwit |
+| bip32 crate | 0.6.0 | BIP-32 along BIP-44, 49, 84 and 86 paths and random ones |
+| ed25519-hd-key, slip10_ed25519 | 2.0.0, 0.1.3 | SLIP-10 Ed25519 |
+| BIP-173 / BIP-350 reference code (Python) | sipa/bech32 `7a7d7ab1` | segwit addresses, both ways |
+| python base58, bs58, bech32 crate | 2.1.1, 0.5.1, 0.12.0 | base58check, segwit |
+
+**Differential fuzzing** (`fuzz/`, `make fuzz`): libFuzzer targets compare the library with libsecp256k1 0.8.0,
+libsodium 1.0.22 and OpenSSL 3.0 on random and adversarial input (scalars at 0, n - 1, n and n + 1, points off
+the curve, high-S and malleable signatures, invalid DER, small-order points in every encoding, bad checksums,
+malformed paths and mnemonics), the Python and Rust oracles joining through the same JSON-lines processes. CI runs
+each target briefly on every push and for an hour nightly; a divergence fails with a minimised reproducer, committed
+as a regression test. `fuzz/cryptofuzz/` is a [Cryptofuzz](https://github.com/MozillaSecurity/cryptofuzz) module,
+ready for OSS-Fuzz once the repository is public.
+
+Earlier, from a scratch folder and not part of the repository's tests: 19,566 comparisons with an earlier in-house
+implementation (secp256k1 keys, ECDSA and recovery, BIP-32, SLIP-10, Ed25519, BIP-39) and 57,334 on the address
+codecs, agreeing except on empty base58 input, which the reference refuses and Bitcoin Core's vectors require; and
+4,000 random cases against `@noble/curves` 1.6.0 and `@scure/bip32` 1.5.0, with no disagreement.
 
 ## Constant time
 
@@ -114,6 +148,8 @@ precomputed tables for the base point and faster inversions; the forms here are 
     make docs            # Doxygen, warnings as errors; open build-docs/docs/html/index.html
     make check           # version, mirror, nothing private
     make ubuntu          # the same on Ubuntu in Docker, with sanitizers and the Valgrind constant-time check
+    make oracles         # the oracle fixtures regenerated in docker/oracles and compared, then replayed
+    make fuzz            # the differential fuzz harness, 30 seconds a target
     make benchmarks      # rewrites BENCHMARKS.md
 
 The design rules, the layout and the contract every change keeps are in CLAUDE.md.
