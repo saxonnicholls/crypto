@@ -218,10 +218,14 @@ template <std::size_t MaxBytes = base58_default_max_bytes>
             carry >>= 8;
         }
     }
-    for (std::size_t i = 0; i < length / 2; ++i) {
+    // Most significant first. length never exceeds bytes.size() (the loop above refuses to grow past it), but GCC
+    // cannot carry that through the loop, and bounded by length alone this reversal is vectorised by GCC 13 on aarch64
+    // into stores past a one-byte buffer that it then reports (-Wstringop-overflow). Bounded by both, it is not.
+    const std::size_t n = length < bytes.size() ? length : bytes.size();
+    for (std::size_t i = 0; i < n / 2; ++i) {
         const std::uint8_t t = bytes[i];
-        bytes[i] = bytes[length - 1 - i];
-        bytes[length - 1 - i] = t;
+        bytes[i] = bytes[n - 1 - i];
+        bytes[n - 1 - i] = t;
     }
     for (std::size_t i = 0; i < zeros; ++i)
         out[i] = 0;
