@@ -5,6 +5,12 @@ involved. Part of the snicholls libraries; it depends on snicholls-core and noth
 
 Status: experimental (0.1, unreleased).
 
+**Documentation:** every public entity is documented in Doxygen, with the design, guarantees, errors, examples
+(compiled from the demos), performance and known issues of each header. Build it with `make docs` and open
+`build-docs/docs/html/index.html`. Once the repository is public, CI will publish it at
+<https://saxonnicholls.github.io/crypto/>, as core's is at <https://saxonnicholls.github.io/core/>: the newest
+release at the root, every version under `/vX.Y.Z/`, the latest `main` under `/main/`.
+
 | Area | Headers | What |
 |---|---|---|
 | shared | `constant_time.hpp`, `secret.hpp`, `error.hpp` | masks and selections, `ct::declassify`; `secret_bytes<N>` (wiped, move-only, `reveal()`); `errc` |
@@ -105,7 +111,7 @@ precomputed tables for the base point and faster inversions; the forms here are 
 
     git submodule update --init
     make test-werror     # every test, demo and boundary check, warnings as errors
-    make docs            # Doxygen, warnings as errors
+    make docs            # Doxygen, warnings as errors; open build-docs/docs/html/index.html
     make check           # version, mirror, nothing private
     make ubuntu          # the same on Ubuntu in Docker, with sanitizers and the Valgrind constant-time check
     make benchmarks      # rewrites BENCHMARKS.md

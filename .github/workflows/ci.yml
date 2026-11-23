@@ -3,80 +3,241 @@ name: CI
 on:
   push:
     branches: [ main ]
-    tags: [ 'v*' ]
+    tags: [ 'v*' ]          # so a release tag is graded by the same matrix
   pull_request:
   workflow_dispatch:
 
 permissions:
   contents: read
 
+# `cmake --build --parallel` with no number passes make a bare -j, which is unlimited jobs: on a 4-CPU, 16 GB runner
+# GCC then runs out of memory and the runner is shut down. CMAKE_BUILD_PARALLEL_LEVEL only applies when --parallel is
+# not given, so every Unix build below passes the number explicitly: 4 jobs, 3 on the ARM64 runners.
 env:
   CMAKE_BUILD_PARALLEL_LEVEL: 4
 
-# The family's legs (core's CLAUDE.md, "Build and CI"): Linux x86-64 and ARM64 with GCC and Clang, macOS ARM64 and
-# x86-64 with Apple Clang, sanitizers on the Clang legs; the Valgrind secret-marking check on the Linux GCC legs;
-# the documentation with warnings as errors. Every leg blocks.
+# The family's legs (core's workflow): Linux x86-64 and ARM64 with GCC and Clang, macOS ARM64 and x86-64 with Apple
+# Clang, the sanitizers on the Clang legs. Crypto adds the Valgrind secret-marking check (CTest label `ct`) on every
+# Linux leg, Release and Debug. Every leg blocks except Windows, which reports without gating while no consumer builds
+# there. The throughput tables are informational. The documentation is built on every run with warnings as errors and
+# published to GitHub Pages, https://saxonnicholls.github.io/crypto/: main to /main/, each release tag to its own
+# /vX.Y.Z/, and the site's root to the newest release.
 jobs:
   build-and-test:
     name: ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
+    # The ARM64 runners are the tightest on memory (macOS ARM64: 3 CPUs, 7 GB), so they build with 3 jobs
     env:
       CMAKE_BUILD_PARALLEL_LEVEL: ${{ matrix.jobs || 4 }}
     strategy:
       fail-fast: false
       matrix:
         include:
-          - { name: Linux x86-64 GCC, os: ubuntu-latest, cxx: g++, valgrind: true }
-          - { name: Linux x86-64 Clang, os: ubuntu-latest, cxx: clang++, sanitize: 'address,undefined' }
-          - { name: Linux ARM64 GCC, os: ubuntu-24.04-arm, cxx: g++, jobs: 3, valgrind: true }
-          - { name: Linux ARM64 Clang, os: ubuntu-24.04-arm, cxx: clang++, jobs: 3, sanitize: 'address,undefined' }
-          - { name: macOS ARM64 Apple Clang, os: macos-latest, cxx: c++, jobs: 3 }
-          - { name: macOS x86-64 Apple Clang, os: macos-15-intel, cxx: c++ }
+          - name: Linux x86-64 GCC
+            os: ubuntu-latest
+            cxx: g++
+          - name: Linux x86-64 Clang
+            os: ubuntu-latest
+            cxx: clang++
+            sanitize: address,undefined
+          - name: Linux ARM64 GCC
+            os: ubuntu-24.04-arm
+            cxx: g++
+            jobs: 3
+          - name: Linux ARM64 Clang
+            os: ubuntu-24.04-arm
+            cxx: clang++
+            jobs: 3
+            sanitize: address,undefined
+          - name: macOS ARM64 Apple Clang
+            os: macos-latest
+            cxx: c++
+            jobs: 3
+          - name: macOS x86-64 Apple Clang
+            os: macos-15-intel
+            cxx: c++
     steps:
       - uses: actions/checkout@v5
         with:
-          submodules: true
-      - name: Static checks (version, mirror, nothing private)
+          submodules: recursive
+          fetch-depth: 0       # check_public.py --commits reads every commit message, not only the last
+
+      # Static properties of the tree, checked on every job rather than discovered on the one platform that happens
+      # to notice: the version in its three places, every header with a registered test and demo, nothing private
+      - name: Static checks (make check)
+        env:
+          RELEASE_TAG: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || '' }}
+        run: make check
+
+      # Valgrind and its header: CMake then builds ct.secret_marking, every secret path run with the secrets marked
+      # undefined, so a branch or a memory index on a secret fails the leg
+      - name: Valgrind (the constant-time check)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends valgrind
+
+      - name: Configure (Release, warnings are errors, benchmarks smoke-run)
+        run: >
+          cmake -B build -DCMAKE_BUILD_TYPE=Release
+          -DCMAKE_CXX_COMPILER=${{ matrix.cxx }}
+          -DSNICHOLLS_CRYPTO_WERROR=ON
+          -DSNICHOLLS_CRYPTO_BUILD_BENCHMARKS=ON
+
+      - name: Build
+        run: cmake --build build --parallel "$CMAKE_BUILD_PARALLEL_LEVEL"
+
+      - name: Test
+        run: ctest --test-dir build --output-on-failure
+
+      # The Test step ran it; this fails the leg if CMake quietly left it out (no Valgrind header found)
+      - name: The constant-time check is registered
+        if: runner.os == 'Linux'
+        run: |
+          ctest --test-dir build -N -L ct | grep -E 'Total Tests: [1-9]'
+
+      # Every benchmark as tables in this job's summary; a shared runner is noisy, so the numbers are a record per
+      # platform, not a gate (BENCHMARKS.md holds the quiet-machine ones).
+      - name: Throughput (informational)
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          python3 scripts/benchmarks_md.py --build build --min-time 0.2 --output - \
+            --title "Throughput - ${{ matrix.name }}" --json bench-json | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Keep the raw benchmark results
+        if: always()
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmarks-${{ matrix.os }}-${{ matrix.cxx }}
+          path: bench-json/
+          if-no-files-found: ignore
+
+      # Without -g: CI never reads the debug information. The Release tree is removed first for its disk.
+      - name: Configure, build and test (Debug, -O0, asserts live)
+        run: >
+          rm -rf build
+          && cmake -B build-debug -DCMAKE_BUILD_TYPE=Debug
+          -DCMAKE_CXX_FLAGS_DEBUG=-O0
+          -DCMAKE_CXX_COMPILER=${{ matrix.cxx }}
+          -DSNICHOLLS_CRYPTO_WERROR=ON
+          && cmake --build build-debug --parallel "$CMAKE_BUILD_PARALLEL_LEVEL"
+          && ctest --test-dir build-debug --output-on-failure
+
+      - name: Address + UB Sanitizers
+        if: matrix.sanitize
+        run: >
+          cmake -B build-san -DCMAKE_BUILD_TYPE=RelWithDebInfo
+          -DCMAKE_CXX_COMPILER=${{ matrix.cxx }}
+          -DSNICHOLLS_CRYPTO_WERROR=ON
+          -DSNICHOLLS_CRYPTO_SANITIZE=${{ matrix.sanitize }}
+          && cmake --build build-san --parallel "$CMAKE_BUILD_PARALLEL_LEVEL"
+          && ctest --test-dir build-san --output-on-failure -LE boundary
+
+  windows:
+    name: Windows MSVC
+    runs-on: windows-latest
+    continue-on-error: true   # not a gate for now: no consumer builds on Windows
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      # make check, without make
+      - name: Static checks
         env:
           RELEASE_TAG: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || '' }}
         run: |
-          python3 scripts/check_version.py
-          python3 scripts/check_mirror.py
-          python3 scripts/check_public.py --commits
-      - name: Valgrind
-        if: matrix.valgrind
-        run: sudo apt-get update && sudo apt-get install -y valgrind
-      - name: Release, warnings are errors, benchmarks smoke-run
+          python scripts/check_version.py
+          python scripts/check_mirror.py
+          python scripts/check_public.py --commits
+
+      - name: Configure (warnings are errors)
+        run: cmake -B build -DSNICHOLLS_CRYPTO_WERROR=ON -DSNICHOLLS_CRYPTO_BUILD_BENCHMARKS=ON
+
+      - name: Build
+        run: cmake --build build --config Release --parallel
+
+      - name: Test
+        run: ctest --test-dir build -C Release --output-on-failure
+
+      - name: Configure, build and test (Debug)
         run: |
-          cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=${{ matrix.cxx }} \
-            -DSNICHOLLS_CRYPTO_WERROR=ON -DSNICHOLLS_CRYPTO_BUILD_BENCHMARKS=ON
-          cmake --build build --parallel "$CMAKE_BUILD_PARALLEL_LEVEL"
-          ctest --test-dir build --output-on-failure --parallel "$CMAKE_BUILD_PARALLEL_LEVEL"
-      - name: Debug at -O0, asserts live
+          cmake --build build --config Debug --parallel
+          ctest --test-dir build -C Debug --output-on-failure
+
+      - name: Throughput (informational)
+        continue-on-error: true
+        shell: bash
         run: |
-          cmake -B build-debug -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=${{ matrix.cxx }} -DSNICHOLLS_CRYPTO_WERROR=ON
-          cmake --build build-debug --parallel "$CMAKE_BUILD_PARALLEL_LEVEL"
-          ctest --test-dir build-debug --output-on-failure --parallel "$CMAKE_BUILD_PARALLEL_LEVEL"
-      - name: Sanitizers
-        if: matrix.sanitize
-        run: |
-          cmake -B build-san -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_CXX_COMPILER=${{ matrix.cxx }} \
-            -DSNICHOLLS_CRYPTO_WERROR=ON -DSNICHOLLS_CRYPTO_SANITIZE=${{ matrix.sanitize }}
-          cmake --build build-san --parallel "$CMAKE_BUILD_PARALLEL_LEVEL"
-          ctest --test-dir build-san --output-on-failure --parallel "$CMAKE_BUILD_PARALLEL_LEVEL"
+          set -o pipefail
+          python scripts/benchmarks_md.py --build build --config Release --min-time 0.2 --output - \
+            --title "Throughput - Windows MSVC" --json bench-json | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Keep the raw benchmark results
+        if: always()
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmarks-windows-msvc
+          path: bench-json/
+          if-no-files-found: ignore
 
   docs:
+    name: Documentation (warnings are errors)
     runs-on: ubuntu-latest
+    permissions:
+      contents: write        # to publish to the gh-pages branch
+    concurrency:
+      group: pages           # main and a tag pushed together must not race on gh-pages
+      cancel-in-progress: false
     steps:
       - uses: actions/checkout@v5
         with:
-          submodules: true
-      - name: Doxygen 1.18 (the pinned version, by SHA-256)
+          submodules: recursive
+
+      # Ubuntu's package is 1.9.8, older than the documentation is written for: the official release, by SHA-256
+      - name: Install Doxygen 1.18.0
         run: |
-          curl -fsSL -o doxygen.tgz https://github.com/doxygen/doxygen/releases/download/Release_1_18_0/doxygen-1.18.0.linux.bin.tar.gz
-          echo "14fa81bdc34171edb5f1f02b1d60e74802f0439b77fa44e592565d517d72df90  doxygen.tgz" | sha256sum -c -
-          tar -xzf doxygen.tgz && sudo install -m 0755 doxygen-1.18.0/bin/doxygen /usr/local/bin/doxygen
-      - name: Documentation, warnings are errors
+          curl -fsSL -o "$RUNNER_TEMP/doxygen.tgz" https://github.com/doxygen/doxygen/releases/download/Release_1_18_0/doxygen-1.18.0.linux.bin.tar.gz
+          echo "14fa81bdc34171edb5f1f02b1d60e74802f0439b77fa44e592565d517d72df90  $RUNNER_TEMP/doxygen.tgz" | sha256sum -c -
+          tar -xzf "$RUNNER_TEMP/doxygen.tgz" -C "$RUNNER_TEMP"
+          sudo install -m 0755 "$RUNNER_TEMP/doxygen-1.18.0/bin/doxygen" /usr/local/bin/doxygen
+          doxygen --version
+
+      - name: Configure
+        run: cmake -B build -DSNICHOLLS_CRYPTO_BUILD_TESTS=OFF -DSNICHOLLS_CRYPTO_BUILD_DOCS=ON
+
+      - name: Build the documentation
+        run: cmake --build build --target docs
+
+      # gh-pages holds generated HTML only, one folder per version; never edit it by hand. GitHub Pages serves the
+      # branch's root (Settings, Pages: "Deploy from a branch", gh-pages, /), which for this repository is
+      # https://saxonnicholls.github.io/crypto/.
+      - name: Publish to GitHub Pages
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
+        env:
+          DEST: ${{ github.ref_type == 'tag' && github.ref_name || 'main' }}
         run: |
-          cmake -B build-docs -DSNICHOLLS_CRYPTO_BUILD_TESTS=OFF -DSNICHOLLS_CRYPTO_BUILD_DOCS=ON
-          cmake --build build-docs --target docs
+          set -euo pipefail
+          site="$RUNNER_TEMP/site"
+          trap 'git worktree remove --force "$site" 2>/dev/null || true' EXIT
+          git branch -D gh-pages 2>/dev/null || true
+          if git fetch --depth 1 origin gh-pages 2>/dev/null; then
+            git worktree add "$site" FETCH_HEAD
+            git -C "$site" switch -C gh-pages
+          else
+            git worktree add --detach "$site"
+            git -C "$site" switch --orphan gh-pages
+          fi
+          rm -rf "${site:?}/$DEST" && mkdir -p "$site/$DEST" && cp -R build/docs/html/. "$site/$DEST/"
+          touch "$site/.nojekyll"
+          latest=$(cd "$site" && ls -d v*/ 2>/dev/null | tr -d / | sort -V | tail -1 || true)
+          target=${latest:-main}
+          printf '<!DOCTYPE html>\n<meta charset="utf-8">\n<title>snicholls-crypto</title>\n<meta http-equiv="refresh" content="0; url=%s/">\n<p>The documentation for <a href="%s/">snicholls-crypto %s</a>; every version: %s</p>\n' \
+            "$target" "$target" "$target" "$(cd "$site" && ls -d main v*/ 2>/dev/null | tr -d / | sort -V | sed 's|.*|<a href="&/">&</a>|' | paste -sd ' ' -)" > "$site/index.html"
+          git -C "$site" add -A
+          if git -C "$site" diff --cached --quiet; then echo "nothing to publish"; exit 0; fi
+          git -C "$site" -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -q -m "docs: $DEST ($GITHUB_SHA)"
+          git -C "$site" push origin gh-pages
