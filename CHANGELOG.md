@@ -1,6 +1,9 @@
 # Changelog
 
-## Unreleased (0.2.0)
+## 0.2.0 (2026-11-24)
+
+RSA signature verification, and snicholls-core v0.22.0 (required at 0.17.0 or later). Experimental and not
+independently audited: not for securing funds yet.
 
 - RSA signature verification (`rsa/rsa.hpp`): RSASSA-PKCS1-v1_5 and RSASSA-PSS with SHA-256 and MGF1-SHA-256
   (JOSE's RS256 and PS256), with keys from components (a JWK's `n` and `e`), a SubjectPublicKeyInfo or an
