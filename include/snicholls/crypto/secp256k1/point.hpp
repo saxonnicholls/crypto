@@ -54,6 +54,8 @@
 /// \gotchas
 /// Projective equality compares cross products; two different (X : Y : Z) can be the same point.
 ///
+/// A point multiplication evaluated in a constant expression needs a raised step limit: see the gotchas of `field.hpp`.
+///
 /// \status
 /// Experimental (0.1).
 

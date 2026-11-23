@@ -113,8 +113,30 @@ function(snicholls_crypto_compile_options target)
     endif()
 endfunction()
 
+# Whole inversions, point multiplications and signatures are evaluated at compile time in the tests and demos
+# (static_assert, constexpr variables). The compilers' default step limits are too low for them, and how many steps
+# one evaluation costs depends on the compiler and its standard library: Clang 21 with libstdc++ 15, which checks
+# its assertions in constant expressions, exceeds Clang's default 1,048,576 on one field inversion. Every target here
+# that evaluates them gets the same limits. The header check does not: it compiles each header as a consumer would,
+# with the defaults.
+function(snicholls_crypto_constexpr_limits target)
+    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+        if(CMAKE_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC")
+            target_compile_options(${target} PRIVATE /clang:-fconstexpr-steps=100000000)
+        else()
+            target_compile_options(${target} PRIVATE -fconstexpr-steps=100000000)
+        endif()
+    elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        target_compile_options(${target} PRIVATE -fconstexpr-ops-limit=4294967296 -fconstexpr-loop-limit=100000000)
+    elseif(MSVC)
+        target_compile_options(${target} PRIVATE /constexpr:steps100000000)
+    endif()
+endfunction()
+
+# Tests, demos and benchmarks: the warnings, and the constexpr limits
 function(snicholls_crypto_test_options target)
     snicholls_crypto_compile_options(${target})
+    snicholls_crypto_constexpr_limits(${target})
     if(MSVC)
         target_compile_options(${target} PRIVATE /wd4459)
         target_compile_definitions(${target} PRIVATE _CRT_SECURE_NO_WARNINGS)

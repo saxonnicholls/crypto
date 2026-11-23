@@ -50,7 +50,12 @@
 /// `<array>`, `<cstdint>`, `<optional>`, `<span>`; core's `detail/wide_mul.hpp`.
 ///
 /// \gotchas
-/// None known.
+/// Evaluated in a constant expression (a `constexpr` variable, a `static_assert`), an inversion, a square root or
+/// anything longer costs more evaluation steps than the compilers allow by default; how many depends on the compiler
+/// and its standard library (Clang 21 with libstdc++ 15 exceeds Clang's default on one inversion). Raise the limit
+/// for such a translation unit: `-fconstexpr-steps=100000000` (Clang), `-fconstexpr-ops-limit=4294967296
+/// -fconstexpr-loop-limit=100000000` (GCC), `/constexpr:steps100000000` (MSVC), as this library's tests and demos
+/// do (`snicholls_crypto_constexpr_limits` in CMakeLists.txt). Evaluation at run time is unaffected.
 ///
 /// \status
 /// Experimental (0.1).

@@ -43,13 +43,8 @@ target_link_libraries(snicholls_crypto_tests PRIVATE snicholls::crypto GTest::gt
 # The official test vectors (tests/fixtures/), read at run time; provenance in tests/fixtures/README.md
 target_compile_definitions(snicholls_crypto_tests PRIVATE SNICHOLLS_CRYPTO_FIXTURE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/fixtures")
 target_include_directories(snicholls_crypto_tests PRIVATE ${PROJECT_SOURCE_DIR}/tests/support)
+# The warnings and the constexpr limits the compile-time tests need (CMakeLists.txt, snicholls_crypto_constexpr_limits)
 snicholls_crypto_test_options(snicholls_crypto_tests)
-# Compile-time tests evaluate whole point multiplications; the compilers' default step limits are too low for them
-if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    target_compile_options(snicholls_crypto_tests PRIVATE -fconstexpr-steps=100000000)
-elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    target_compile_options(snicholls_crypto_tests PRIVATE -fconstexpr-ops-limit=4294967296 -fconstexpr-loop-limit=100000000)
-endif()
 
 include(GoogleTest)
 gtest_discover_tests(snicholls_crypto_tests PROPERTIES LABELS unit DISCOVERY_MODE PRE_TEST)

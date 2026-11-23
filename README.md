@@ -21,8 +21,9 @@ release at the root, every version under `/vX.Y.Z/`, the latest `main` under `/m
 | `hd/` | `path`, `bip32`, `slip10` | derivation paths and BIP-44/49/84/86; BIP-32 with xprv / xpub (tprv, yprv, zprv); SLIP-10 for Ed25519, hardened only |
 | `address/` | `base58`, `base58check`, `bech32` | base58 with any alphabet (Bitcoin, XRPL, Flickr), base58check, bech32 / bech32m and segwit addresses |
 
-Everything is `constexpr` (a whole RFC 6979 signature is a `static_assert` in the tests), allocation-free, and
-returns `snicholls::result<V, errc>` where it can fail. The hashes are core's (`hash/`); core is pinned at v0.21.0 and
+Everything is `constexpr` (a whole RFC 6979 signature is a `static_assert` in the tests; evaluating one at compile
+time needs a raised step limit, `secp256k1/field.hpp` says which), allocation-free, and returns
+`snicholls::result<V, errc>` where it can fail. The hashes are core's (`hash/`); core is pinned at v0.21.0 and
 required at 0.17.0 or later.
 
     #include <snicholls/crypto/hd/bip32.hpp>
