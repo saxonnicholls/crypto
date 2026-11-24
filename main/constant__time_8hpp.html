@@ -26,7 +26,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">snicholls-crypto<span id="projectnumber">&#160;0.3.0</span>
+   <div id="projectname">snicholls-crypto<span id="projectnumber">&#160;0.4.0</span>
    </div>
    <div id="projectbrief">Elliptic curves, signatures and wallet key derivation for the snicholls libraries</div>
   </td>
@@ -187,7 +187,7 @@ requires std::is_unsigned_v&lt;T&gt;</td></tr>
 <div class="line">    ct::conditional_swap(mask, a, b);                       <span class="comment">// swapped, with no branch on secret_bit</span></div>
 <div class="line">    <span class="keyword">const</span> <span class="keyword">auto</span> chosen = ct::select&lt;std::uint32_t&gt;(ct::mask_less(a, b), a, b);   <span class="comment">// min(a, b) without a branch</span></div>
 <div class="line"> </div>
-<div class="line">    <span class="keyword">const</span> std::array&lt;std::uint8_t, 4&gt; tag{1, 2, 3, 4}, expected{1, 2, 3, 4};</div>
+<div class="line">    <span class="keyword">const</span> std::array&lt;std::uint8_t, 4&gt; <a class="code hl_typedef" href="namespacesnicholls_1_1crypto_1_1aead.html#a6416b3a47fa4d034458c765b733ea95e">tag</a>{1, 2, 3, 4}, expected{1, 2, 3, 4};</div>
 <div class="line">    <span class="keyword">const</span> <span class="keywordtype">bool</span> same = ct::equal(tag, expected);             <span class="comment">// a MAC check that does not stop at the first difference</span></div>
 </div><!-- fragment --><dl class="section user"><dt>Performance</dt><dd></dd></dl>
 <p>Not benchmarked on its own: a handful of instructions each; the curve benchmarks measure them in use.</p>

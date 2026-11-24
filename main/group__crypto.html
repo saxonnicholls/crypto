@@ -26,7 +26,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">snicholls-crypto<span id="projectnumber">&#160;0.3.0</span>
+   <div id="projectname">snicholls-crypto<span id="projectnumber">&#160;0.4.0</span>
    </div>
    <div id="projectbrief">Elliptic curves, signatures and wallet key derivation for the snicholls libraries</div>
   </td>
@@ -125,6 +125,8 @@ Topics</h2></td></tr>
 <tr class="memdesc:group__address"><td class="mdescLeft">&#160;</td><td class="mdescRight">Address and key text: base58 (any alphabet), base58check, bech32 and bech32m, segwit addresses. <br /></td></tr>
 <tr class="memitem:curve25519" id="r_curve25519"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="group__curve25519.html">Curve25519</a></td></tr>
 <tr class="memdesc:group__curve25519"><td class="mdescLeft">&#160;</td><td class="mdescRight">The field and scalars of Curve25519, edwards25519, Ed25519 signatures and X25519 key agreement. <br /></td></tr>
+<tr class="memitem:aead" id="r_aead"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="group__aead.html">Authenticated encryption</a></td></tr>
+<tr class="memdesc:group__aead"><td class="mdescLeft">&#160;</td><td class="mdescRight">ChaCha20-Poly1305 (RFC 8439), XChaCha20-Poly1305, AES-256-GCM and AES-256 key wrap (RFC 3394). <br /></td></tr>
 <tr class="memitem:p256" id="r_p256"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="group__p256.html">P-256</a></td></tr>
 <tr class="memdesc:group__p256"><td class="mdescLeft">&#160;</td><td class="mdescRight">P-256 (secp256r1): its field, scalars and points, and ECDSA with SHA-256 (ES256) with RFC 6979 nonces. <br /></td></tr>
 <tr class="memitem:rsa" id="r_rsa"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="group__rsa.html">RSA</a></td></tr>
@@ -154,7 +156,7 @@ Classes</h2></td></tr>
 Macros</h2></td></tr>
 <tr class="memitem:ga54161ed5eeea29786c330f33f17859a2" id="r_ga54161ed5eeea29786c330f33f17859a2"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ga54161ed5eeea29786c330f33f17859a2">SNICHOLLS_CRYPTO_VERSION_MAJOR</a>&#160;&#160;&#160;0</td></tr>
 <tr class="memdesc:ga54161ed5eeea29786c330f33f17859a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Major version of snicholls-crypto.  <br /></td></tr>
-<tr class="memitem:ga9f127f473a417f0e4670b9c9e8b874cd" id="r_ga9f127f473a417f0e4670b9c9e8b874cd"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ga9f127f473a417f0e4670b9c9e8b874cd">SNICHOLLS_CRYPTO_VERSION_MINOR</a>&#160;&#160;&#160;3</td></tr>
+<tr class="memitem:ga9f127f473a417f0e4670b9c9e8b874cd" id="r_ga9f127f473a417f0e4670b9c9e8b874cd"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ga9f127f473a417f0e4670b9c9e8b874cd">SNICHOLLS_CRYPTO_VERSION_MINOR</a>&#160;&#160;&#160;4</td></tr>
 <tr class="memdesc:ga9f127f473a417f0e4670b9c9e8b874cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Minor version of snicholls-crypto.  <br /></td></tr>
 <tr class="memitem:ga46adf5d826fcc6e97324b882df225091" id="r_ga46adf5d826fcc6e97324b882df225091"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ga46adf5d826fcc6e97324b882df225091">SNICHOLLS_CRYPTO_VERSION_PATCH</a>&#160;&#160;&#160;0</td></tr>
 <tr class="memdesc:ga46adf5d826fcc6e97324b882df225091"><td class="mdescLeft">&#160;</td><td class="mdescRight">Patch version of snicholls-crypto.  <br /></td></tr>
@@ -200,6 +202,7 @@ Enumerations</h2></td></tr>
 , <a class="el" href="#ggaa314007c5b3658974966bfdaeb2c3625a3830eedc1ebf7207f10ac8239650001e">snicholls::crypto::errc::invalid_witness_version</a>
 , <br />
 &#160;&#160;<a class="el" href="#ggaa314007c5b3658974966bfdaeb2c3625ac20ddc41cc208191634e2ec6163e53cc">snicholls::crypto::errc::invalid_witness_program</a>
+, <a class="el" href="#ggaa314007c5b3658974966bfdaeb2c3625a047ef5b1ba6d5dcc4dbee37c075a2088">snicholls::crypto::errc::authentication_failed</a>
 <br />
  }</td></tr>
 <tr class="memdesc:gaa314007c5b3658974966bfdaeb2c3625"><td class="mdescLeft">&#160;</td><td class="mdescRight">Why an operation failed. The values are stable: new ones are only ever appended.  <a href="#gaa314007c5b3658974966bfdaeb2c3625">More...</a><br /></td></tr>
@@ -346,7 +349,7 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define SNICHOLLS_CRYPTO_VERSION_MINOR&#160;&#160;&#160;3</td>
+          <td class="memname">#define SNICHOLLS_CRYPTO_VERSION_MINOR&#160;&#160;&#160;4</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -521,6 +524,8 @@ Functions</h2></td></tr>
 <tr><td class="fieldname"><a id="ggaa314007c5b3658974966bfdaeb2c3625a3830eedc1ebf7207f10ac8239650001e" name="ggaa314007c5b3658974966bfdaeb2c3625a3830eedc1ebf7207f10ac8239650001e"></a>invalid_witness_version&#160;</td><td class="fielddoc"><p>A segwit witness version above 16, or the wrong checksum variant for the version. </p>
 </td></tr>
 <tr><td class="fieldname"><a id="ggaa314007c5b3658974966bfdaeb2c3625ac20ddc41cc208191634e2ec6163e53cc" name="ggaa314007c5b3658974966bfdaeb2c3625ac20ddc41cc208191634e2ec6163e53cc"></a>invalid_witness_program&#160;</td><td class="fielddoc"><p>A segwit witness program outside 2 to 40 bytes, or not 20 or 32 bytes for version 0. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggaa314007c5b3658974966bfdaeb2c3625a047ef5b1ba6d5dcc4dbee37c075a2088" name="ggaa314007c5b3658974966bfdaeb2c3625a047ef5b1ba6d5dcc4dbee37c075a2088"></a>authentication_failed&#160;</td><td class="fielddoc"><p>An AEAD tag did not match: the ciphertext, the associated data, the nonce or the key differ. </p>
 </td></tr>
 </table>
 

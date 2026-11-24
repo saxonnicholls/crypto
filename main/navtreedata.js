@@ -64,9 +64,9 @@ var NAVTREE =
 
 var NAVTREEINDEX =
 [
-"annotated.html",
-"functions_func_d.html",
-"structsnicholls_1_1crypto_1_1ed25519_1_1public__key.html#aff07f9b4755dafa65084f7c4d5234241"
+"aes256__gcm_8hpp.html",
+"functions_func.html",
+"schnorr_8hpp.html"
 ];
 
 const SYNCONMSG = 'click to disable panel synchronization';

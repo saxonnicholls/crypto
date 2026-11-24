@@ -26,7 +26,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">snicholls-crypto<span id="projectnumber">&#160;0.3.0</span>
+   <div id="projectname">snicholls-crypto<span id="projectnumber">&#160;0.4.0</span>
    </div>
    <div id="projectbrief">Elliptic curves, signatures and wallet key derivation for the snicholls libraries</div>
   </td>
@@ -143,12 +143,12 @@ Public Attributes</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 id="header-friends" class="groupheader"><a id="friends" name="friends"></a>
 Friends</h2></td></tr>
 <tr class="memitem:af6acb99808f684dcbe1630b3d7b51a58" id="r_af6acb99808f684dcbe1630b3d7b51a58"><td class="memItemLeft">constexpr bool&#160;</td><td class="memItemRight"><a class="el" href="#af6acb99808f684dcbe1630b3d7b51a58">operator==</a> (const <a class="el" href="structsnicholls_1_1crypto_1_1secp256k1_1_1signature.html">signature</a> &amp;a, const <a class="el" href="structsnicholls_1_1crypto_1_1secp256k1_1_1signature.html">signature</a> &amp;b) noexcept=default</td></tr>
-<tr class="memdesc:af6acb99808f684dcbe1630b3d7b51a58"><td class="mdescLeft">&#160;</td><td class="mdescRight">Equality of bytes.  <br /></td></tr>
+<tr class="memdesc:af6acb99808f684dcbe1630b3d7b51a58"><td class="mdescLeft">&#160;</td><td class="mdescRight">Equality of r and s.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>An ECDSA signature: r and s, 32 bytes each, big-endian. Public data; not validated until verified. </p>
 
-<p class="definition">Definition at line <a class="el" href="secp256k1_2ecdsa_8hpp_source.html#l00095">95</a> of file <a class="el" href="secp256k1_2ecdsa_8hpp_source.html">ecdsa.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="secp256k1_2ecdsa_8hpp_source.html#l00096">96</a> of file <a class="el" href="secp256k1_2ecdsa_8hpp_source.html">ecdsa.hpp</a>.</p>
 </div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
 <a id="a2ff743f370f8d75d220023eedb6f15e5" name="a2ff743f370f8d75d220023eedb6f15e5"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a2ff743f370f8d75d220023eedb6f15e5">&#9670;&#160;</a></span>compact()</h2>
@@ -176,7 +176,7 @@ Friends</h2></td></tr>
 <p>r || s. </p>
 <dl class="section return"><dt>Returns</dt><dd>64 bytes. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="secp256k1_2ecdsa_8hpp_source.html#l00114">114</a> of file <a class="el" href="secp256k1_2ecdsa_8hpp_source.html">ecdsa.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="secp256k1_2ecdsa_8hpp_source.html#l00115">115</a> of file <a class="el" href="secp256k1_2ecdsa_8hpp_source.html">ecdsa.hpp</a>.</p>
 
 </div>
 </div>
@@ -206,7 +206,7 @@ Friends</h2></td></tr>
 <p>The DER encoding: SEQUENCE { INTEGER r, INTEGER s }, minimal, at most 72 bytes. </p>
 <dl class="section return"><dt>Returns</dt><dd>The bytes. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="secp256k1_2ecdsa_8hpp_source.html#l00126">126</a> of file <a class="el" href="secp256k1_2ecdsa_8hpp_source.html">ecdsa.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="secp256k1_2ecdsa_8hpp_source.html#l00127">127</a> of file <a class="el" href="secp256k1_2ecdsa_8hpp_source.html">ecdsa.hpp</a>.</p>
 
 </div>
 </div>
@@ -242,7 +242,7 @@ Friends</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The signature. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="secp256k1_2ecdsa_8hpp_source.html#l00102">102</a> of file <a class="el" href="secp256k1_2ecdsa_8hpp_source.html">ecdsa.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="secp256k1_2ecdsa_8hpp_source.html#l00103">103</a> of file <a class="el" href="secp256k1_2ecdsa_8hpp_source.html">ecdsa.hpp</a>.</p>
 
 </div>
 </div>
@@ -278,7 +278,7 @@ Friends</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The signature (r and s not yet range-checked), or <span class="tt"><a class="el" href="group__crypto.html#ggaa314007c5b3658974966bfdaeb2c3625a12c527ffd45868061a192960b352b5d9" title="A signature was out of range, badly encoded, or did not verify.">errc::invalid_signature</a></span>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="secp256k1_2ecdsa_8hpp_source.html#l00156">156</a> of file <a class="el" href="secp256k1_2ecdsa_8hpp_source.html">ecdsa.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="secp256k1_2ecdsa_8hpp_source.html#l00135">135</a> of file <a class="el" href="secp256k1_2ecdsa_8hpp_source.html">ecdsa.hpp</a>.</p>
 
 </div>
 </div>
@@ -310,7 +310,7 @@ Friends</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Equality of bytes. </p>
+<p>Equality of r and s. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">a</td><td>A signature. </td></tr>
@@ -318,7 +318,7 @@ Friends</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>Whether r and s agree. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Whether they are equal. </dd></dl>
 
 </div>
 </div>
@@ -337,7 +337,7 @@ Friends</h2></td></tr>
 
 <p>r. </p>
 
-<p class="definition">Definition at line <a class="el" href="secp256k1_2ecdsa_8hpp_source.html#l00096">96</a> of file <a class="el" href="secp256k1_2ecdsa_8hpp_source.html">ecdsa.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="secp256k1_2ecdsa_8hpp_source.html#l00097">97</a> of file <a class="el" href="secp256k1_2ecdsa_8hpp_source.html">ecdsa.hpp</a>.</p>
 
 </div>
 </div>
@@ -355,7 +355,7 @@ Friends</h2></td></tr>
 
 <p>s. </p>
 
-<p class="definition">Definition at line <a class="el" href="secp256k1_2ecdsa_8hpp_source.html#l00097">97</a> of file <a class="el" href="secp256k1_2ecdsa_8hpp_source.html">ecdsa.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="secp256k1_2ecdsa_8hpp_source.html#l00098">98</a> of file <a class="el" href="secp256k1_2ecdsa_8hpp_source.html">ecdsa.hpp</a>.</p>
 
 </div>
 </div>

@@ -1,6 +1,7 @@
 var dir_e640b4835ac9da1ad5a0ff265cb85ec2 =
 [
     [ "address", "dir_fc1b43ea57395fe949b3bd4acc50e5b3.html", "dir_fc1b43ea57395fe949b3bd4acc50e5b3" ],
+    [ "aead", "dir_c9d065dacee208462b62c3788c1e31a9.html", "dir_c9d065dacee208462b62c3788c1e31a9" ],
     [ "bip39", "dir_323d9dcd85b1acc0d1055cca7cd45f91.html", "dir_323d9dcd85b1acc0d1055cca7cd45f91" ],
     [ "curve25519", "dir_d2e7d9ecc5e355351d89bcde468f4602.html", "dir_d2e7d9ecc5e355351d89bcde468f4602" ],
     [ "hd", "dir_3b6f9e86862f58b58a08fcb1467e7f8d.html", "dir_3b6f9e86862f58b58a08fcb1467e7f8d" ],

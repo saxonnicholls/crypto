@@ -1,5 +1,7 @@
 var searchData=
 [
-  ['r_0',['r',['../structsnicholls_1_1crypto_1_1p256_1_1signature.html#a7a9dc4d1bfc11dd91e5e60a69e4d64a5',1,'snicholls::crypto::p256::signature::r'],['../structsnicholls_1_1crypto_1_1secp256k1_1_1signature.html#a5c07c9cc2288be281af583c30888a17d',1,'snicholls::crypto::secp256k1::signature::r']]],
-  ['recovery_5fid_1',['recovery_id',['../structsnicholls_1_1crypto_1_1secp256k1_1_1recoverable__signature.html#acad513dd6146f87dfcc7afadfcbc06ac',1,'snicholls::crypto::secp256k1::recoverable_signature']]]
+  ['parent_0',['parent',['../structsnicholls_1_1crypto_1_1hd_1_1extended__public__key.html#a460de6002f2dbd011a4d5fb4310b830e',1,'snicholls::crypto::hd::extended_public_key']]],
+  ['private_5fversion_1',['private_version',['../structsnicholls_1_1crypto_1_1hd_1_1key__versions.html#ab793ccc03f44b83864cda4976b3cfc63',1,'snicholls::crypto::hd::key_versions']]],
+  ['program_2',['program',['../structsnicholls_1_1crypto_1_1address_1_1witness__program.html#aa42506aa64c0111e16427a34b1651fee',1,'snicholls::crypto::address::witness_program']]],
+  ['public_5fversion_3',['public_version',['../structsnicholls_1_1crypto_1_1hd_1_1key__versions.html#a13f4de310a16aa1e5c2e40422597a5ad',1,'snicholls::crypto::hd::key_versions']]]
 ];

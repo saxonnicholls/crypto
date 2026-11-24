@@ -1,6 +1,22 @@
 var namespacesnicholls_1_1crypto =
 [
     [ "address", "namespacesnicholls_1_1crypto_1_1address.html", "namespacesnicholls_1_1crypto_1_1address" ],
+    [ "aead", "namespacesnicholls_1_1crypto_1_1aead.html", [
+      [ "tag", "namespacesnicholls_1_1crypto_1_1aead.html#a6416b3a47fa4d034458c765b733ea95e", null ],
+      [ "aes256_gcm_open", "group__aead.html#ga1e9d3283b937a14902df2c3d5676de2d", null ],
+      [ "aes256_gcm_seal", "group__aead.html#ga96d9d4108a70983af8482e0bc2b0c7a5", null ],
+      [ "aes256_key_unwrap", "group__aead.html#ga053c26421cb7244326a624a4ff1fe1f8", null ],
+      [ "aes256_key_wrap", "group__aead.html#ga8159cb23030d3b7e4d80d13c2d16b538", null ],
+      [ "chacha20_poly1305_open", "group__aead.html#gac31d752792648f7b113849891095a3de", null ],
+      [ "chacha20_poly1305_seal", "group__aead.html#ga01376fa591b0c92e3db4305375bbc13a", null ],
+      [ "xchacha20_poly1305_open", "group__aead.html#gab406f1f01f58690a153ce7a76fa9c8f3", null ],
+      [ "xchacha20_poly1305_seal", "group__aead.html#ga2a49dda18145fba0f7acbb596bfccdfd", null ],
+      [ "key_size", "namespacesnicholls_1_1crypto_1_1aead.html#a68c867da2c6af5c5394084e8b56d92f8", null ],
+      [ "key_wrap_max_blocks", "namespacesnicholls_1_1crypto_1_1aead.html#afb0799f6d7d50604aaa18c994e77a7c5", null ],
+      [ "nonce_size", "namespacesnicholls_1_1crypto_1_1aead.html#ada1ffa0ed1108e788393d111e7d75405", null ],
+      [ "tag_size", "namespacesnicholls_1_1crypto_1_1aead.html#a42271e3b0bdf9660478812cf4ef158ac", null ],
+      [ "xnonce_size", "namespacesnicholls_1_1crypto_1_1aead.html#a4756238e89828cf555a13588c4a717e5", null ]
+    ] ],
     [ "bip39", "namespacesnicholls_1_1crypto_1_1bip39.html", "namespacesnicholls_1_1crypto_1_1bip39" ],
     [ "ct", "namespacesnicholls_1_1crypto_1_1ct.html", [
       [ "conditional_copy", "namespacesnicholls_1_1crypto_1_1ct.html#a0a3ed72330b6a3bb2ac7856e26db88ab", null ],
@@ -44,7 +60,8 @@ var namespacesnicholls_1_1crypto =
       [ "invalid_character", "group__crypto.html#ggaa314007c5b3658974966bfdaeb2c3625add83009b482779fb2e0b1bd7a064f4b8", null ],
       [ "invalid_hrp", "group__crypto.html#ggaa314007c5b3658974966bfdaeb2c3625ac773270d518c9d9c0f2d98f3e59abcf9", null ],
       [ "invalid_witness_version", "group__crypto.html#ggaa314007c5b3658974966bfdaeb2c3625a3830eedc1ebf7207f10ac8239650001e", null ],
-      [ "invalid_witness_program", "group__crypto.html#ggaa314007c5b3658974966bfdaeb2c3625ac20ddc41cc208191634e2ec6163e53cc", null ]
+      [ "invalid_witness_program", "group__crypto.html#ggaa314007c5b3658974966bfdaeb2c3625ac20ddc41cc208191634e2ec6163e53cc", null ],
+      [ "authentication_failed", "group__crypto.html#ggaa314007c5b3658974966bfdaeb2c3625a047ef5b1ba6d5dcc4dbee37c075a2088", null ]
     ] ],
     [ "secure_wipe", "namespacesnicholls_1_1crypto.html#a1ca93c7d6a42579f7ef5cd91bde65f3d", null ],
     [ "secure_wipe", "namespacesnicholls_1_1crypto.html#a753cb859a11f7816769a5eb9c1da8631", null ],

@@ -26,7 +26,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">snicholls-crypto<span id="projectnumber">&#160;0.3.0</span>
+   <div id="projectname">snicholls-crypto<span id="projectnumber">&#160;0.4.0</span>
    </div>
    <div id="projectbrief">Elliptic curves, signatures and wallet key derivation for the snicholls libraries</div>
   </td>
@@ -214,7 +214,7 @@ Functions</h2></td></tr>
 </td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="secp256k1_2ecdsa_8hpp_source.html#l00088">88</a> of file <a class="el" href="secp256k1_2ecdsa_8hpp_source.html">ecdsa.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="secp256k1_2ecdsa_8hpp_source.html#l00089">89</a> of file <a class="el" href="secp256k1_2ecdsa_8hpp_source.html">ecdsa.hpp</a>.</p>
 
 </div>
 </div>
@@ -268,7 +268,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The key, or <span class="tt"><a class="el" href="group__crypto.html#ggaa314007c5b3658974966bfdaeb2c3625a12c527ffd45868061a192960b352b5d9" title="A signature was out of range, badly encoded, or did not verify.">errc::invalid_signature</a></span>, <span class="tt"><a class="el" href="group__crypto.html#ggaa314007c5b3658974966bfdaeb2c3625a39d5eda5d3764cd724349731d24e8f55" title="A signature&#39;s s was above n / 2 where only low-S is accepted.">errc::high_s</a></span>, <span class="tt"><a class="el" href="group__crypto.html#ggaa314007c5b3658974966bfdaeb2c3625a7c0b49097944aba452c42d501a9792c7" title="A recovery id was not 0 to 3 (or an Ethereum v not 27 or 28).">errc::invalid_recovery_id</a></span>, <span class="tt"><a class="el" href="group__crypto.html#ggaa314007c5b3658974966bfdaeb2c3625a028938ebaa01571573462ff99b7b43ab" title="No public key could be recovered: r is not the x of a curve point, or Q is infinity.">errc::recovery_failed</a></span>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="secp256k1_2ecdsa_8hpp_source.html#l00302">302</a> of file <a class="el" href="secp256k1_2ecdsa_8hpp_source.html">ecdsa.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="secp256k1_2ecdsa_8hpp_source.html#l00259">259</a> of file <a class="el" href="secp256k1_2ecdsa_8hpp_source.html">ecdsa.hpp</a>.</p>
 
 </div>
 </div>
@@ -315,7 +315,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The key (its <span class="tt">xy()</span> hashed with Keccak-256 gives the address), or the errors of <span class="tt"><a class="el" href="#ga747c7222170a44e38d1c0148fee3ba49" title="Recovers the public key from a signature, its recovery id and the hash. Variable time; public data on...">recover</a></span>; <span class="tt"><a class="el" href="group__crypto.html#ggaa314007c5b3658974966bfdaeb2c3625a7c0b49097944aba452c42d501a9792c7" title="A recovery id was not 0 to 3 (or an Ethereum v not 27 or 28).">errc::invalid_recovery_id</a></span> for any other v. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="secp256k1_2ecdsa_8hpp_source.html#l00340">340</a> of file <a class="el" href="secp256k1_2ecdsa_8hpp_source.html">ecdsa.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="secp256k1_2ecdsa_8hpp_source.html#l00297">297</a> of file <a class="el" href="secp256k1_2ecdsa_8hpp_source.html">ecdsa.hpp</a>.</p>
 
 </div>
 </div>
@@ -456,7 +456,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The signature and its recovery id. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="secp256k1_2ecdsa_8hpp_source.html#l00225">225</a> of file <a class="el" href="secp256k1_2ecdsa_8hpp_source.html">ecdsa.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="secp256k1_2ecdsa_8hpp_source.html#l00182">182</a> of file <a class="el" href="secp256k1_2ecdsa_8hpp_source.html">ecdsa.hpp</a>.</p>
 
 </div>
 </div>
@@ -509,7 +509,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Success, or <span class="tt"><a class="el" href="group__crypto.html#ggaa314007c5b3658974966bfdaeb2c3625a12c527ffd45868061a192960b352b5d9" title="A signature was out of range, badly encoded, or did not verify.">errc::invalid_signature</a></span> / <span class="tt"><a class="el" href="group__crypto.html#ggaa314007c5b3658974966bfdaeb2c3625a39d5eda5d3764cd724349731d24e8f55" title="A signature&#39;s s was above n / 2 where only low-S is accepted.">errc::high_s</a></span>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="secp256k1_2ecdsa_8hpp_source.html#l00280">280</a> of file <a class="el" href="secp256k1_2ecdsa_8hpp_source.html">ecdsa.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="secp256k1_2ecdsa_8hpp_source.html#l00237">237</a> of file <a class="el" href="secp256k1_2ecdsa_8hpp_source.html">ecdsa.hpp</a>.</p>
 
 </div>
 </div>

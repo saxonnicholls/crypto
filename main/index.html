@@ -26,7 +26,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">snicholls-crypto<span id="projectnumber">&#160;0.3.0</span>
+   <div id="projectname">snicholls-crypto<span id="projectnumber">&#160;0.4.0</span>
    </div>
    <div id="projectbrief">Elliptic curves, signatures and wallet key derivation for the snicholls libraries</div>
   </td>
@@ -116,7 +116,7 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('index.html',''
 <div class="textblock"><p><a class="anchor" id="md__2home_2runner_2work_2crypto_2crypto_2README"></a></p>
 <p>Elliptic curves, signatures and wallet key derivation, header-only C++20, constant-time wherever a secret is involved. Part of the snicholls libraries; it depends on snicholls-core and nothing else.</p>
 <blockquote class="doxtable">
-<p><b>Status: experimental (0.3.0). Not independently audited. Do not use it to secure funds yet.</b> Scrutiny is welcome: report vulnerabilities privately as SECURITY.md describes. </p>
+<p><b>Status: experimental (0.4.0). Not independently audited. Do not use it to secure funds yet.</b> Scrutiny is welcome: report vulnerabilities privately as SECURITY.md describes. </p>
 </blockquote>
 <p><b>Documentation:</b> every public entity is documented in Doxygen, with the design, guarantees, errors, examples (compiled from the demos), performance and known issues of each header. Build it with <span class="tt">make docs</span> and open <span class="tt">build-docs/docs/html/index.html</span>. Once the repository is public, CI will publish it at <a href="https://saxonnicholls.github.io/crypto/">https://saxonnicholls.github.io/crypto/</a>, as core's is at <a href="https://saxonnicholls.github.io/core/">https://saxonnicholls.github.io/core/</a>: the newest release at the root, every version under <span class="tt">/vX.Y.Z/</span>, the latest <span class="tt">main</span> under <span class="tt">/main/</span>.</p>
 <table class="markdownTable">
@@ -127,19 +127,21 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('index.html',''
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">secp256k1/</span>  </td><td class="markdownTableBodyNone"><span class="tt">field</span>, <span class="tt">scalar</span>, <span class="tt">point</span>, <span class="tt">keys</span>, <span class="tt">rfc6979</span>, <span class="tt">ecdsa</span>, <span class="tt">schnorr</span>  </td><td class="markdownTableBodyNone">keys and SEC1; ECDSA with RFC 6979, low-S and the recovery id; verification (high-S accepted or rejected); recovery and Ethereum's <span class="tt">ecrecover</span>; strict DER; BIP-340  </td></tr>
 <tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><span class="tt">aead/</span>  </td><td class="markdownTableBodyNone"><span class="tt">chacha20_poly1305</span>, <span class="tt">aes256_gcm</span>, <span class="tt">aes_key_wrap</span>  </td><td class="markdownTableBodyNone">ChaCha20-Poly1305 (RFC 8439), XChaCha20-Poly1305 (random 24-byte nonces), AES-256-GCM (JWE's A256GCM; AES without tables) and AES-256 key wrap (RFC 3394, A256KW): constant time, constant-time tag checks, nothing released before the tag verifies  </td></tr>
+<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">p256/</span>  </td><td class="markdownTableBodyNone"><span class="tt">field</span>, <span class="tt">scalar</span>, <span class="tt">point</span>, <span class="tt">ecdsa</span>  </td><td class="markdownTableBodyNone">P-256 (secp256r1): keys and SEC1, ECDSA with SHA-256 (ES256) with RFC 6979 nonces in constant time, verification, JOSE r || s and DER  </td></tr>
-<tr class="markdownTableRowEven">
+<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">rsa/</span>  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="group__rsa.html" title="RSA signature verification: RSASSA-PKCS1-v1_5 and RSASSA-PSS with SHA-256 (RS256, PS256).">RSA</a></span>  </td><td class="markdownTableBodyNone">RSA signature verification only: RSASSA-PKCS1-v1_5 and PSS with SHA-256 (RS256, PS256), keys from JWK <span class="tt">n</span> / <span class="tt">e</span>, SubjectPublicKeyInfo or RSAPublicKey, 2048 to 4096 bits  </td></tr>
-<tr class="markdownTableRowOdd">
+<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">curve25519/</span>  </td><td class="markdownTableBodyNone"><span class="tt">field</span>, <span class="tt">scalar</span>, <span class="tt">edwards</span>, <span class="tt">ed25519</span>, <span class="tt">x25519</span>  </td><td class="markdownTableBodyNone">Ed25519 (RFC 8032, cofactorless verification with S &lt; L) and X25519 (RFC 7748, refusing the all-zero secret)  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">bip39/</span>  </td><td class="markdownTableBodyNone"><span class="tt">wordlist</span>, <span class="tt">mnemonic</span>  </td><td class="markdownTableBodyNone">entropy to words and back, constant-time word lookup, the seed (PBKDF2-HMAC-SHA512)  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">hd/</span>  </td><td class="markdownTableBodyNone"><span class="tt">path</span>, <span class="tt">bip32</span>, <span class="tt">slip10</span>  </td><td class="markdownTableBodyNone">derivation paths and BIP-44/49/84/86; BIP-32 with xprv / xpub (tprv, yprv, zprv); SLIP-10 for Ed25519, hardened only  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">bip39/</span>  </td><td class="markdownTableBodyNone"><span class="tt">wordlist</span>, <span class="tt">mnemonic</span>  </td><td class="markdownTableBodyNone">entropy to words and back, constant-time word lookup, the seed (PBKDF2-HMAC-SHA512)  </td></tr>
 <tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><span class="tt">hd/</span>  </td><td class="markdownTableBodyNone"><span class="tt">path</span>, <span class="tt">bip32</span>, <span class="tt">slip10</span>  </td><td class="markdownTableBodyNone">derivation paths and BIP-44/49/84/86; BIP-32 with xprv / xpub (tprv, yprv, zprv); SLIP-10 for Ed25519, hardened only  </td></tr>
+<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">address/</span>  </td><td class="markdownTableBodyNone"><span class="tt">base58</span>, <span class="tt">base58check</span>, <span class="tt">bech32</span>  </td><td class="markdownTableBodyNone">base58 with any alphabet (Bitcoin, XRPL, Flickr), base58check, bech32 / bech32m and segwit addresses  </td></tr>
 </table>
-<p>Everything is <span class="tt">constexpr</span> (a whole RFC 6979 signature is a <span class="tt">static_assert</span> in the tests; evaluating one at compile time needs a raised step limit, <span class="tt"><a class="el" href="secp256k1_2field_8hpp.html" title="secp256k1::field_element: arithmetic modulo p = 2^256 - 2^32 - 977, constant-time and constexpr.">secp256k1/field.hpp</a></span> says which), allocation-free, and returns <span class="tt">snicholls::result&lt;V, errc&gt;</span> where it can fail. The hashes are core's (<span class="tt">hash/</span>); core is pinned at v0.22.0 and required at 0.17.0 or later. </p><pre class="fragment">#include &lt;snicholls/crypto/hd/bip32.hpp&gt;
+<p>Everything is <span class="tt">constexpr</span> (a whole RFC 6979 signature is a <span class="tt">static_assert</span> in the tests; evaluating one at compile time needs a raised step limit, <span class="tt"><a class="el" href="secp256k1_2field_8hpp.html" title="secp256k1::field_element: arithmetic modulo p = 2^256 - 2^32 - 977, constant-time and constexpr.">secp256k1/field.hpp</a></span> says which), allocation-free, and returns <span class="tt">snicholls::result&lt;V, errc&gt;</span> where it can fail. The hashes are core's (<span class="tt">hash/</span>); core is pinned at v0.23.0 and required at 0.17.0 or later. </p><pre class="fragment">#include &lt;snicholls/crypto/hd/bip32.hpp&gt;
 #include &lt;snicholls/crypto/bip39/mnemonic.hpp&gt;
 #include &lt;snicholls/crypto/secp256k1/ecdsa.hpp&gt;
 
@@ -157,6 +159,10 @@ Test vectors</h1>
 <th class="markdownTableHeadNone">Source  </th><th class="markdownTableHeadNone">Cases  </th><th class="markdownTableHeadNone">Result  </th></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">Wycheproof <span class="tt">ecdsa_secp256k1_sha256</span> (DER), <span class="tt">_p1363</span>, <span class="tt">_bitcoin</span> (low-S)  </td><td class="markdownTableBodyNone">476, 252, 464  </td><td class="markdownTableBodyNone">all as expected  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">Wycheproof <span class="tt">chacha20_poly1305_test.json</span>, <span class="tt">xchacha20_poly1305_test.json</span>; RFC 8439 2.3.2, 2.4.2, 2.5.2, 2.8.2; the XChaCha draft  </td><td class="markdownTableBodyNone">325, 315; 5  </td><td class="markdownTableBodyNone">all as expected (sealed and opened)  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">Wycheproof <span class="tt">aes_gcm_test.json</span> (AES-256, 128-bit tags), <span class="tt">aes_wrap_test.json</span> (256-bit KEK); FIPS 197 C.3; the GCM specification's test cases 13 and 15; RFC 3394 4.6  </td><td class="markdownTableBodyNone">105, 68; 4  </td><td class="markdownTableBodyNone">all as expected for 96-bit nonces (other nonce lengths not offered); the one "acceptable" 8-byte key wrap refused, stated  </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">Wycheproof <span class="tt">ecdsa_secp256r1_sha256</span> (DER), <span class="tt">_p1363</span>; RFC 6979 A.2.5 (P-256, SHA-256)  </td><td class="markdownTableBodyNone">484, 262; 2  </td><td class="markdownTableBodyNone">all as expected  </td></tr>
 <tr class="markdownTableRowOdd">
@@ -202,24 +208,26 @@ Testing against other implementations</h1>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">OpenSSL (through cryptography), <span class="tt">@noble/curves</span> <span class="tt"><a class="el" href="group__p256.html" title="P-256 (secp256r1): its field, scalars and points, and ECDSA with SHA-256 (ES256) with RFC 6979 nonces...">P-256</a></span>, RustCrypto's p256, Node's crypto  </td><td class="markdownTableBodyNone">4.0.3, 2.4.0, 0.14.0, Node 26.13.1 (OpenSSL 3.5.9)  </td><td class="markdownTableBodyNone">P-256: keys, RFC 6979 ES256 signatures byte for byte, verification of mutated and out-of-range signatures (Node: the message, uncompressed keys), SEC1 parsing  </td></tr>
 <tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">OpenSSL (through cryptography), libsodium (PyNaCl), Node's crypto  </td><td class="markdownTableBodyNone">4.0.3, bundled, Node 26.13.1 (OpenSSL 3.5.9)  </td><td class="markdownTableBodyNone">ChaCha20-Poly1305 and AES-256-GCM seal byte for byte and open of sealed and tampered messages; XChaCha20-Poly1305 against libsodium; a fuzz target against libsodium and OpenSSL  </td></tr>
+<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">ed25519-dalek, x25519-dalek  </td><td class="markdownTableBodyNone">3.0.0, 3.0.0  </td><td class="markdownTableBodyNone">Ed25519 (<span class="tt">verify</span> and <span class="tt">verify_strict</span>), X25519  </td></tr>
-<tr class="markdownTableRowOdd">
+<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">@noble/curves</span>  </td><td class="markdownTableBodyNone">2.4.0  </td><td class="markdownTableBodyNone">Ed25519 (RFC 8032 and ZIP-215 modes), X25519  </td></tr>
-<tr class="markdownTableRowEven">
+<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">python-mnemonic (Trezor's BIP-39 reference)  </td><td class="markdownTableBodyNone">0.21  </td><td class="markdownTableBodyNone">BIP-39 words, entropy, seeds, non-canonical text  </td></tr>
-<tr class="markdownTableRowOdd">
+<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">@scure/bip39</span>, bip39 crate  </td><td class="markdownTableBodyNone">2.4.0, 3.0.0  </td><td class="markdownTableBodyNone">the same  </td></tr>
-<tr class="markdownTableRowEven">
+<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">SLIP-10 reference (python slip10)  </td><td class="markdownTableBodyNone">1.1.0  </td><td class="markdownTableBodyNone">BIP-32 and SLIP-10 Ed25519  </td></tr>
-<tr class="markdownTableRowOdd">
+<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">bitcoinjs: bip32, bitcoinjs-lib, bs58check  </td><td class="markdownTableBodyNone">5.0.1, 7.0.5, 4.0.0  </td><td class="markdownTableBodyNone">BIP-32, P2PKH, P2SH-P2WPKH, P2WPKH and P2TR addresses, base58check, segwit  </td></tr>
-<tr class="markdownTableRowEven">
+<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">bip32 crate  </td><td class="markdownTableBodyNone">0.6.0  </td><td class="markdownTableBodyNone">BIP-32 along BIP-44, 49, 84 and 86 paths and random ones  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">ed25519-hd-key, slip10_ed25519  </td><td class="markdownTableBodyNone">2.0.0, 0.1.3  </td><td class="markdownTableBodyNone">SLIP-10 Ed25519  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">BIP-173 / BIP-350 reference code (Python)  </td><td class="markdownTableBodyNone">sipa/bech32 <span class="tt">7a7d7ab1</span>  </td><td class="markdownTableBodyNone">segwit addresses, both ways  </td></tr>
+<td class="markdownTableBodyNone">ed25519-hd-key, slip10_ed25519  </td><td class="markdownTableBodyNone">2.0.0, 0.1.3  </td><td class="markdownTableBodyNone">SLIP-10 Ed25519  </td></tr>
 <tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">BIP-173 / BIP-350 reference code (Python)  </td><td class="markdownTableBodyNone">sipa/bech32 <span class="tt">7a7d7ab1</span>  </td><td class="markdownTableBodyNone">segwit addresses, both ways  </td></tr>
+<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">python base58, bs58, bech32 crate  </td><td class="markdownTableBodyNone">2.1.1, 0.5.1, 0.12.0  </td><td class="markdownTableBodyNone">base58check, segwit  </td></tr>
 </table>
 <p><b>Differential fuzzing</b> (<span class="tt">fuzz/</span>, <span class="tt">make fuzz</span>): libFuzzer targets compare the library with libsecp256k1 0.8.0, libsodium 1.0.22 and OpenSSL 3.0 on random and adversarial input (scalars at 0, n - 1, n and n + 1, points off the curve, high-S and malleable signatures, invalid DER, small-order points in every encoding, bad checksums, malformed paths and mnemonics), the Python and Rust oracles joining through the same JSON-lines processes. CI runs each target briefly on every push and for an hour nightly; a divergence fails with a minimised reproducer, committed as a regression test. <span class="tt">fuzz/cryptofuzz/</span> is a <a href="https://github.com/MozillaSecurity/cryptofuzz">Cryptofuzz</a> module, ready for OSS-Fuzz once the repository is public.</p>

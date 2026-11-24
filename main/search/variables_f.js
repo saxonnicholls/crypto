@@ -1,4 +1,6 @@
 var searchData=
 [
-  ['y_0',['y',['../structsnicholls_1_1crypto_1_1p256_1_1affine__point.html#a11b6179a3fb2653340a59e188d7c748f',1,'snicholls::crypto::p256::affine_point::y'],['../structsnicholls_1_1crypto_1_1secp256k1_1_1affine__point.html#a9eb00b9c336cdb0bd2c7bb8af0b9489d',1,'snicholls::crypto::secp256k1::affine_point::y']]]
+  ['x_0',['x',['../structsnicholls_1_1crypto_1_1p256_1_1affine__point.html#a4e7c9fba55d53358ada5cc7dc6428bc5',1,'snicholls::crypto::p256::affine_point::x'],['../structsnicholls_1_1crypto_1_1secp256k1_1_1affine__point.html#a7e05c40c3e2c2b47a1bbdfb5dd7fca7b',1,'snicholls::crypto::secp256k1::affine_point::x']]],
+  ['xnonce_5fsize_1',['xnonce_size',['../namespacesnicholls_1_1crypto_1_1aead.html#a4756238e89828cf555a13588c4a717e5',1,'snicholls::crypto::aead']]],
+  ['xrpl_5fbase58_2',['xrpl_base58',['../namespacesnicholls_1_1crypto_1_1address.html#a95acf08c795b98ab31994bf6bfcb37a8',1,'snicholls::crypto::address']]]
 ];

@@ -3,6 +3,7 @@ var group__crypto =
     [ "secp256k1", "group__secp256k1.html", "group__secp256k1" ],
     [ "Addresses", "group__address.html", "group__address" ],
     [ "Curve25519", "group__curve25519.html", "group__curve25519" ],
+    [ "Authenticated encryption", "group__aead.html", "group__aead" ],
     [ "P-256", "group__p256.html", "group__p256" ],
     [ "RSA", "group__rsa.html", "group__rsa" ],
     [ "Wallets", "group__wallet.html", "group__wallet" ],
@@ -54,7 +55,8 @@ var group__crypto =
       [ "snicholls::crypto::errc::invalid_character", "group__crypto.html#ggaa314007c5b3658974966bfdaeb2c3625add83009b482779fb2e0b1bd7a064f4b8", null ],
       [ "snicholls::crypto::errc::invalid_hrp", "group__crypto.html#ggaa314007c5b3658974966bfdaeb2c3625ac773270d518c9d9c0f2d98f3e59abcf9", null ],
       [ "snicholls::crypto::errc::invalid_witness_version", "group__crypto.html#ggaa314007c5b3658974966bfdaeb2c3625a3830eedc1ebf7207f10ac8239650001e", null ],
-      [ "snicholls::crypto::errc::invalid_witness_program", "group__crypto.html#ggaa314007c5b3658974966bfdaeb2c3625ac20ddc41cc208191634e2ec6163e53cc", null ]
+      [ "snicholls::crypto::errc::invalid_witness_program", "group__crypto.html#ggaa314007c5b3658974966bfdaeb2c3625ac20ddc41cc208191634e2ec6163e53cc", null ],
+      [ "snicholls::crypto::errc::authentication_failed", "group__crypto.html#ggaa314007c5b3658974966bfdaeb2c3625a047ef5b1ba6d5dcc4dbee37c075a2088", null ]
     ] ],
     [ "snicholls::crypto::version", "group__crypto.html#ga7518429385f6f3c7893c5719f90ba202", null ],
     [ "snicholls::crypto::version_major", "group__crypto.html#ga25f0fb710a29b569702366f46e262eca", null ],
