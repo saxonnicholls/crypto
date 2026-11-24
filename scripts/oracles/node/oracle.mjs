@@ -17,6 +17,7 @@
 //      scure_bip39       @scure/bip39
 //      ed25519_hd_key    ed25519-hd-key: SLIP-10 Ed25519
 //      node_crypto       Node's built-in crypto (its bundled OpenSSL): RSA PKCS#1 v1.5 and PSS, SPKI
+//      jose              panva's jose: whole JWEs, ECDH-ES and ECDH-ES+A256KW with A256GCM on X25519 and P-256
 //
 
 import * as secp from "@noble/secp256k1";
@@ -31,6 +32,7 @@ import * as bitcoin from "bitcoinjs-lib";
 import bs58check from "bs58check";
 import * as hdkey from "ed25519-hd-key";
 import { ethers } from "ethers";
+import * as jose from "jose";
 import * as ecc from "tiny-secp256k1";
 import { constants, createCipheriv, createDecipheriv, createPrivateKey, createPublicKey, sign as cryptoSign, verify as cryptoVerify } from "node:crypto";
 import { readFileSync } from "node:fs";
@@ -71,6 +73,19 @@ const refuse = (f) => {
 // Read from node_modules directly: not every package exports its package.json
 const version = (name) =>
   JSON.parse(readFileSync(join(import.meta.dirname, "node_modules", name, "package.json"), "utf8")).version;
+
+// Key objects from raw bytes: X25519 (the u-coordinate; the secret as PKCS#8) and P-256 (SEC1; the secret as a
+// SEC1 ECPrivateKey without its public key, which OpenSSL computes)
+const b64u = (u) => Buffer.from(u).toString("base64url");
+function joseKey(crv, pub, secret) {
+  if (secret)
+    return crv === "X25519"
+      ? createPrivateKey({ format: "der", type: "pkcs8", key: Buffer.from("302e020100300506032b656e04220420" + secret, "hex") })
+      : createPrivateKey({ format: "der", type: "sec1", key: Buffer.from("30310201010420" + secret + "a00a06082a8648ce3d030107", "hex") });
+  const u = bytes(pub);
+  return createPublicKey({ format: "jwk", key: crv === "X25519" ? { kty: "OKP", crv, x: b64u(u) }
+    : { kty: "EC", crv, x: b64u(u.slice(1, 33)), y: b64u(u.slice(33)) } });
+}
 
 const LIBS = {
   noble_secp256k1: {
@@ -320,6 +335,22 @@ const LIBS = {
       },
     },
   },
+  jose: {
+    name: "jose",
+    ops: {
+      // A compact JWE to the recipient's key, every random choice fixed (the ephemeral key, the IV and, with key
+      // wrapping, the CEK) so the answer is deterministic
+      jwe_ecdh_es: async (q) => {
+        const params = { epk: joseKey(q.crv, null, q.esk) };
+        if (q.apu) params.apu = bytes(q.apu);
+        if (q.apv) params.apv = bytes(q.apv);
+        const e = new jose.CompactEncrypt(bytes(q.m)).setProtectedHeader({ alg: q.alg, enc: "A256GCM" })
+          .setKeyManagementParameters(params).setInitializationVector(bytes(q.iv));
+        if (q.cek) e.setContentEncryptionKey(bytes(q.cek));
+        return { jwe: await e.encrypt(joseKey(q.crv, q.rpub)) };
+      },
+    },
+  },
   scure_bip39: {
     name: "@scure/bip39",
     ops: {
@@ -339,7 +370,7 @@ const LIBS = {
   },
 };
 
-function answer(q) {
+async function answer(q) {
   if (q.op === "version") {
     const libs = {};
     for (const [k, v] of Object.entries(LIBS)) libs[k] = { version: v.name === "node" ? "" : version(v.name), ops: Object.keys(v.ops) };
@@ -353,7 +384,7 @@ function answer(q) {
   const f = lib && lib.ops[q.op];
   if (!f) return { unsupported: true };
   try {
-    return f(q);
+    return await f(q);
   } catch (e) {
     if (e instanceof Refused) return { error: e.message || "refused" };
     return { crash: String(e && e.stack ? e.stack : e) };
@@ -364,7 +395,7 @@ const rl = createInterface({ input: process.stdin, crlfDelay: Infinity });
 for await (const line of rl) {
   if (!line.trim()) continue;
   const q = JSON.parse(line);
-  const a = answer(q);
+  const a = await answer(q);
   if ("id" in q) a.id = q.id;
   process.stdout.write(JSON.stringify(a) + "\n");
 }

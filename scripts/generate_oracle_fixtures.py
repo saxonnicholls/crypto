@@ -1477,6 +1477,102 @@ def gen_aead(pool, fx):
 
 
 # ---------------------------------------------------------------------------------------------------------------
+# JOSE: ECDH-ES (RFC 7518 4.6, RFC 8037)
+
+# Every algorithm whose name goes into the OtherInfo, with its key length (RFC 7518 4.6.2)
+JOSE_ALGS = [("A128GCM", 16), ("A192GCM", 24), ("A256GCM", 32), ("ECDH-ES+A128KW", 16), ("ECDH-ES+A192KW", 24),
+             ("ECDH-ES+A256KW", 32), ("A128CBC-HS256", 32), ("A192CBC-HS384", 48), ("A256CBC-HS512", 64)]
+
+
+def jose_keys(pool, rng, crv, count):
+    """count (secret, public) pairs on the curve, the public keys by consensus of the curve's oracles."""
+    secrets = []
+    while len(secrets) < count:
+        k = rand_bytes(rng, 32)
+        if crv == "X25519" or 0 < int.from_bytes(k, "big") < P256_N:
+            secrets.append(hx(k))
+    if crv == "X25519":
+        answers = pool.ask("x25519", [{"k": k, "u": "09" + "00" * 31} for k in secrets])
+        pubs = [consensus(pool, "jose keys", {"k": k}, a, lambda lib, x: x["out"])[0] for k, a in zip(secrets, answers)]
+    else:
+        answers = pool.ask("p256_pub", [{"sk": k} for k in secrets])
+        pubs = [consensus(pool, "jose keys", {"sk": k}, a, lambda lib, x: x["u"])[0] for k, a in zip(secrets, answers)]
+    return list(zip(secrets, pubs))
+
+
+def gen_jose(pool, fx):
+    import base64
+
+    def d64(t):
+        return base64.urlsafe_b64decode(t + "=" * (-len(t) % 4))
+    rng = random.Random("jose v1")
+    lens = [0, 0, 3, 5, 32, 65]
+
+    # The key alone, every algorithm and length: OpenSSL's ECDH and cryptography's ConcatKDFHash
+    f = Fixture("jose_ecdh_es.txt", "JOSE ECDH-ES keys (RFC 7518 4.6): ECDH, then the Concat KDF with SHA-256",
+                "curve, recipient secret, ephemeral secret, ephemeral public key (the epk), algorithm (enc, or alg "
+                "with key wrapping), apu, apv, key length in bytes, key")
+    cases = []
+    for crv in ("X25519", "P-256"):
+        rk = jose_keys(pool, rng, crv, 150)
+        ek = jose_keys(pool, rng, crv, 150)
+        for (rsk, _), (esk, epk) in zip(rk, ek):
+            alg, n = rng.choice(JOSE_ALGS)
+            cases.append({"crv": crv, "rsk": rsk, "esk": esk, "epk": epk, "alg": alg, "n": n,
+                          "apu": hx(rand_bytes(rng, rng.choice(lens))), "apv": hx(rand_bytes(rng, rng.choice(lens)))})
+    answers = pool.ask("jwe_ecdh_es_key", [{k: c[k] for k in ("crv", "rsk", "epk", "alg", "n", "apu", "apv")} for c in cases])
+    for case, ans in zip(cases, answers):
+        v, libs = consensus(pool, f.name, case, ans, lambda lib, a: a["k"])
+        if libs:
+            f.add([case["crv"], case["rsk"], case["esk"], case["epk"], case["alg"], case["apu"] or None,
+                   case["apv"] or None, case["n"], v], libs)
+    fx.append(f)
+
+    # Whole JWEs: made by jose with every random choice fixed, opened by cryptography
+    f = Fixture("jose_jwe.txt", "Compact JWEs, ECDH-ES and ECDH-ES+A256KW with A256GCM, made by jose and opened by "
+                "cryptography", "curve, alg, recipient secret, ephemeral secret, epk, apu, apv, CEK ('-' for "
+                "ECDH-ES, where it is derived), IV, plaintext, protected header (its base64url text, as bytes: the "
+                "associated data), encrypted key ('-' for ECDH-ES), ciphertext, tag")
+    cases = []
+    for crv in ("X25519", "P-256"):
+        rk = jose_keys(pool, rng, crv, 60)
+        ek = jose_keys(pool, rng, crv, 60)
+        for i, ((rsk, rpub), (esk, epk)) in enumerate(zip(rk, ek)):
+            alg = ("ECDH-ES", "ECDH-ES+A256KW")[i % 2]
+            cases.append({"crv": crv, "alg": alg, "rsk": rsk, "rpub": rpub, "esk": esk, "epk": epk,
+                          "apu": hx(rand_bytes(rng, rng.choice(lens))), "apv": hx(rand_bytes(rng, rng.choice(lens))),
+                          "cek": hx(rand_bytes(rng, 32)) if alg != "ECDH-ES" else "", "iv": hx(rand_bytes(rng, 12)),
+                          "m": hx(rand_bytes(rng, rng.choice([0, 1, 16, 100])))})
+    made = pool.ask("jwe_ecdh_es", [{k: c[k] for k in ("crv", "alg", "rpub", "esk", "apu", "apv", "cek", "iv", "m")}
+                                    for c in cases])
+    rows = []
+    for case, ans in zip(cases, made):
+        v, libs = consensus(pool, f.name, case, ans, lambda lib, a: a["jwe"])
+        if not libs:
+            continue
+        parts = v.split(".")
+        hdr = json.loads(d64(parts[0]))
+        if len(parts) != 5 or d64(parts[2]).hex() != case["iv"] or bool(parts[1]) != bool(case["cek"]) or \
+                hdr.get("alg") != case["alg"] or d64(hdr.get("apu", "")).hex() != case["apu"] or \
+                d64(hdr.get("apv", "")).hex() != case["apv"]:
+            fail(f.name, case, "jose's JWE does not have the inputs: " + v)
+            continue
+        rows.append((case, v, parts, libs))
+    opened = pool.ask("jwe_open", [{"crv": c["crv"], "rsk": c["rsk"], "jwe": v} for c, v, _, _ in rows])
+    for (case, v, parts, libs), ans in zip(rows, opened):
+        w, libs2 = consensus(pool, f.name + " open", case, ans, lambda lib, a: refused_or(a, "m", "epk"))
+        if not libs2:
+            continue
+        if not w or w[0] != case["m"] or w[1] != case["epk"]:
+            fail(f.name, case, "cryptography opened jose's JWE to something else: %r" % (w,))
+            continue
+        f.add([case["crv"], case["alg"], case["rsk"], case["esk"], case["epk"], case["apu"] or None,
+               case["apv"] or None, case["cek"] or None, case["iv"], case["m"] or None, hx(parts[0].encode("ascii")),
+               d64(parts[1]).hex() or None, d64(parts[3]).hex() or None, d64(parts[4]).hex()], set(libs) | set(libs2))
+    fx.append(f)
+
+
+# ---------------------------------------------------------------------------------------------------------------
 
 def generate():
     pool = Pool()
@@ -1495,6 +1591,7 @@ def generate():
         gen_rsa(pool, fx)
         gen_p256(pool, fx)
         gen_aead(pool, fx)
+        gen_jose(pool, fx)
         files = {f.name: f.text(pool) for f in fx}
         manifest = pool.manifest()
         manifest["fixtures"] = {f.name: {"cases": len(f.rows), "oracles": sorted(f.libs)} for f in fx}

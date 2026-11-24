@@ -134,6 +134,19 @@
         "ethers"
       ]
     },
+    "jose_ecdh_es.txt": {
+      "cases": 300,
+      "oracles": [
+        "openssl"
+      ]
+    },
+    "jose_jwe.txt": {
+      "cases": 120,
+      "oracles": [
+        "jose",
+        "openssl"
+      ]
+    },
     "key_addresses.txt": {
       "cases": 400,
       "oracles": [
@@ -299,7 +312,7 @@
       "version": "21.0.0"
     },
     "dalek": {
-      "answers": 2406,
+      "answers": 2826,
       "program": "rust",
       "version": "ed25519-dalek 3.0.0, x25519-dalek 3.0.0"
     },
@@ -318,6 +331,11 @@
       "program": "node",
       "version": "6.17.0"
     },
+    "jose": {
+      "answers": 120,
+      "program": "node",
+      "version": "6.2.18"
+    },
     "k256": {
       "answers": 20906,
       "program": "rust",
@@ -334,7 +352,7 @@
       "version": "2.4.0"
     },
     "noble_p256": {
-      "answers": 4437,
+      "answers": 4857,
       "program": "node",
       "version": "2.4.0"
     },
@@ -344,7 +362,7 @@
       "version": "3.2.0"
     },
     "noble_x25519": {
-      "answers": 700,
+      "answers": 1120,
       "program": "node",
       "version": "2.4.0"
     },
@@ -359,17 +377,17 @@
       "version": "Node v26.13.1, OpenSSL 3.5.9"
     },
     "openssl": {
-      "answers": 18113,
+      "answers": 19373,
       "program": "python",
       "version": "OpenSSL 4.0.3 29 Sep 2026 (cryptography 50.0.2)"
     },
     "p256_rs": {
-      "answers": 4437,
+      "answers": 4857,
       "program": "rust",
       "version": "p256 0.14.0"
     },
     "pynacl": {
-      "answers": 3606,
+      "answers": 4026,
       "program": "python",
       "version": "libsodium 1.0.19 or later, bundled (PyNaCl 1.6.2)"
     },

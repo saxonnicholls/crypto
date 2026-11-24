@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.5.0 (2026-11-24)
+
+JWE's key agreement. Pins snicholls-core at v0.23.1 and requires it (the Concat KDF). Experimental and not
+independently audited.
+
+- ECDH on P-256 (`p256/ecdh.hpp`): `shared_secret(private_key, public_key)`, the x-coordinate of d Q, constant time
+  in the key; the peer's point is checked to be on the curve again before it is multiplied, so a `public_key` built
+  from an unchecked point (an invalid-curve attack) is refused.
+- JOSE's ECDH-ES (`jose/ecdh_es.hpp`, RFC 7518 4.6, RFC 8037): `ecdh_es_x25519<N>`, `ecdh_es_p256<N>` and
+  `ecdh_es_kdf<N>`, the content encryption key for `"alg": "ECDH-ES"` or the key-encryption key for
+  `"ECDH-ES+A256KW"`, through core's `jwa_concat_kdf` with SHA-256, its hash states wiped. With `aead/` this is a
+  JWE recipient's whole cryptography (A256GCM, A256KW); the JOSE text is the caller's.
+- Tests: RFC 7518 appendix C byte for byte (also as a `static_assert`), RFC 8037 A.6, all 355 Wycheproof
+  `ecdh_secp256r1_ecpoint` cases; oracle fixtures of keys against OpenSSL and cryptography's ConcatKDFHash, and of
+  whole JWEs made by jose and opened by cryptography, opened and remade here; the secret paths in the Valgrind check.
+- The README's "Future directions": key generation and key formats (PKCS#8, SPKI, PEM), and RSA signing.
+
 ## 0.4.1 (2026-11-24)
 
 - Poly1305 (ChaCha20-Poly1305, XChaCha20-Poly1305): the final reduction's choice goes through `ct::select`. Clang 21

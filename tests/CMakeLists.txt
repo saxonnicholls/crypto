@@ -37,8 +37,11 @@ add_executable(snicholls_crypto_tests
     hd/bip32_test.cpp
     hd/bip32_oracles_test.cpp
     hd/path_test.cpp
+    jose/ecdh_es_test.cpp
+    jose/ecdh_es_oracles_test.cpp
     hd/slip10_test.cpp
     hd/slip10_oracles_test.cpp
+    p256/ecdh_test.cpp
     p256/ecdsa_test.cpp
     p256/ecdsa_oracles_test.cpp
     p256/field_test.cpp

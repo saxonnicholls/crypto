@@ -3,7 +3,7 @@
 Elliptic curves, signatures and wallet key derivation, header-only C++20, constant-time wherever a secret is
 involved. Part of the snicholls libraries; it depends on snicholls-core and nothing else.
 
-> **Status: experimental (0.4.1). Not independently audited. Do not use it to secure funds yet.**
+> **Status: experimental (0.5.0). Not independently audited. Do not use it to secure funds yet.**
 > Scrutiny is welcome: report vulnerabilities privately as SECURITY.md describes.
 
 **Documentation:** every public entity is documented in Doxygen, with the design, guarantees, errors, examples
@@ -17,7 +17,8 @@ release at the root, every version under `/vX.Y.Z/`, the latest `main` under `/m
 | shared | `constant_time.hpp`, `secret.hpp`, `error.hpp` | masks and selections, `ct::declassify`; `secret_bytes<N>` (wiped, move-only, `reveal()`); `errc` |
 | `secp256k1/` | `field`, `scalar`, `point`, `keys`, `rfc6979`, `ecdsa`, `schnorr` | keys and SEC1; ECDSA with RFC 6979, low-S and the recovery id; verification (high-S accepted or rejected); recovery and Ethereum's `ecrecover`; strict DER; BIP-340 |
 | `aead/` | `chacha20_poly1305`, `aes256_gcm`, `aes_key_wrap` | ChaCha20-Poly1305 (RFC 8439), XChaCha20-Poly1305 (random 24-byte nonces), AES-256-GCM (JWE's A256GCM; AES without tables) and AES-256 key wrap (RFC 3394, A256KW): constant time, constant-time tag checks, nothing released before the tag verifies |
-| `p256/` | `field`, `scalar`, `point`, `ecdsa` | P-256 (secp256r1): keys and SEC1, ECDSA with SHA-256 (ES256) with RFC 6979 nonces in constant time, verification, JOSE r \|\| s and DER |
+| `p256/` | `field`, `scalar`, `point`, `ecdsa`, `ecdh` | P-256 (secp256r1): keys and SEC1, ECDSA with SHA-256 (ES256) with RFC 6979 nonces in constant time, verification, JOSE r \|\| s and DER; ECDH, refusing a point off the curve |
+| `jose/` | `ecdh_es` | JWE's key agreement: ECDH-ES and ECDH-ES+A*KW on X25519 (RFC 8037) and P-256, with JOSE's Concat KDF (RFC 7518 4.6, core's); with `aead/` a JWE recipient's whole cryptography (A256GCM, A256KW) |
 | `rsa/` | `rsa` | RSA signature verification only: RSASSA-PKCS1-v1_5 and PSS with SHA-256 (RS256, PS256), keys from JWK `n` / `e`, SubjectPublicKeyInfo or RSAPublicKey, 2048 to 4096 bits |
 | `curve25519/` | `field`, `scalar`, `edwards`, `ed25519`, `x25519` | Ed25519 (RFC 8032, cofactorless verification with S < L) and X25519 (RFC 7748, refusing the all-zero secret) |
 | `bip39/` | `wordlist`, `mnemonic` | entropy to words and back, constant-time word lookup, the seed (PBKDF2-HMAC-SHA512) |
@@ -27,7 +28,7 @@ release at the root, every version under `/vX.Y.Z/`, the latest `main` under `/m
 Everything is `constexpr` (a whole RFC 6979 signature is a `static_assert` in the tests; evaluating one at compile
 time needs a raised step limit, `secp256k1/field.hpp` says which), allocation-free, and returns
 `snicholls::result<V, errc>` where it can fail. The hashes are core's (`hash/`); core is pinned at v0.23.1 and
-required at 0.17.0 or later.
+required at 0.23.1 or later.
 
     #include <snicholls/crypto/hd/bip32.hpp>
     #include <snicholls/crypto/bip39/mnemonic.hpp>
@@ -52,6 +53,7 @@ All from the standards or their reference suites; each fixture records its sourc
 | Wycheproof `chacha20_poly1305_test.json`, `xchacha20_poly1305_test.json`; RFC 8439 2.3.2, 2.4.2, 2.5.2, 2.8.2; the XChaCha draft | 325, 315; 5 | all as expected (sealed and opened) |
 | Wycheproof `aes_gcm_test.json` (AES-256, 128-bit tags), `aes_wrap_test.json` (256-bit KEK); FIPS 197 C.3; the GCM specification's test cases 13 and 15; RFC 3394 4.6 | 105, 68; 4 | all as expected for 96-bit nonces (other nonce lengths not offered); the one "acceptable" 8-byte key wrap refused, stated |
 | Wycheproof `ecdsa_secp256r1_sha256` (DER), `_p1363`; RFC 6979 A.2.5 (P-256, SHA-256) | 484, 262; 2 | all as expected |
+| Wycheproof `ecdh_secp256r1_ecpoint_test.json`; RFC 7518 appendix C (ECDH-ES on P-256), RFC 8037 A.6 (X25519) | 355; 2 | all as expected (the one "acceptable" compressed point accepted; the 24 invalid points, invalid-curve attacks among them, refused) |
 | Wycheproof `rsa_signature_{2048,3072,4096}_sha256`, `rsa_pss_{2048,3072,4096}_sha256_mgf1_32`, `rsa_pss_2048_sha256_mgf1_0` | 776, 324, 103 | all as expected (3 "acceptable" DigestInfos without NULL refused, stated) |
 | Wycheproof `ed25519_test.json`, `x25519_test.json` | 210, 518 | all as expected (29 "acceptable" small-order keys accepted, stated) |
 | RFC 6979 A.2.5 (P-256 nonces), secp256k1 RFC 6979 signatures | 2 + 16 | pass |
@@ -86,6 +88,7 @@ listed in `tests/fixtures/README.md`.
 | OpenSSL (through cryptography), Node's crypto, RustCrypto's rsa | 4.0.3, Node 26.13.1 (OpenSSL 3.5.9), 0.10.0 | RSA: PKCS#1 v1.5 signatures byte for byte, verdicts on mutated signatures and malformed encodings, PSS at salt lengths 0, 20, 32 and 64, SubjectPublicKeyInfo |
 | OpenSSL (through cryptography), `@noble/curves` `p256`, RustCrypto's p256, Node's crypto | 4.0.3, 2.4.0, 0.14.0, Node 26.13.1 (OpenSSL 3.5.9) | P-256: keys, RFC 6979 ES256 signatures byte for byte, verification of mutated and out-of-range signatures (Node: the message, uncompressed keys), SEC1 parsing |
 | OpenSSL (through cryptography), libsodium (PyNaCl), Node's crypto | 4.0.3, bundled, Node 26.13.1 (OpenSSL 3.5.9) | ChaCha20-Poly1305 and AES-256-GCM seal byte for byte and open of sealed and tampered messages; XChaCha20-Poly1305 against libsodium; a fuzz target against libsodium and OpenSSL |
+| OpenSSL's ECDH and cryptography's ConcatKDFHash; panva's jose | 4.0.3, cryptography 50.0.2; 6.2.18 | JOSE ECDH-ES keys on X25519 and P-256 for every algorithm and length (16 to 64 bytes), from both sides; whole compact JWEs (ECDH-ES and ECDH-ES+A256KW, A256GCM) made by jose with fixed randomness and opened by cryptography, opened here and made again byte for byte |
 | ed25519-dalek, x25519-dalek | 3.0.0, 3.0.0 | Ed25519 (`verify` and `verify_strict`), X25519 |
 | `@noble/curves` | 2.4.0 | Ed25519 (RFC 8032 and ZIP-215 modes), X25519 |
 | python-mnemonic (Trezor's BIP-39 reference) | 0.21 | BIP-39 words, entropy, seeds, non-canonical text |
@@ -152,6 +155,23 @@ Release, AppleClang 17, Intel Xeon W-3245 at 3.2 GHz, 2026-11-20, a loaded machi
 
 These are several times slower than libsecp256k1 and libsodium, which use wider limbs with lazy reduction,
 precomputed tables for the base point and faster inversions; the forms here are the shortest that are constant time.
+
+## Future directions
+
+Not in this library yet, each waiting on a user that needs it:
+
+- **Key generation and key formats.** Keys are taken, never made: an X25519 or P-256 ephemeral key for a JWE, a
+  signing key, a CEK come from the caller's system random source. Generating them here needs a source of
+  randomness in the family (core is the place for it, with a test seam), and exchanging them needs PKCS#8
+  (`PrivateKeyInfo`) and SubjectPublicKeyInfo for EC and OKP keys, in DER and PEM; PEM needs base64, which core does
+  not have yet. Parsing would follow rule 8 (strict DER, no repair); serialising a private key would be constant
+  time and wipe its buffers.
+- **RSA signing (RS256, PS256).** RSA is verification only, and the library holds no RSA private key. Signing would
+  need a private exponentiation in constant time (CRT with blinding, a fixed-window ladder over Montgomery
+  multiplication on secret limbs), a fault check (verify each signature before releasing it, against the
+  Bellcore attack on CRT), constant-time PKCS#1 v1.5 and PSS encoding, and strict PKCS#1 / PKCS#8 private-key
+  parsing; it would also end the "no RSA private key" property the threat model relies on. It is worth doing only
+  for a provider that requires an RS256 client assertion and offers nothing else (ES256 or EdDSA cover the rest).
 
 ## Building
 

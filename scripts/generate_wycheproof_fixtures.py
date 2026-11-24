@@ -105,6 +105,18 @@ def ecdsa_p256(data):
     return ["msg", "sig (key lines: key - uncompressed_public_key)"], lines
 
 
+def ecdh_p256(data):
+    """ecdh_secp256r1_ecpoint_test.json: one line per test, the private key as 32 bytes (Wycheproof gives it as an
+    ASN.1 integer's magnitude, sometimes with a leading zero byte or fewer than 32)."""
+    lines = []
+    for g in data["testGroups"]:
+        for t in g["tests"]:
+            d = int(t["private"], 16)
+            assert d.bit_length() <= 256
+            lines.append("%d %s %s %064x %s" % (t["tcId"], t["result"], field(t["public"]), d, field(t["shared"])))
+    return ["public", "private", "shared"], lines
+
+
 def ecdsa_secp256k1(data):
     """ecdsa_secp256k1_sha256*_test.json: a "key" line per group (the uncompressed SEC1 key), then its tests."""
     lines = []
@@ -149,6 +161,7 @@ CONVERTERS = {
     "chacha20_poly1305_test.json": ("chacha20_poly1305.txt", aead),
     "xchacha20_poly1305_test.json": ("xchacha20_poly1305.txt", aead),
     "ecdsa_secp256r1_sha256_test.json": ("ecdsa_p256_sha256.txt", ecdsa_p256),
+    "ecdh_secp256r1_ecpoint_test.json": ("ecdh_p256.txt", ecdh_p256),
     "ecdsa_secp256r1_sha256_p1363_test.json": ("ecdsa_p256_sha256_p1363.txt", ecdsa_p256),
     "rsa_signature_2048_sha256_test.json": ("rsa_pkcs1_2048_sha256.txt", rsa),
     "rsa_signature_3072_sha256_test.json": ("rsa_pkcs1_3072_sha256.txt", rsa),

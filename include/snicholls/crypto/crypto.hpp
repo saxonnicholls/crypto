@@ -31,7 +31,11 @@
 
 /// \defgroup p256 P-256
 /// \ingroup crypto
-/// \brief P-256 (secp256r1): its field, scalars and points, and ECDSA with SHA-256 (ES256) with RFC 6979 nonces.
+/// \brief P-256 (secp256r1): its field, scalars and points, ECDSA with SHA-256 (ES256) with RFC 6979 nonces, and ECDH.
+
+/// \defgroup jose JOSE
+/// \ingroup crypto
+/// \brief JWE's key agreement: ECDH-ES and ECDH-ES+A*KW on X25519 and P-256, with JOSE's Concat KDF (RFC 7518 4.6).
 
 /// \defgroup rsa RSA
 /// \ingroup crypto
@@ -64,6 +68,8 @@
 #include <snicholls/crypto/hd/bip32.hpp>
 #include <snicholls/crypto/hd/path.hpp>
 #include <snicholls/crypto/hd/slip10.hpp>
+#include <snicholls/crypto/jose/ecdh_es.hpp>
+#include <snicholls/crypto/p256/ecdh.hpp>
 #include <snicholls/crypto/p256/ecdsa.hpp>
 #include <snicholls/crypto/rsa/rsa.hpp>
 #include <snicholls/crypto/secp256k1/ecdsa.hpp>
