@@ -26,7 +26,7 @@ release at the root, every version under `/vX.Y.Z/`, the latest `main` under `/m
 
 Everything is `constexpr` (a whole RFC 6979 signature is a `static_assert` in the tests; evaluating one at compile
 time needs a raised step limit, `secp256k1/field.hpp` says which), allocation-free, and returns
-`snicholls::result<V, errc>` where it can fail. The hashes are core's (`hash/`); core is pinned at v0.23.0 and
+`snicholls::result<V, errc>` where it can fail. The hashes are core's (`hash/`); core is pinned at v0.23.1 and
 required at 0.17.0 or later.
 
     #include <snicholls/crypto/hd/bip32.hpp>
