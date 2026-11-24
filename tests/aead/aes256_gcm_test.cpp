@@ -55,6 +55,7 @@ TEST(CryptoAeadWycheproof, Aes256Gcm96BitNonces)
 {
     int valid = 0, invalid = 0, not_offered = 0;
     for (const auto& f : read_fixture("wycheproof/aes256_gcm.txt")) {
+        ASSERT_EQ(f.size(), 8u) << "a short fixture line, tcId " << f[0];
         const auto iv = hex_bytes(f[2]), key = hex_bytes(f[3]), aad = hex_bytes(f[4]), msg = hex_bytes(f[5]), ct = hex_bytes(f[6]), tg = hex_bytes(f[7]);
         if (iv.size() != 12) {   // GCM with other nonce lengths is not offered by this API
             ++not_offered;

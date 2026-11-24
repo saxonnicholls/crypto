@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.4.1 (2026-11-24)
+
+- Poly1305 (ChaCha20-Poly1305, XChaCha20-Poly1305): the final reduction's choice goes through `ct::select`. Clang 21
+  at -O2 compiled the masked choice into a conditional on the accumulator, which Valgrind's secret-marking check
+  reported; the result was correct, but the rule is no conditional on secret data. Clean under every compiler of
+  the Ubuntu gate.
+- Tests: the Wycheproof ChaCha20-Poly1305 and XChaCha20-Poly1305 fixtures wrote an empty tag without its "-", so 18
+  lines each were a field short and the test read past them (undefined behaviour that passed on macOS and failed
+  on Linux). The converter writes the placeholder; the tests refuse a short line.
+
 ## 0.4.0 (2026-11-24)
 
 Authenticated encryption, the single include, and snicholls-core v0.23.0 (required at 0.17.0 or later).

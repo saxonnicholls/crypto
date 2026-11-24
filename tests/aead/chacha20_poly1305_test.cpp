@@ -91,6 +91,7 @@ namespace {
 void wycheproof(const std::string& name, std::size_t nonce_len, int& valid, int& invalid, int& unrepresentable)
 {
     for (const auto& f : read_fixture("wycheproof/" + name)) {
+        ASSERT_EQ(f.size(), 8u) << "a short fixture line, tcId " << f[0];
         const auto iv = hex_bytes(f[2]), key = hex_bytes(f[3]), aad = hex_bytes(f[4]), msg = hex_bytes(f[5]), ct = hex_bytes(f[6]),
                    tg = hex_bytes(f[7]);
         if (iv.size() != nonce_len || tg.size() != 16) {

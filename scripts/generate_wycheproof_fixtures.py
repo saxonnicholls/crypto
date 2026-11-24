@@ -79,7 +79,7 @@ def aead(data):
             continue
         for t in g["tests"]:
             lines.append("%d %s %s %s %s %s %s %s" % (t["tcId"], t["result"], field(t["iv"]), t["key"], field(t["aad"]),
-                                                    field(t["msg"]), field(t["ct"]), t["tag"]))
+                                                    field(t["msg"]), field(t["ct"]), field(t["tag"])))
     return ["iv", "key", "aad", "msg", "ct", "tag"], lines
 
 

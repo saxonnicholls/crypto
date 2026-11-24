@@ -15,6 +15,7 @@
 #ifndef snicholls_crypto_detail_poly1305_hpp
 #define snicholls_crypto_detail_poly1305_hpp
 
+#include <snicholls/crypto/constant_time.hpp>
 #include <snicholls/crypto/detail/chacha20.hpp>
 #include <snicholls/crypto/secret.hpp>
 
@@ -99,9 +100,10 @@ public:
         c = g[3] >> 26;
         g[3] &= 0x3ffffff;
         g[4] = h_[4] + c - (1u << 26);
-        const std::uint32_t mask = (g[4] >> 31) - 1;   // all ones when g >= 0
+        // all ones when g >= 0; through ct's barrier and select, so no compiler turns the choice into a branch
+        const std::uint64_t mask = ct::mask_from_bit((g[4] >> 31) ^ 1);
         for (std::size_t i = 0; i < 5; ++i)
-            h_[i] = (h_[i] & ~mask) | (g[i] & mask);
+            h_[i] = static_cast<std::uint32_t>(ct::select(mask, g[i], h_[i]));
         // h mod 2^128, plus s
         const std::uint32_t w0 = h_[0] | (h_[1] << 26);
         const std::uint32_t w1 = (h_[1] >> 6) | (h_[2] << 20);
