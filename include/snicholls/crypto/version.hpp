@@ -41,8 +41,8 @@
 // stops the compile instead. The macros are defined inside the guard, so the version is written out here again: a
 // bump changes both, and scripts/check_version.py compares them.
 #if defined(SNICHOLLS_CRYPTO_VERSION_MAJOR) && \
-    (SNICHOLLS_CRYPTO_VERSION_MAJOR != 0 || SNICHOLLS_CRYPTO_VERSION_MINOR != 5 || SNICHOLLS_CRYPTO_VERSION_PATCH != 0)
-#error "snicholls-crypto: two versions in one translation unit: 0.5.0 here, and another already included"
+    (SNICHOLLS_CRYPTO_VERSION_MAJOR != 0 || SNICHOLLS_CRYPTO_VERSION_MINOR != 6 || SNICHOLLS_CRYPTO_VERSION_PATCH != 0)
+#error "snicholls-crypto: two versions in one translation unit: 0.6.0 here, and another already included"
 #endif
 
 #ifndef snicholls_crypto_version_hpp
@@ -58,7 +58,7 @@
 /// \brief Major version of snicholls-crypto.
 #define SNICHOLLS_CRYPTO_VERSION_MAJOR 0
 /// \brief Minor version of snicholls-crypto.
-#define SNICHOLLS_CRYPTO_VERSION_MINOR 5
+#define SNICHOLLS_CRYPTO_VERSION_MINOR 6
 /// \brief Patch version of snicholls-crypto.
 #define SNICHOLLS_CRYPTO_VERSION_PATCH 0
 

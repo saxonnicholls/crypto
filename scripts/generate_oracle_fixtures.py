@@ -1435,6 +1435,115 @@ def gen_p256(pool, fx):
 
 
 # ---------------------------------------------------------------------------------------------------------------
+# P-384
+
+P384_P = 2**384 - 2**128 - 2**96 + 2**32 - 1
+P384_N = 0xffffffffffffffffffffffffffffffffffffffffffffffffc7634d81f4372ddf581a0db248b0a77aecec196accc52973
+
+
+def i48(v):
+    assert 0 <= v < 2**384, v
+    return "%096x" % v
+
+
+def gen_p384(pool, fx):
+    rng = random.Random("p384 v1")
+    edges = [0, 1, 2, P384_N - 1, P384_N, P384_N + 1, 2**384 - 1]
+    keys = [i48(k) for k in edges] + [hx(rand_bytes(rng, 48)) for _ in range(300)]
+    f = Fixture("p384_keys.txt", "P-384 private keys to public keys (SEC1)",
+                "private key, compressed, uncompressed ('-' '-': refused, 0 or at or above n)")
+    answers = pool.ask("p384_pub", [{"sk": k} for k in keys])
+    good = []
+    for k, ans in zip(keys, answers):
+        v, libs = consensus(pool, f.name, {"sk": k}, ans, lambda lib, a: refused_or(a, "c", "u"))
+        if libs:
+            f.add([k] + (v or [None, None]), libs)
+            if v:
+                good.append((k, v[0], v[1]))
+    fx.append(f)
+
+    # Signatures to verify: RFC 6979 with SHA-384, byte for byte across OpenSSL and noble, then mutated
+    cases = []
+    for k, c, u in good[:200]:
+        m = rand_bytes(rng, rng.choice([0, 1, 48, 100]))
+        cases.append({"sk": k, "m": hx(m), "h": hx(hashlib.sha384(m).digest())})
+    answers = pool.ask("p384_sign", [{"sk": c["sk"], "h": c["h"]} for c in cases])
+    signed = []
+    pub_of = {k: (c, u) for k, c, u in good}
+    for case, ans in zip(cases, answers):
+        v, libs = consensus(pool, "p384 sign", case, ans, lambda lib, a: [a["r"], a["s"]])
+        if libs:
+            signed.append((case, int(v[0], 16), int(v[1], 16)))
+    vcases = []
+    for i, (case, ri, si) in enumerate(signed):
+        c, u = pub_of[case["sk"]]
+        pub = u if i % 2 else c
+
+        def add(why, pub_, m, h, rr, ss):
+            vcases.append({"why": why, "pub": pub_, "m": m, "h": h, "sig": i48(rr % 2**384) + i48(ss % 2**384)})
+        add("valid", pub, case["m"], case["h"], ri, si)
+        add("n - s", pub, case["m"], case["h"], ri, P384_N - si)   # either s verifies
+        add("r bit flipped", pub, case["m"], case["h"], ri ^ (1 << rng.randrange(384)), si)
+        add("s bit flipped", pub, case["m"], case["h"], ri, si ^ (1 << rng.randrange(384)))
+        m2 = case["m"] + "00"
+        add("another message", pub, m2, hx(hashlib.sha384(bytes.fromhex(m2)).digest()), ri, si)
+        add("another key", good[(i + 1) % len(good)][2], case["m"], case["h"], ri, si)
+        if i < 20:
+            for rr, ss, why in ((0, si, "r = 0"), (ri, 0, "s = 0"), (P384_N, si, "r = n"), (ri, P384_N, "s = n"),
+                                (ri + P384_N, si, "r + n"), (ri, 2**384 - 1, "s = 2^384 - 1")):
+                add(why, pub, case["m"], case["h"], rr, ss)
+    f = Fixture("p384_verify.txt", "P-384 ECDSA verification with SHA-384 (either s accepted); the signatures are RFC 6979's, "
+                "OpenSSL's and noble's byte for byte", "case, public key (SEC1), message, SHA-384, r || s, valid (1 or 0)",
+                ["Node's crypto verifies the message (it hashes it) with uncompressed keys only; the others verify the hash."])
+    answers = pool.ask("p384_verify", [{k: c[k] for k in ("pub", "m", "h", "sig")} for c in vcases])
+    for case, ans in zip(vcases, answers):
+        v, libs = consensus(pool, f.name, {"why": case["why"], "sig": case["sig"][:16]}, ans,
+                            lambda lib, a: int(bool(a.get("valid"))))
+        if libs:
+            f.add([case["why"].replace(" ", "_"), case["pub"], case["m"] or None, case["h"], case["sig"], v], libs)
+    fx.append(f)
+
+    # ECDH: a private key and a peer's key (compressed, uncompressed, or off the curve)
+    ecases = []
+    for i in range(min(200, len(good) - 1)):
+        sk = good[i][0]
+        c, u = good[i + 1][1], good[i + 1][2]
+        peer = (c, u)[i % 2]
+        if i % 10 == 9:   # y + 1: off the curve
+            x, y = int(u[2:98], 16), int(u[98:], 16)
+            peer = "04" + i48(x) + i48((y + 1) % P384_P)
+        ecases.append({"sk": sk, "pub": peer})
+    f = Fixture("p384_ecdh.txt", "P-384 ECDH: the shared secret, the x-coordinate of d Q",
+                "private key, peer's public key (SEC1), shared secret ('-': refused, the peer's point is not on the curve)")
+    answers = pool.ask("p384_ecdh", ecases)
+    for case, ans in zip(ecases, answers):
+        v, libs = consensus(pool, f.name, case, ans, lambda lib, a: refused_or(a, "z"))
+        if libs:
+            f.add([case["sk"], case["pub"], v[0] if v else None], libs)
+    fx.append(f)
+
+    # SEC1 parsing
+    pcases = []
+    for k, c, u in good[:150]:
+        x, y = int(u[2:98], 16), int(u[98:], 16)
+        pcases += [c, u, "04" + i48(x) + i48((y + 1) % P384_P), "%02x" % (6 + (y & 1)) + u[2:]]
+    for _ in range(100):
+        pcases.append(rng.choice(["02", "03"]) + hx(rand_bytes(rng, 48)))
+    for x in (P384_P, P384_P + 1, 2**384 - 1, 0):
+        pcases += ["02" + i48(x), "03" + i48(x)]
+    pcases += ["00", "04"]
+    f = Fixture("p384_sec1.txt", "P-384 SEC1 public-key parsing", "encoding, compressed form ('-': refused)",
+                ["Every oracle and this library refuse the hybrid form (0x06, 0x07), points off the curve and x or y",
+                 "at or above p."])
+    answers = pool.ask("p384_pub_parse", [{"pub": c} for c in pcases])
+    for c, ans in zip(pcases, answers):
+        v, libs = consensus(pool, f.name, {"pub": c}, ans, lambda lib, a: refused_or(a, "c"))
+        if libs:
+            f.add([c, v[0] if v else None], libs)
+    fx.append(f)
+
+
+# ---------------------------------------------------------------------------------------------------------------
 # ChaCha20-Poly1305 and XChaCha20-Poly1305
 
 def gen_aead(pool, fx):
@@ -1592,6 +1701,7 @@ def generate():
         gen_p256(pool, fx)
         gen_aead(pool, fx)
         gen_jose(pool, fx)
+        gen_p384(pool, fx)
         files = {f.name: f.text(pool) for f in fx}
         manifest = pool.manifest()
         manifest["fixtures"] = {f.name: {"cases": len(f.rows), "oracles": sorted(f.libs)} for f in fx}

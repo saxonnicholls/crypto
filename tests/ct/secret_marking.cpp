@@ -34,6 +34,8 @@
 #include <snicholls/crypto/jose/ecdh_es.hpp>
 #include <snicholls/crypto/p256/ecdh.hpp>
 #include <snicholls/crypto/p256/ecdsa.hpp>
+#include <snicholls/crypto/p384/ecdh.hpp>
+#include <snicholls/crypto/p384/ecdsa.hpp>
 #include <snicholls/crypto/secp256k1/ecdsa.hpp>
 #include <snicholls/crypto/secp256k1/schnorr.hpp>
 
@@ -170,6 +172,29 @@ void p256_paths()
 }
 
 // P-256 ECDH and JOSE's ECDH-ES on both curves: the private keys secret, the peers' keys public
+// P-384: a private key's validity, its public key and ECDH, the keys secret, the peers' keys public
+void p384_paths()
+{
+    namespace p384 = snicholls::crypto::p384;
+    std::array<std::uint8_t, 48> a{}, b{};
+    for (std::size_t i = 0; i < 48; ++i) {
+        a[i] = static_cast<std::uint8_t>(0x3a + 7 * i);
+        b[i] = static_cast<std::uint8_t>(0x29 + 11 * i);
+    }
+    a[0] = b[0] = 0x3a;   // below n
+    mark_secret(a);
+    mark_secret(b);
+    const auto ka = p384::private_key::from_bytes(a).unwrap(), kb = p384::private_key::from_bytes(b).unwrap();
+    auto pa = ka.public_key(), pb = kb.public_key();
+    make_public(pa);
+    make_public(pb);
+    check(p384::public_key::parse(pa.compressed()).is_ok(), "P-384 public key");
+    auto za = p384::shared_secret(ka, pb).unwrap(), zb = p384::shared_secret(kb, pa).unwrap();
+    auto equal = za == zb;
+    make_public(equal);
+    check(equal, "P-384 ECDH shared secret");
+}
+
 void jose_paths()
 {
     using namespace snicholls::crypto;
@@ -295,6 +320,7 @@ int main(int argc, char** argv)
     secp256k1_paths();
     p256_paths();
     aead_paths();
+    p384_paths();
     jose_paths();
     hd_paths();
     curve25519_paths();

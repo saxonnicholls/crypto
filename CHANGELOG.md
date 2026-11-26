@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.6.0 (unreleased)
+
+P-384, for TLS 1.3's secp384r1 and ecdsa_secp384r1_sha384, X.509's ecdsa-with-SHA384 and JOSE's ES384.
+Experimental and not independently audited.
+
+- P-384 (`p384/`): `field`, `scalar`, `point`, `ecdsa` (keys, SEC1, verification over SHA-384 with
+  `verify_message` hashing for you, JOSE's 96-byte r || s and strict DER) and `ecdh` (`shared_secret`, constant
+  time, the peer's point checked on the curve again before it is multiplied). Verification only: no P-384 signing.
+- One implementation for both NIST curves: the Montgomery arithmetic is a template over the limb count
+  (`detail/mont.hpp`; `detail/mont256.hpp` keeps its names at four limbs), the field elements and scalars are one
+  class (`detail/mont_residue.hpp`), and the points are one class over the curve (`detail/weierstrass_a3.hpp`, the
+  complete addition for a = -3 and the fixed-window multiplication). P-256's `field_element`, `scalar`,
+  `affine_point` and `point` are now its instances, with the same interface and behaviour. The ECDSA DER codec is
+  a template over the scalar width (`detail/ecdsa_der.hpp`).
+- Tests: every Wycheproof `ecdsa_secp384r1_sha384` (DER and P1363) and `ecdh_secp384r1_ecpoint` case, RFC 6979
+  A.2.6's key and SHA-384 signature; oracle fixtures from OpenSSL, `@noble/curves` and Node's crypto (keys,
+  verification of RFC 6979 signatures and their mutations, ECDH, SEC1); a fuzz target `p384` against OpenSSL; the
+  secret paths in the Valgrind check.
+
 ## 0.5.0 (2026-11-24)
 
 JWE's key agreement, AES-128-GCM and RSA with SHA-384 and SHA-512. Pins snicholls-core at v0.24.1 (requires

@@ -194,6 +194,36 @@
         "p256_rs"
       ]
     },
+    "p384_ecdh.txt": {
+      "cases": 200,
+      "oracles": [
+        "noble_p384",
+        "node_crypto",
+        "openssl"
+      ]
+    },
+    "p384_keys.txt": {
+      "cases": 307,
+      "oracles": [
+        "noble_p384",
+        "openssl"
+      ]
+    },
+    "p384_sec1.txt": {
+      "cases": 710,
+      "oracles": [
+        "noble_p384",
+        "openssl"
+      ]
+    },
+    "p384_verify.txt": {
+      "cases": 1320,
+      "oracles": [
+        "noble_p384",
+        "node_crypto",
+        "openssl"
+      ]
+    },
     "rsa_pkcs1_sign.txt": {
       "cases": 240,
       "oracles": [
@@ -363,6 +393,11 @@
       "program": "node",
       "version": "2.4.0"
     },
+    "noble_p384": {
+      "answers": 2737,
+      "program": "node",
+      "version": "2.4.0"
+    },
     "noble_secp256k1": {
       "answers": 15842,
       "program": "node",
@@ -379,12 +414,12 @@
       "version": "2.4.0"
     },
     "node_crypto": {
-      "answers": 4946,
+      "answers": 5906,
       "program": "node",
       "version": "Node v26.13.1, OpenSSL 3.5.9"
     },
     "openssl": {
-      "answers": 19973,
+      "answers": 22710,
       "program": "python",
       "version": "OpenSSL 4.0.3 29 Sep 2026 (cryptography 50.0.2)"
     },

@@ -95,26 +95,27 @@ def key_wrap(data):
     return ["key", "msg", "ct"], lines
 
 
-def ecdsa_p256(data):
-    """ecdsa_secp256r1_sha256*_test.json: a "key" line per group (the uncompressed SEC1 key), then its tests."""
+def ecdsa_p256(data, curve="secp256r1", sha="SHA-256"):
+    """ecdsa_secp256r1_sha256*_test.json and ecdsa_secp384r1_sha384*_test.json: a "key" line per group (the
+    uncompressed SEC1 key), then its tests."""
     lines = []
     for g in data["testGroups"]:
-        assert g["publicKey"]["curve"] == "secp256r1" and g["sha"] == "SHA-256"
+        assert g["publicKey"]["curve"] == curve and g["sha"] == sha
         lines.append("key - %s" % g["publicKey"]["uncompressed"])
         for t in g["tests"]:
             lines.append("%d %s %s %s" % (t["tcId"], t["result"], field(t["msg"]), field(t["sig"])))
     return ["msg", "sig (key lines: key - uncompressed_public_key)"], lines
 
 
-def ecdh_p256(data):
-    """ecdh_secp256r1_ecpoint_test.json: one line per test, the private key as 32 bytes (Wycheproof gives it as an
-    ASN.1 integer's magnitude, sometimes with a leading zero byte or fewer than 32)."""
+def ecdh_p256(data, size=32):
+    """ecdh_secp256r1_ecpoint_test.json and ecdh_secp384r1_ecpoint_test.json: one line per test, the private key as
+    size bytes (Wycheproof gives it as an ASN.1 integer's magnitude, sometimes with a leading zero byte or shorter)."""
     lines = []
     for g in data["testGroups"]:
         for t in g["tests"]:
             d = int(t["private"], 16)
-            assert d.bit_length() <= 256
-            lines.append("%d %s %s %064x %s" % (t["tcId"], t["result"], field(t["public"]), d, field(t["shared"])))
+            assert d.bit_length() <= 8 * size
+            lines.append("%d %s %s %0*x %s" % (t["tcId"], t["result"], field(t["public"]), 2 * size, d, field(t["shared"])))
     return ["public", "private", "shared"], lines
 
 
@@ -164,6 +165,9 @@ CONVERTERS = {
     "xchacha20_poly1305_test.json": ("xchacha20_poly1305.txt", aead),
     "ecdsa_secp256r1_sha256_test.json": ("ecdsa_p256_sha256.txt", ecdsa_p256),
     "ecdh_secp256r1_ecpoint_test.json": ("ecdh_p256.txt", ecdh_p256),
+    "ecdh_secp384r1_ecpoint_test.json": ("ecdh_p384.txt", lambda d: ecdh_p256(d, 48)),
+    "ecdsa_secp384r1_sha384_test.json": ("ecdsa_p384_sha384.txt", lambda d: ecdsa_p256(d, "secp384r1", "SHA-384")),
+    "ecdsa_secp384r1_sha384_p1363_test.json": ("ecdsa_p384_sha384_p1363.txt", lambda d: ecdsa_p256(d, "secp384r1", "SHA-384")),
     "ecdsa_secp256r1_sha256_p1363_test.json": ("ecdsa_p256_sha256_p1363.txt", ecdsa_p256),
     "rsa_signature_2048_sha256_test.json": ("rsa_pkcs1_2048_sha256.txt", rsa),
     "rsa_signature_3072_sha256_test.json": ("rsa_pkcs1_3072_sha256.txt", rsa),
