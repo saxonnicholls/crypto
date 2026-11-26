@@ -169,7 +169,7 @@ if(SNICHOLLS_CRYPTO_BUILD_TESTS)
     include(${CMAKE_CURRENT_SOURCE_DIR}/third_party/tooling/cmake/SnichollsTooling.cmake)
     snicholls_single_include_check(snicholls_crypto_single_include)
     snicholls_crypto_compile_options(snicholls_crypto_single_include)
-    snicholls_tooling_add_checks(SINGLE_INCLUDE)
+    snicholls_tooling_add_checks(SINGLE_INCLUDE PINS)
 
     if(NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest/CMakeLists.txt)
         message(FATAL_ERROR "third_party/googletest is empty - run: git submodule update --init --recursive")

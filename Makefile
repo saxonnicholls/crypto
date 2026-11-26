@@ -41,6 +41,7 @@ check:
 	python3 scripts/check_version.py
 	python3 scripts/check_mirror.py
 	python3 scripts/check_public.py --commits
+	python3 third_party/tooling/scripts/check_pins.py
 
 $(BUILD)/CMakeCache.txt:
 	cmake -B $(BUILD) -DCMAKE_BUILD_TYPE=$(CONFIG) -DCMAKE_CXX_COMPILER=$(CXX) $(CMAKE_FLAGS)

@@ -36,8 +36,19 @@
 ///
 /// \snippet version_demo.cpp version
 
+// The two-versions check (tooling STANDARDS section 2). Two copies of crypto in one translation unit share this
+// header's guard, so the guard alone would skip the second without a word; this block stands before the guard and
+// stops the compile instead. The macros are defined inside the guard, so the version is written out here again: a
+// bump changes both, and scripts/check_version.py compares them.
+#if defined(SNICHOLLS_CRYPTO_VERSION_MAJOR) && \
+    (SNICHOLLS_CRYPTO_VERSION_MAJOR != 0 || SNICHOLLS_CRYPTO_VERSION_MINOR != 5 || SNICHOLLS_CRYPTO_VERSION_PATCH != 0)
+#error "snicholls-crypto: two versions in one translation unit: 0.5.0 here, and another already included"
+#endif
+
 #ifndef snicholls_crypto_version_hpp
-#define snicholls_crypto_version_hpp
+/// \cond
+#define snicholls_crypto_version_hpp   // the guard: Doxygen does not take it for one after the check above
+/// \endcond
 
 #include <string_view>
 
