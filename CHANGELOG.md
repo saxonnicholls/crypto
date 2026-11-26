@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.2 (2026-11-27)
+
+Pins snicholls-core at v0.28.0 (still required at 0.17.0 or later) and tooling at v0.3.2. No change to the library.
+
+- `tooling.conf`: tooling's new `check_pins.py` exempts `fuzz/cryptofuzz/Makefile` from its reach rule; that
+  Makefile's `-I ../../include` paths are Cryptofuzz's own, from the module's place in Cryptofuzz's tree.
+
 ## 0.4.1 (2026-11-24)
 
 - Poly1305 (ChaCha20-Poly1305, XChaCha20-Poly1305): the final reduction's choice goes through `ct::select`. Clang 21

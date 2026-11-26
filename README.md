@@ -3,7 +3,7 @@
 Elliptic curves, signatures and wallet key derivation, header-only C++20, constant-time wherever a secret is
 involved. Part of the snicholls libraries; it depends on snicholls-core and nothing else.
 
-> **Status: experimental (0.4.1). Not independently audited. Do not use it to secure funds yet.**
+> **Status: experimental (0.4.2). Not independently audited. Do not use it to secure funds yet.**
 > Scrutiny is welcome: report vulnerabilities privately as SECURITY.md describes.
 
 **Documentation:** every public entity is documented in Doxygen, with the design, guarantees, errors, examples
@@ -26,7 +26,7 @@ release at the root, every version under `/vX.Y.Z/`, the latest `main` under `/m
 
 Everything is `constexpr` (a whole RFC 6979 signature is a `static_assert` in the tests; evaluating one at compile
 time needs a raised step limit, `secp256k1/field.hpp` says which), allocation-free, and returns
-`snicholls::result<V, errc>` where it can fail. The hashes are core's (`hash/`); core is pinned at v0.23.0 and
+`snicholls::result<V, errc>` where it can fail. The hashes are core's (`hash/`); core is pinned at v0.28.0 and
 required at 0.17.0 or later.
 
     #include <snicholls/crypto/hd/bip32.hpp>
