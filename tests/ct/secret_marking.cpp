@@ -22,6 +22,7 @@
 
 #define SNICHOLLS_CRYPTO_DECLASSIFY(pointer, size) VALGRIND_MAKE_MEM_DEFINED(pointer, size)
 
+#include <snicholls/crypto/aead/aes128_gcm.hpp>
 #include <snicholls/crypto/aead/aes256_gcm.hpp>
 #include <snicholls/crypto/aead/aes_key_wrap.hpp>
 #include <snicholls/crypto/aead/chacha20_poly1305.hpp>
@@ -126,6 +127,16 @@ void aead_paths()
     make_public(back);
     make_public(msg);
     check(gopened && back == msg, "AES-256-GCM seal and open (the computed S-box)");
+
+    auto key16 = std::span<const std::uint8_t, 16>(key.data(), 16);
+    mark_secret(msg);
+    auto g128 = aead::aes128_gcm_seal(key16, n12, {}, msg, ct).unwrap();
+    make_public(ct);
+    make_public(g128);
+    const bool g128_opened = aead::aes128_gcm_open(key16, n12, {}, ct, g128, back).is_ok();
+    make_public(back);
+    make_public(msg);
+    check(g128_opened && back == msg, "AES-128-GCM seal and open");
 
     std::array<std::uint8_t, 32> cek{};
     for (std::size_t i = 0; i < cek.size(); ++i)

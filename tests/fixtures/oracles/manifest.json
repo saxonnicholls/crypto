@@ -1,5 +1,12 @@
 {
   "fixtures": {
+    "aes128_gcm.txt": {
+      "cases": 300,
+      "oracles": [
+        "node_crypto",
+        "openssl"
+      ]
+    },
     "aes256_gcm.txt": {
       "cases": 300,
       "oracles": [
@@ -372,12 +379,12 @@
       "version": "2.4.0"
     },
     "node_crypto": {
-      "answers": 4346,
+      "answers": 4946,
       "program": "node",
       "version": "Node v26.13.1, OpenSSL 3.5.9"
     },
     "openssl": {
-      "answers": 19373,
+      "answers": 19973,
       "program": "python",
       "version": "OpenSSL 4.0.3 29 Sep 2026 (cryptography 50.0.2)"
     },

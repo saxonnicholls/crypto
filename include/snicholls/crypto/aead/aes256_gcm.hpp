@@ -82,7 +82,8 @@ namespace detail {
 
 inline constexpr std::uint64_t gcm_max_message = (std::uint64_t{1} << 36) - 32;
 
-constexpr void gcm_ctr(const crypto::detail::aes256& aes, std::array<std::uint8_t, 16> counter, std::span<const std::uint8_t> in,
+template <class Aes>
+constexpr void gcm_ctr(const Aes& aes, std::array<std::uint8_t, 16> counter, std::span<const std::uint8_t> in,
                        std::span<std::uint8_t> out) noexcept
 {
     for (std::size_t off = 0; off < in.size(); off += 16) {
@@ -108,7 +109,8 @@ constexpr void ghash_update(std::array<std::uint8_t, 16>& y, const std::array<st
     }
 }
 
-constexpr tag gcm_tag(const crypto::detail::aes256& aes, const std::array<std::uint8_t, 16>& j0, std::span<const std::uint8_t> aad,
+template <class Aes>
+constexpr tag gcm_tag(const Aes& aes, const std::array<std::uint8_t, 16>& j0, std::span<const std::uint8_t> aad,
                       std::span<const std::uint8_t> ciphertext) noexcept
 {
     auto h = aes.encrypt({});
@@ -140,6 +142,38 @@ constexpr std::array<std::uint8_t, 16> gcm_j0(std::span<const std::uint8_t, 12> 
     return j0;
 }
 
+// Seal and open for either key size: the bodies of aes128_gcm_* and aes256_gcm_*
+template <std::size_t KeyBytes>
+constexpr result<tag, errc> gcm_seal(std::span<const std::uint8_t, KeyBytes> key, std::span<const std::uint8_t, 12> nonce,
+                                     std::span<const std::uint8_t> aad, std::span<const std::uint8_t> plaintext,
+                                     std::span<std::uint8_t> ciphertext) noexcept
+{
+    if (plaintext.size() != ciphertext.size() || plaintext.size() > gcm_max_message)
+        return err(errc::invalid_length);
+    const crypto::detail::aes_cipher<KeyBytes> aes(key);
+    const auto j0 = gcm_j0(nonce);
+    gcm_ctr(aes, j0, plaintext, ciphertext);
+    return ok(gcm_tag(aes, j0, aad, ciphertext));
+}
+
+template <std::size_t KeyBytes>
+constexpr result<void, errc> gcm_open(std::span<const std::uint8_t, KeyBytes> key, std::span<const std::uint8_t, 12> nonce,
+                                      std::span<const std::uint8_t> aad, std::span<const std::uint8_t> ciphertext,
+                                      std::span<const std::uint8_t, 16> received, std::span<std::uint8_t> plaintext) noexcept
+{
+    if (plaintext.size() != ciphertext.size() || ciphertext.size() > gcm_max_message)
+        return err(errc::invalid_length);
+    const crypto::detail::aes_cipher<KeyBytes> aes(key);
+    const auto j0 = gcm_j0(nonce);
+    if (!tags_equal(gcm_tag(aes, j0, aad, ciphertext), received)) {
+        for (auto& b : plaintext)
+            b = 0;
+        return err(errc::authentication_failed);
+    }
+    gcm_ctr(aes, j0, ciphertext, plaintext);
+    return ok();
+}
+
 } // namespace detail
 
 /// \brief Encrypts and authenticates with AES-256-GCM. Constant time in the key and the plaintext.
@@ -154,12 +188,7 @@ constexpr std::array<std::uint8_t, 16> gcm_j0(std::span<const std::uint8_t, 12> 
                                                           std::span<const std::uint8_t> aad, std::span<const std::uint8_t> plaintext,
                                                           std::span<std::uint8_t> ciphertext) noexcept
 {
-    if (plaintext.size() != ciphertext.size() || plaintext.size() > detail::gcm_max_message)
-        return err(errc::invalid_length);
-    const crypto::detail::aes256 aes(key);
-    const auto j0 = detail::gcm_j0(nonce);
-    detail::gcm_ctr(aes, j0, plaintext, ciphertext);
-    return ok(detail::gcm_tag(aes, j0, aad, ciphertext));
+    return detail::gcm_seal<32>(key, nonce, aad, plaintext, ciphertext);
 }
 
 /// \brief Checks the tag and decrypts with AES-256-GCM. Constant time in the key, the plaintext and the tag.
@@ -177,17 +206,7 @@ constexpr std::array<std::uint8_t, 16> gcm_j0(std::span<const std::uint8_t, 12> 
                                                            std::span<const std::uint8_t, 16> received,
                                                            std::span<std::uint8_t> plaintext) noexcept
 {
-    if (plaintext.size() != ciphertext.size() || ciphertext.size() > detail::gcm_max_message)
-        return err(errc::invalid_length);
-    const crypto::detail::aes256 aes(key);
-    const auto j0 = detail::gcm_j0(nonce);
-    if (!detail::tags_equal(detail::gcm_tag(aes, j0, aad, ciphertext), received)) {
-        for (auto& b : plaintext)
-            b = 0;
-        return err(errc::authentication_failed);
-    }
-    detail::gcm_ctr(aes, j0, ciphertext, plaintext);
-    return ok();
+    return detail::gcm_open<32>(key, nonce, aad, ciphertext, received, plaintext);
 }
 
 } // namespace snicholls::crypto::aead

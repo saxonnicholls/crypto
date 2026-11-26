@@ -4,7 +4,7 @@
 //
 //  Copyright 2010-2026 Saxon Herschel Nicholls
 //
-//  The hashes this library uses - SHA-256, SHA-512, RIPEMD-160, HASH160, HMAC and PBKDF2-HMAC-SHA512 - are
+//  The hashes this library uses - SHA-256, SHA-384, SHA-512, RIPEMD-160, HASH160, HMAC and PBKDF2-HMAC-SHA512 - are
 //  snicholls-core's (hash/sha2.hpp, hash/ripemd160.hpp, hash/hmac.hpp, hash/kdf.hpp). This file only adapts them to
 //  the shape the library calls: bytes as std::uint8_t in and std::array<std::uint8_t, N> out, and every hash or
 //  HMAC state wiped when it dies (core's states are trivially copyable values that do not wipe themselves, and an
@@ -123,6 +123,7 @@ constexpr std::array<std::uint8_t, N> jwa_concat_kdf_sha256(std::span<const std:
     secure_wipe(b);
     return out;
 }
+using sha384 = wiped_hash<snicholls::sha384>;
 using sha512 = wiped_hash<snicholls::sha512>;
 using ripemd160 = wiped_hash<snicholls::ripemd160>;
 

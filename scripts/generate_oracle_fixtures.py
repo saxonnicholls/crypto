@@ -1439,13 +1439,13 @@ def gen_p256(pool, fx):
 
 def gen_aead(pool, fx):
     rng = random.Random("aead v1")
-    for op, nlen, name in (("chacha", 12, "chacha20_poly1305.txt"), ("xchacha", 24, "xchacha20_poly1305.txt"),
-                           ("gcm", 12, "aes256_gcm.txt")):
-        cases = [{"k": hx(rand_bytes(rng, 32)), "n": hx(rand_bytes(rng, nlen)),
+    for op, klen, nlen, name in (("chacha", 32, 12, "chacha20_poly1305.txt"), ("xchacha", 32, 24, "xchacha20_poly1305.txt"),
+                                 ("gcm", 32, 12, "aes256_gcm.txt"), ("gcm", 16, 12, "aes128_gcm.txt")):
+        cases = [{"k": hx(rand_bytes(rng, klen)), "n": hx(rand_bytes(rng, nlen)),
                   "ad": hx(rand_bytes(rng, rng.choice([0, 1, 12, 64]))),
                   "m": hx(rand_bytes(rng, rng.choice([0, 1, 15, 16, 17, 64, 65, 500])))} for _ in range(300)]
         f = Fixture(name, "%s: seal byte for byte, and open of the sealed and of a tampered message" %
-                    {"chacha": "ChaCha20-Poly1305", "xchacha": "XChaCha20-Poly1305", "gcm": "AES-256-GCM"}[op],
+                    {"chacha": "ChaCha20-Poly1305", "xchacha": "XChaCha20-Poly1305", "gcm": "AES-%d-GCM" % (8 * klen)}[op],
                     "key, nonce, associated data, message, ciphertext, tag, tampered (ciphertext or tag), opens (1 or 0)")
         sealed = pool.ask(op + "_seal", cases)
         rows = []

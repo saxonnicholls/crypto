@@ -6,7 +6,8 @@
 //
 
 /// \file
-/// \brief RSA signature verification (RFC 8017): RSASSA-PKCS1-v1_5 and RSASSA-PSS with SHA-256 (RS256, PS256).
+/// \brief RSA signature verification (RFC 8017): RSASSA-PKCS1-v1_5 and RSASSA-PSS with SHA-256, SHA-384 and SHA-512
+/// (RS256 to RS512, PS256 to PS512, and TLS's rsa_pkcs1_* and rsa_pss_rsae_*).
 /// \ingroup rsa
 ///
 /// \overview
@@ -23,16 +24,19 @@
 ///   lenient (the class of forgery behind Bleichenbacher's 2006 low-exponent attack is impossible by construction).
 ///   The DigestInfo is DER with its NULL parameters; the form without them, which RFC 8017 does not define for
 ///   SHA-256 and Wycheproof marks "acceptable", is refused.
+/// - `verify_pkcs1v15_sha384`, `verify_pkcs1v15_sha512`, `verify_pss_sha384`, `verify_pss_sha512`: the same with
+///   SHA-384 or SHA-512 (and MGF1 on the same hash for PSS, salt length the hash's by default), the hashes of
+///   RS384 / RS512, PS384 / PS512, X.509's sha384WithRSAEncryption and TLS 1.3's rsa_pss_rsae_sha384 / _sha512.
 /// - `verify_pss_sha256`: RFC 8017 section 8.1.2 with EMSA-PSS, SHA-256 and MGF1-SHA-256 (JOSE's PS256), for a
 ///   given salt length (32 by default, as PS256 uses; 0 to the maximum the modulus allows).
-/// - Each has a prehashed form taking the 32-byte SHA-256 of the message.
+/// - Each has a prehashed form taking the hash of the message (32, 48 or 64 bytes).
 ///
 /// Strict input (CLAUDE.md rule 8): a signature must be exactly as long as the modulus, and below it; `n` and `e`
 /// given as components must have no leading zero byte (JWK's rule, RFC 7518 section 6.3.1); DER must be DER (minimal
 /// lengths and integers, nothing trailing), with the rsaEncryption algorithm's NULL parameters present.
 ///
 /// \relations
-/// - `detail/montgomery.hpp`: the modular arithmetic; `detail/hashes.hpp`: SHA-256 (core's).
+/// - `detail/montgomery.hpp`: the modular arithmetic; `detail/hashes.hpp`: SHA-256, SHA-384, SHA-512 (core's).
 /// - Group: \ref rsa.
 ///
 /// \impls
@@ -60,13 +64,15 @@
 ///
 /// \testing
 /// `tests/rsa/rsa_test.cpp`: every Wycheproof `rsa_signature_{2048,3072,4096}_sha256` and
-/// `rsa_pss_{2048,3072,4096}_sha256_mgf1_32`, `rsa_pss_2048_sha256_mgf1_0` case (`tests/fixtures/wycheproof/`),
+/// `rsa_pss_{2048,3072,4096}_sha256_mgf1_32`, `rsa_pss_2048_sha256_mgf1_0` case, and their SHA-384 and SHA-512
+/// counterparts (`rsa_signature_{2048,3072,4096}_sha{384,512}`, `rsa_pss_{2048,4096}_sha384_mgf1_48`,
+/// `rsa_pss_4096_sha512_mgf1_{32,64}`) (`tests/fixtures/wycheproof/`),
 /// each key read from its SubjectPublicKeyInfo, its RSAPublicKey and its components; key and DER edge cases.
 /// `tests/rsa/rsa_oracles_test.cpp`: signatures from OpenSSL, Node and RustCrypto (`tests/fixtures/oracles/`).
 /// `demos/rsa/rsa_demo.cpp`.
 ///
 /// \deps
-/// `<array>`, `<cstdint>`, `<span>`; core's `result.hpp` and SHA-256.
+/// `<array>`, `<cstdint>`, `<span>`; core's `result.hpp` and SHA-2.
 ///
 /// \gotchas
 /// A JWK's `n` and `e` are base64url text: decode them first (this library takes bytes). PEM is base64 text around
@@ -145,9 +151,27 @@ constexpr std::optional<std::span<const std::uint8_t>> der_unsigned(std::span<co
 
 inline constexpr std::array<std::uint8_t, 9> rsa_encryption_oid{0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01, 0x01};
 
-// DER of DigestInfo for SHA-256, before the hash (RFC 8017 section 9.2, note 1)
+// DER of DigestInfo, before the hash (RFC 8017 section 9.2, note 1): SHA-256, SHA-384, SHA-512
 inline constexpr std::array<std::uint8_t, 19> sha256_digest_info{0x30, 0x31, 0x30, 0x0d, 0x06, 0x09, 0x60, 0x86, 0x48, 0x01,
                                                                  0x65, 0x03, 0x04, 0x02, 0x01, 0x05, 0x00, 0x04, 0x20};
+inline constexpr std::array<std::uint8_t, 19> sha384_digest_info{0x30, 0x41, 0x30, 0x0d, 0x06, 0x09, 0x60, 0x86, 0x48, 0x01,
+                                                                 0x65, 0x03, 0x04, 0x02, 0x02, 0x05, 0x00, 0x04, 0x30};
+inline constexpr std::array<std::uint8_t, 19> sha512_digest_info{0x30, 0x51, 0x30, 0x0d, 0x06, 0x09, 0x60, 0x86, 0x48, 0x01,
+                                                                 0x65, 0x03, 0x04, 0x02, 0x03, 0x05, 0x00, 0x04, 0x40};
+
+// Each hash with its DigestInfo
+struct with_sha256 {
+    using hash = crypto::detail::sha256;
+    static constexpr const auto& digest_info = sha256_digest_info;
+};
+struct with_sha384 {
+    using hash = crypto::detail::sha384;
+    static constexpr const auto& digest_info = sha384_digest_info;
+};
+struct with_sha512 {
+    using hash = crypto::detail::sha512;
+    static constexpr const auto& digest_info = sha512_digest_info;
+};
 
 } // namespace detail
 
@@ -282,12 +306,13 @@ private:
 
 namespace detail {
 
-// MGF1 with SHA-256 (RFC 8017 appendix B.2.1), XORed into out
-constexpr void mgf1_sha256_xor(std::span<const std::uint8_t, 32> seed, std::span<std::uint8_t> out) noexcept
+// MGF1 with H (RFC 8017 appendix B.2.1), XORed into out
+template <class H>
+constexpr void mgf1_xor(std::span<const std::uint8_t, H::digest_size> seed, std::span<std::uint8_t> out) noexcept
 {
     std::size_t done = 0;
     for (std::uint32_t counter = 0; done < out.size(); ++counter) {
-        crypto::detail::sha256 h;
+        H h;
         h.update(seed);
         const std::array<std::uint8_t, 4> c{static_cast<std::uint8_t>(counter >> 24), static_cast<std::uint8_t>(counter >> 16),
                                             static_cast<std::uint8_t>(counter >> 8), static_cast<std::uint8_t>(counter)};
@@ -298,31 +323,23 @@ constexpr void mgf1_sha256_xor(std::span<const std::uint8_t, 32> seed, std::span
     }
 }
 
-} // namespace detail
-
-/// \brief Verifies an RSASSA-PKCS1-v1_5 signature over a SHA-256 hash (RFC 8017 section 8.2.2). Variable time; public
-/// data only.
-/// \ingroup rsa
-/// \param key The signer's public key.
-/// \param hash The SHA-256 of the message.
-/// \param sig The signature, exactly `key.modulus_bytes()` long.
-/// \return Success, or `errc::invalid_signature`.
-[[nodiscard]] constexpr result<void, errc> verify_pkcs1v15_sha256_prehashed(const public_key& key,
-                                                                            std::span<const std::uint8_t, 32> hash,
-                                                                            std::span<const std::uint8_t> sig) noexcept
+// RSASSA-PKCS1-v1_5 verification over a hash (RFC 8017 section 8.2.2): EM rebuilt and compared whole
+template <class Scheme>
+constexpr result<void, errc> verify_pkcs1v15(const public_key& key, std::span<const std::uint8_t, Scheme::hash::digest_size> hash,
+                                             std::span<const std::uint8_t> sig) noexcept
 {
     std::array<std::uint8_t, max_modulus_bytes> em{};
     if (const auto r = key.open(sig, em); !r)
         return r;
-    // EM = 0x00 0x01 0xFF ... 0xFF 0x00 DigestInfo H, rebuilt and compared whole
+    // EM = 0x00 0x01 0xFF ... 0xFF 0x00 DigestInfo H (at least 8 bytes of 0xFF: k >= 256 > t + 11 for every hash here)
     const std::size_t k = key.modulus_bytes();
-    const std::size_t t = detail::sha256_digest_info.size() + hash.size();
+    const std::size_t t = Scheme::digest_info.size() + hash.size();
     std::size_t i = 0;
     bool same = em[i++] == 0x00 && em[i++] == 0x01;
     for (; i < k - t - 1; ++i)
         same = same && em[i] == 0xff;
     same = same && em[i++] == 0x00;
-    for (const auto b : detail::sha256_digest_info)
+    for (const auto b : Scheme::digest_info)
         same = same && em[i++] == b;
     for (const auto b : hash)
         same = same && em[i++] == b;
@@ -331,36 +348,15 @@ constexpr void mgf1_sha256_xor(std::span<const std::uint8_t, 32> seed, std::span
     return ok();
 }
 
-/// \brief Verifies an RSASSA-PKCS1-v1_5 signature with SHA-256 over a message: JOSE's RS256. Variable time; public data
-/// only.
-/// \ingroup rsa
-/// \param key The signer's public key.
-/// \param message The signed bytes (for a JWS, the ASCII of `header.payload`).
-/// \param sig The signature, exactly `key.modulus_bytes()` long.
-/// \return Success, or `errc::invalid_signature`.
-[[nodiscard]] constexpr result<void, errc> verify_pkcs1v15_sha256(const public_key& key, std::span<const std::uint8_t> message,
-                                                                  std::span<const std::uint8_t> sig) noexcept
+// RSASSA-PSS verification over a hash with MGF1 on the same hash (RFC 8017 sections 8.1.2 and 9.1.2)
+template <class H>
+constexpr result<void, errc> verify_pss(const public_key& key, std::span<const std::uint8_t, H::digest_size> hash,
+                                        std::span<const std::uint8_t> sig, std::size_t salt_length) noexcept
 {
-    const auto h = crypto::detail::sha256::hash(message);
-    return verify_pkcs1v15_sha256_prehashed(key, h, sig);
-}
-
-/// \brief Verifies an RSASSA-PSS signature over a SHA-256 hash, with MGF1-SHA-256 (RFC 8017 sections 8.1.2 and
-/// 9.1.2). Variable time; public data only.
-/// \ingroup rsa
-/// \param key The signer's public key.
-/// \param hash The SHA-256 of the message.
-/// \param sig The signature, exactly `key.modulus_bytes()` long.
-/// \param salt_length The salt length the signer used, in bytes (PS256: 32).
-/// \return Success, `errc::invalid_length` for a salt length the modulus cannot hold, or `errc::invalid_signature`.
-[[nodiscard]] constexpr result<void, errc> verify_pss_sha256_prehashed(const public_key& key, std::span<const std::uint8_t, 32> hash,
-                                                                       std::span<const std::uint8_t> sig,
-                                                                       std::size_t salt_length = 32) noexcept
-{
-    constexpr std::size_t h_len = 32;
+    constexpr std::size_t h_len = H::digest_size;
     const std::size_t em_bits = key.modulus_bits() - 1;
     const std::size_t em_len = (em_bits + 7) / 8;
-    if (em_len < h_len + salt_length + 2)
+    if (salt_length > em_len || em_len < h_len + salt_length + 2)
         return err(errc::invalid_length);
     std::array<std::uint8_t, max_modulus_bytes> m{};
     if (const auto r = key.open(sig, m); !r)
@@ -382,7 +378,7 @@ constexpr void mgf1_sha256_xor(std::span<const std::uint8_t, 32> seed, std::span
     std::array<std::uint8_t, h_len> h_copy{};
     for (std::size_t i = 0; i < h_len; ++i)
         h_copy[i] = h[i];
-    detail::mgf1_sha256_xor(h_copy, db);
+    mgf1_xor<H>(h_copy, db);
     db[0] &= top_mask;
     const std::size_t ps_len = db_len - salt_length - 1;
     for (std::size_t i = 0; i < ps_len; ++i)
@@ -390,8 +386,8 @@ constexpr void mgf1_sha256_xor(std::span<const std::uint8_t, 32> seed, std::span
             return err(errc::invalid_signature);
     if (db[ps_len] != 0x01)
         return err(errc::invalid_signature);
-    // H' = SHA-256(0x00 x 8 || mHash || salt)
-    crypto::detail::sha256 hp;
+    // H' = Hash(0x00 x 8 || mHash || salt)
+    H hp;
     const std::array<std::uint8_t, 8> zeros{};
     hp.update(zeros);
     hp.update(hash);
@@ -403,13 +399,58 @@ constexpr void mgf1_sha256_xor(std::span<const std::uint8_t, 32> seed, std::span
     return ok();
 }
 
-/// \brief Verifies an RSASSA-PSS signature with SHA-256 and MGF1-SHA-256 over a message: JOSE's PS256 (salt length
-/// 32). Variable time; public data only.
+} // namespace detail
+
+/// \brief Verifies an RSASSA-PKCS1-v1_5 signature over a SHA-256 hash (RFC 8017 section 8.2.2). Variable time; public
+/// data only.
+/// \ingroup rsa
+/// \param key The signer's public key.
+/// \param hash The SHA-256 of the message.
+/// \param sig The signature, exactly `key.modulus_bytes()` long.
+/// \return Success, or `errc::invalid_signature`.
+[[nodiscard]] constexpr result<void, errc> verify_pkcs1v15_sha256_prehashed(const public_key& key,
+                                                                            std::span<const std::uint8_t, 32> hash,
+                                                                            std::span<const std::uint8_t> sig) noexcept
+{
+    return detail::verify_pkcs1v15<detail::with_sha256>(key, hash, sig);
+}
+
+/// \brief Verifies an RSASSA-PKCS1-v1_5 signature with SHA-256 over a message: JOSE's RS256, TLS's rsa_pkcs1_sha256.
+/// Variable time; public data only.
+/// \ingroup rsa
+/// \param key The signer's public key.
+/// \param message The signed bytes (for a JWS, the ASCII of `header.payload`).
+/// \param sig The signature, exactly `key.modulus_bytes()` long.
+/// \return Success, or `errc::invalid_signature`.
+[[nodiscard]] constexpr result<void, errc> verify_pkcs1v15_sha256(const public_key& key, std::span<const std::uint8_t> message,
+                                                                  std::span<const std::uint8_t> sig) noexcept
+{
+    const auto h = crypto::detail::sha256::hash(message);
+    return verify_pkcs1v15_sha256_prehashed(key, h, sig);
+}
+
+/// \brief Verifies an RSASSA-PSS signature over a SHA-256 hash, with MGF1-SHA-256 (RFC 8017 sections 8.1.2 and
+/// 9.1.2). Variable time; public data only.
+/// \ingroup rsa
+/// \param key The signer's public key.
+/// \param hash The SHA-256 of the message.
+/// \param sig The signature, exactly `key.modulus_bytes()` long.
+/// \param salt_length The salt length the signer used, in bytes (PS256 and TLS: 32, the hash's length).
+/// \return Success, `errc::invalid_length` for a salt length the modulus cannot hold, or `errc::invalid_signature`.
+[[nodiscard]] constexpr result<void, errc> verify_pss_sha256_prehashed(const public_key& key, std::span<const std::uint8_t, 32> hash,
+                                                                       std::span<const std::uint8_t> sig,
+                                                                       std::size_t salt_length = 32) noexcept
+{
+    return detail::verify_pss<crypto::detail::sha256>(key, hash, sig, salt_length);
+}
+
+/// \brief Verifies an RSASSA-PSS signature with SHA-256 and MGF1-SHA-256 over a message: JOSE's PS256 and TLS's
+/// rsa_pss_rsae_sha256 (salt length 32). Variable time; public data only.
 /// \ingroup rsa
 /// \param key The signer's public key.
 /// \param message The signed bytes.
 /// \param sig The signature, exactly `key.modulus_bytes()` long.
-/// \param salt_length The salt length the signer used, in bytes (PS256: 32).
+/// \param salt_length The salt length the signer used, in bytes (PS256 and TLS: 32).
 /// \return Success, `errc::invalid_length` for a salt length the modulus cannot hold, or `errc::invalid_signature`.
 [[nodiscard]] constexpr result<void, errc> verify_pss_sha256(const public_key& key, std::span<const std::uint8_t> message,
                                                              std::span<const std::uint8_t> sig,
@@ -417,6 +458,124 @@ constexpr void mgf1_sha256_xor(std::span<const std::uint8_t, 32> seed, std::span
 {
     const auto h = crypto::detail::sha256::hash(message);
     return verify_pss_sha256_prehashed(key, h, sig, salt_length);
+}
+
+/// \brief Verifies an RSASSA-PKCS1-v1_5 signature over a SHA-384 hash (RFC 8017 section 8.2.2). Variable time; public
+/// data only.
+/// \ingroup rsa
+/// \param key The signer's public key.
+/// \param hash The SHA-384 of the message.
+/// \param sig The signature, exactly `key.modulus_bytes()` long.
+/// \return Success, or `errc::invalid_signature`.
+[[nodiscard]] constexpr result<void, errc> verify_pkcs1v15_sha384_prehashed(const public_key& key,
+                                                                            std::span<const std::uint8_t, 48> hash,
+                                                                            std::span<const std::uint8_t> sig) noexcept
+{
+    return detail::verify_pkcs1v15<detail::with_sha384>(key, hash, sig);
+}
+
+/// \brief Verifies an RSASSA-PKCS1-v1_5 signature with SHA-384 over a message: JOSE's RS384, TLS's rsa_pkcs1_sha384.
+/// Variable time; public data only.
+/// \ingroup rsa
+/// \param key The signer's public key.
+/// \param message The signed bytes (for a JWS, the ASCII of `header.payload`).
+/// \param sig The signature, exactly `key.modulus_bytes()` long.
+/// \return Success, or `errc::invalid_signature`.
+[[nodiscard]] constexpr result<void, errc> verify_pkcs1v15_sha384(const public_key& key, std::span<const std::uint8_t> message,
+                                                                  std::span<const std::uint8_t> sig) noexcept
+{
+    const auto h = crypto::detail::sha384::hash(message);
+    return verify_pkcs1v15_sha384_prehashed(key, h, sig);
+}
+
+/// \brief Verifies an RSASSA-PSS signature over a SHA-384 hash, with MGF1-SHA-384 (RFC 8017 sections 8.1.2 and
+/// 9.1.2). Variable time; public data only.
+/// \ingroup rsa
+/// \param key The signer's public key.
+/// \param hash The SHA-384 of the message.
+/// \param sig The signature, exactly `key.modulus_bytes()` long.
+/// \param salt_length The salt length the signer used, in bytes (PS384 and TLS: 48, the hash's length).
+/// \return Success, `errc::invalid_length` for a salt length the modulus cannot hold, or `errc::invalid_signature`.
+[[nodiscard]] constexpr result<void, errc> verify_pss_sha384_prehashed(const public_key& key, std::span<const std::uint8_t, 48> hash,
+                                                                       std::span<const std::uint8_t> sig,
+                                                                       std::size_t salt_length = 48) noexcept
+{
+    return detail::verify_pss<crypto::detail::sha384>(key, hash, sig, salt_length);
+}
+
+/// \brief Verifies an RSASSA-PSS signature with SHA-384 and MGF1-SHA-384 over a message: JOSE's PS384 and TLS's
+/// rsa_pss_rsae_sha384 (salt length 48). Variable time; public data only.
+/// \ingroup rsa
+/// \param key The signer's public key.
+/// \param message The signed bytes.
+/// \param sig The signature, exactly `key.modulus_bytes()` long.
+/// \param salt_length The salt length the signer used, in bytes (PS384 and TLS: 48).
+/// \return Success, `errc::invalid_length` for a salt length the modulus cannot hold, or `errc::invalid_signature`.
+[[nodiscard]] constexpr result<void, errc> verify_pss_sha384(const public_key& key, std::span<const std::uint8_t> message,
+                                                             std::span<const std::uint8_t> sig,
+                                                             std::size_t salt_length = 48) noexcept
+{
+    const auto h = crypto::detail::sha384::hash(message);
+    return verify_pss_sha384_prehashed(key, h, sig, salt_length);
+}
+
+/// \brief Verifies an RSASSA-PKCS1-v1_5 signature over a SHA-512 hash (RFC 8017 section 8.2.2). Variable time; public
+/// data only.
+/// \ingroup rsa
+/// \param key The signer's public key.
+/// \param hash The SHA-512 of the message.
+/// \param sig The signature, exactly `key.modulus_bytes()` long.
+/// \return Success, or `errc::invalid_signature`.
+[[nodiscard]] constexpr result<void, errc> verify_pkcs1v15_sha512_prehashed(const public_key& key,
+                                                                            std::span<const std::uint8_t, 64> hash,
+                                                                            std::span<const std::uint8_t> sig) noexcept
+{
+    return detail::verify_pkcs1v15<detail::with_sha512>(key, hash, sig);
+}
+
+/// \brief Verifies an RSASSA-PKCS1-v1_5 signature with SHA-512 over a message: JOSE's RS512, TLS's rsa_pkcs1_sha512.
+/// Variable time; public data only.
+/// \ingroup rsa
+/// \param key The signer's public key.
+/// \param message The signed bytes (for a JWS, the ASCII of `header.payload`).
+/// \param sig The signature, exactly `key.modulus_bytes()` long.
+/// \return Success, or `errc::invalid_signature`.
+[[nodiscard]] constexpr result<void, errc> verify_pkcs1v15_sha512(const public_key& key, std::span<const std::uint8_t> message,
+                                                                  std::span<const std::uint8_t> sig) noexcept
+{
+    const auto h = crypto::detail::sha512::hash(message);
+    return verify_pkcs1v15_sha512_prehashed(key, h, sig);
+}
+
+/// \brief Verifies an RSASSA-PSS signature over a SHA-512 hash, with MGF1-SHA-512 (RFC 8017 sections 8.1.2 and
+/// 9.1.2). Variable time; public data only.
+/// \ingroup rsa
+/// \param key The signer's public key.
+/// \param hash The SHA-512 of the message.
+/// \param sig The signature, exactly `key.modulus_bytes()` long.
+/// \param salt_length The salt length the signer used, in bytes (PS512 and TLS: 64, the hash's length).
+/// \return Success, `errc::invalid_length` for a salt length the modulus cannot hold, or `errc::invalid_signature`.
+[[nodiscard]] constexpr result<void, errc> verify_pss_sha512_prehashed(const public_key& key, std::span<const std::uint8_t, 64> hash,
+                                                                       std::span<const std::uint8_t> sig,
+                                                                       std::size_t salt_length = 64) noexcept
+{
+    return detail::verify_pss<crypto::detail::sha512>(key, hash, sig, salt_length);
+}
+
+/// \brief Verifies an RSASSA-PSS signature with SHA-512 and MGF1-SHA-512 over a message: JOSE's PS512 and TLS's
+/// rsa_pss_rsae_sha512 (salt length 64). Variable time; public data only.
+/// \ingroup rsa
+/// \param key The signer's public key.
+/// \param message The signed bytes.
+/// \param sig The signature, exactly `key.modulus_bytes()` long.
+/// \param salt_length The salt length the signer used, in bytes (PS512 and TLS: 64).
+/// \return Success, `errc::invalid_length` for a salt length the modulus cannot hold, or `errc::invalid_signature`.
+[[nodiscard]] constexpr result<void, errc> verify_pss_sha512(const public_key& key, std::span<const std::uint8_t> message,
+                                                             std::span<const std::uint8_t> sig,
+                                                             std::size_t salt_length = 64) noexcept
+{
+    const auto h = crypto::detail::sha512::hash(message);
+    return verify_pss_sha512_prehashed(key, h, sig, salt_length);
 }
 
 } // namespace snicholls::crypto::rsa

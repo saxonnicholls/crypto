@@ -16,10 +16,10 @@ release at the root, every version under `/vX.Y.Z/`, the latest `main` under `/m
 |---|---|---|
 | shared | `constant_time.hpp`, `secret.hpp`, `error.hpp` | masks and selections, `ct::declassify`; `secret_bytes<N>` (wiped, move-only, `reveal()`); `errc` |
 | `secp256k1/` | `field`, `scalar`, `point`, `keys`, `rfc6979`, `ecdsa`, `schnorr` | keys and SEC1; ECDSA with RFC 6979, low-S and the recovery id; verification (high-S accepted or rejected); recovery and Ethereum's `ecrecover`; strict DER; BIP-340 |
-| `aead/` | `chacha20_poly1305`, `aes256_gcm`, `aes_key_wrap` | ChaCha20-Poly1305 (RFC 8439), XChaCha20-Poly1305 (random 24-byte nonces), AES-256-GCM (JWE's A256GCM; AES without tables) and AES-256 key wrap (RFC 3394, A256KW): constant time, constant-time tag checks, nothing released before the tag verifies |
+| `aead/` | `chacha20_poly1305`, `aes128_gcm`, `aes256_gcm`, `aes_key_wrap` | ChaCha20-Poly1305 (RFC 8439), XChaCha20-Poly1305 (random 24-byte nonces), AES-128-GCM and AES-256-GCM (TLS 1.3's AES_128_GCM and AES_256_GCM, JWE's A128GCM and A256GCM; AES without tables) and AES-256 key wrap (RFC 3394, A256KW): constant time, constant-time tag checks, nothing released before the tag verifies |
 | `p256/` | `field`, `scalar`, `point`, `ecdsa`, `ecdh` | P-256 (secp256r1): keys and SEC1, ECDSA with SHA-256 (ES256) with RFC 6979 nonces in constant time, verification, JOSE r \|\| s and DER; ECDH, refusing a point off the curve |
 | `jose/` | `ecdh_es` | JWE's key agreement: ECDH-ES and ECDH-ES+A*KW on X25519 (RFC 8037) and P-256, with JOSE's Concat KDF (RFC 7518 4.6, core's); with `aead/` a JWE recipient's whole cryptography (A256GCM, A256KW) |
-| `rsa/` | `rsa` | RSA signature verification only: RSASSA-PKCS1-v1_5 and PSS with SHA-256 (RS256, PS256), keys from JWK `n` / `e`, SubjectPublicKeyInfo or RSAPublicKey, 2048 to 4096 bits |
+| `rsa/` | `rsa` | RSA signature verification only: RSASSA-PKCS1-v1_5 and PSS with SHA-256, SHA-384 and SHA-512 (RS256 to RS512, PS256 to PS512, TLS's rsa_pkcs1_* and rsa_pss_rsae_*), keys from JWK `n` / `e`, SubjectPublicKeyInfo or RSAPublicKey, 2048 to 4096 bits |
 | `curve25519/` | `field`, `scalar`, `edwards`, `ed25519`, `x25519` | Ed25519 (RFC 8032, cofactorless verification with S < L) and X25519 (RFC 7748, refusing the all-zero secret) |
 | `bip39/` | `wordlist`, `mnemonic` | entropy to words and back, constant-time word lookup, the seed (PBKDF2-HMAC-SHA512) |
 | `hd/` | `path`, `bip32`, `slip10` | derivation paths and BIP-44/49/84/86; BIP-32 with xprv / xpub (tprv, yprv, zprv); SLIP-10 for Ed25519, hardened only |
@@ -55,6 +55,8 @@ All from the standards or their reference suites; each fixture records its sourc
 | Wycheproof `ecdsa_secp256r1_sha256` (DER), `_p1363`; RFC 6979 A.2.5 (P-256, SHA-256) | 484, 262; 2 | all as expected |
 | Wycheproof `ecdh_secp256r1_ecpoint_test.json`; RFC 7518 appendix C (ECDH-ES on P-256), RFC 8037 A.6 (X25519) | 355; 2 | all as expected (the one "acceptable" compressed point accepted; the 24 invalid points, invalid-curve attacks among them, refused) |
 | Wycheproof `rsa_signature_{2048,3072,4096}_sha256`, `rsa_pss_{2048,3072,4096}_sha256_mgf1_32`, `rsa_pss_2048_sha256_mgf1_0` | 776, 324, 103 | all as expected (3 "acceptable" DigestInfos without NULL refused, stated) |
+| Wycheproof `rsa_signature_{2048,3072,4096}_sha{384,512}`, `rsa_pss_{2048,4096}_sha384_mgf1_48`, `rsa_pss_4096_sha512_mgf1_{32,64}` | 1,562, 642 | all as expected ("acceptable" DigestInfos without NULL refused, stated) |
+| Wycheproof `aes_gcm_test.json` (AES-128, 128-bit tags); FIPS 197 C.1; the GCM specification's test cases 1 to 4 | 108; 5 | all as expected for 96-bit nonces |
 | Wycheproof `ed25519_test.json`, `x25519_test.json` | 210, 518 | all as expected (29 "acceptable" small-order keys accepted, stated) |
 | RFC 6979 A.2.5 (P-256 nonces), secp256k1 RFC 6979 signatures | 2 + 16 | pass |
 | RFC 8032 section 7.1, RFC 7748 sections 5.2 and 6.1 (1 and 1,000 iterations; 1,000,000 as a disabled test) | 5, 5 | pass |

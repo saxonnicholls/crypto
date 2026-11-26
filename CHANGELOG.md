@@ -15,6 +15,15 @@ independently audited.
 - Tests: RFC 7518 appendix C byte for byte (also as a `static_assert`), RFC 8037 A.6, all 355 Wycheproof
   `ecdh_secp256r1_ecpoint` cases; oracle fixtures of keys against OpenSSL and cryptography's ConcatKDFHash, and of
   whole JWEs made by jose and opened by cryptography, opened and remade here; the secret paths in the Valgrind check.
+- AES-128-GCM (`aead/aes128_gcm.hpp`): TLS 1.3's mandatory TLS_AES_128_GCM_SHA256 and JOSE's A128GCM. AES is now
+  one template over the key size (`detail::aes_cipher<16>` and `<32>`), so both share the same table-free,
+  constant-time code; AES-256-GCM is unchanged. Tests: FIPS 197 C.1 and the GCM specification's test cases 1 to 4
+  (also as `static_assert`s), every Wycheproof AES-128 case with a 96-bit nonce, oracle fixtures from OpenSSL and
+  Node's crypto, the secret path in the Valgrind check.
+- RSA verification with SHA-384 and SHA-512: `verify_pkcs1v15_sha384` / `_sha512` and `verify_pss_sha384` /
+  `_sha512` (MGF1 on the same hash, salt the hash's length by default), with prehashed forms: RS384, RS512, PS384,
+  PS512, X.509's sha384WithRSAEncryption and TLS's rsa_pss_rsae_sha384 / _sha512. PKCS#1 v1.5 and PSS are now
+  one implementation over the hash. Every Wycheproof case for 2048, 3072 and 4096 bits.
 - The README's "Future directions": key generation and key formats (PKCS#8, SPKI, PEM), and RSA signing.
 
 ## 0.4.1 (2026-11-24)

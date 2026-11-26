@@ -19,7 +19,8 @@
 #  The RFC 8032 mode reads the RFC's plain text (https://www.rfc-editor.org/rfc/rfc8032.txt) and writes
 #  tests/fixtures/rfc8032_ed25519.txt, since TEST 1024's message is too long to copy into a test by hand.
 #
-#  One function per source file, registered in CONVERTERS: to add a file, write its converter and register it.
+#  One function per source file, registered in CONVERTERS: to add a file, write its converter and register it. A
+#  second fixture from the same file is registered as "<file>#<tag>".
 #  Every fixture line is "tcId result field field ...", hex fields, "-" for an empty field; result is valid,
 #  invalid or acceptable, as Wycheproof gives it.
 #
@@ -69,13 +70,13 @@ def x25519(data):
     return ["private", "public", "shared"], lines
 
 
-def aead(data):
+def aead(data, key_bits=256):
     """chacha20_poly1305_test.json, xchacha20_poly1305_test.json, aes_gcm_test.json: one line per test, the nonce
-    first; groups with a key other than 256 bits or a tag other than 128 bits are left out (AES-128 and AES-192
-    are not in this library)."""
+    first; groups with a key other than key_bits or a tag other than 128 bits are left out (AES-192 is not in
+    this library)."""
     lines = []
     for g in data["testGroups"]:
-        if g["keySize"] != 256 or g["tagSize"] != 128:
+        if g["keySize"] != key_bits or g["tagSize"] != 128:
             continue
         for t in g["tests"]:
             lines.append("%d %s %s %s %s %s %s %s" % (t["tcId"], t["result"], field(t["iv"]), t["key"], field(t["aad"]),
@@ -128,15 +129,15 @@ def ecdsa_secp256k1(data):
     return ["msg", "sig (key lines: key - uncompressed_public_key)"], lines
 
 
-def rsa(data):
-    """rsa_signature_*_sha256_test.json and rsa_pss_*_sha256_mgf1_*_test.json: a "key" line per group (the key as
-    SPKI DER, as a bare PKCS#1 RSAPublicKey, and as n and e; and the PSS salt length, '-' for PKCS#1 v1.5), then
-    its tests."""
+def rsa(data, sha="SHA-256"):
+    """rsa_signature_*_sha{256,384,512}_test.json and rsa_pss_*_sha{256,384,512}_mgf1_*_test.json: a "key" line per
+    group (the key as SPKI DER, as a bare PKCS#1 RSAPublicKey, and as n and e; and the PSS salt length, '-' for
+    PKCS#1 v1.5), then its tests. Every group's hash, and PSS's MGF1 hash, must be sha."""
     lines = []
     for g in data["testGroups"]:
-        assert g["sha"] == "SHA-256", g["sha"]
+        assert g["sha"] == sha, g["sha"]
         if g["type"] == "RsassaPssVerify":
-            assert g["mgf"] == "MGF1" and g["mgfSha"] == "SHA-256"
+            assert g["mgf"] == "MGF1" and g["mgfSha"] == sha
             slen = str(g["sLen"])
         else:
             assert g["type"] == "RsassaPkcs1Verify", g["type"]
@@ -157,6 +158,7 @@ CONVERTERS = {
     "ed25519_test.json": ("ed25519.txt", ed25519),
     "x25519_test.json": ("x25519.txt", x25519),
     "aes_gcm_test.json": ("aes256_gcm.txt", aead),
+    "aes_gcm_test.json#128": ("aes128_gcm.txt", lambda d: aead(d, 128)),
     "aes_wrap_test.json": ("aes256_wrap.txt", key_wrap),
     "chacha20_poly1305_test.json": ("chacha20_poly1305.txt", aead),
     "xchacha20_poly1305_test.json": ("xchacha20_poly1305.txt", aead),
@@ -166,6 +168,16 @@ CONVERTERS = {
     "rsa_signature_2048_sha256_test.json": ("rsa_pkcs1_2048_sha256.txt", rsa),
     "rsa_signature_3072_sha256_test.json": ("rsa_pkcs1_3072_sha256.txt", rsa),
     "rsa_signature_4096_sha256_test.json": ("rsa_pkcs1_4096_sha256.txt", rsa),
+    "rsa_signature_2048_sha384_test.json": ("rsa_pkcs1_2048_sha384.txt", lambda d: rsa(d, "SHA-384")),
+    "rsa_signature_2048_sha512_test.json": ("rsa_pkcs1_2048_sha512.txt", lambda d: rsa(d, "SHA-512")),
+    "rsa_signature_3072_sha384_test.json": ("rsa_pkcs1_3072_sha384.txt", lambda d: rsa(d, "SHA-384")),
+    "rsa_signature_3072_sha512_test.json": ("rsa_pkcs1_3072_sha512.txt", lambda d: rsa(d, "SHA-512")),
+    "rsa_signature_4096_sha384_test.json": ("rsa_pkcs1_4096_sha384.txt", lambda d: rsa(d, "SHA-384")),
+    "rsa_signature_4096_sha512_test.json": ("rsa_pkcs1_4096_sha512.txt", lambda d: rsa(d, "SHA-512")),
+    "rsa_pss_2048_sha384_mgf1_48_test.json": ("rsa_pss_2048_sha384_mgf1_48.txt", lambda d: rsa(d, "SHA-384")),
+    "rsa_pss_4096_sha384_mgf1_48_test.json": ("rsa_pss_4096_sha384_mgf1_48.txt", lambda d: rsa(d, "SHA-384")),
+    "rsa_pss_4096_sha512_mgf1_32_test.json": ("rsa_pss_4096_sha512_mgf1_32.txt", lambda d: rsa(d, "SHA-512")),
+    "rsa_pss_4096_sha512_mgf1_64_test.json": ("rsa_pss_4096_sha512_mgf1_64.txt", lambda d: rsa(d, "SHA-512")),
     "rsa_pss_2048_sha256_mgf1_0_test.json": ("rsa_pss_2048_sha256_mgf1_0.txt", rsa),
     "rsa_pss_2048_sha256_mgf1_32_test.json": ("rsa_pss_2048_sha256_mgf1_32.txt", rsa),
     "rsa_pss_3072_sha256_mgf1_32_test.json": ("rsa_pss_3072_sha256_mgf1_32.txt", rsa),
@@ -241,6 +253,7 @@ def main():
 
     stale = []
     for source, (target, convert) in sorted(CONVERTERS.items()):
+        source = source.split("#")[0]
         path = os.path.join(args.source, source)
         if not os.path.exists(path):
             print("skip %s (not in %s)" % (source, args.source))

@@ -7,6 +7,8 @@ add_executable(snicholls_crypto_tests
     secret_test.cpp
     version_test.cpp
     address/base58_test.cpp
+    aead/aes128_gcm_test.cpp
+    aead/aes128_gcm_oracles_test.cpp
     aead/aes256_gcm_test.cpp
     aead/aes256_gcm_oracles_test.cpp
     aead/aes_key_wrap_test.cpp

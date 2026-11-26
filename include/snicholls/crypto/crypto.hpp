@@ -27,7 +27,7 @@
 
 /// \defgroup aead Authenticated encryption
 /// \ingroup crypto
-/// \brief ChaCha20-Poly1305 (RFC 8439), XChaCha20-Poly1305, AES-256-GCM and AES-256 key wrap (RFC 3394).
+/// \brief ChaCha20-Poly1305 (RFC 8439), XChaCha20-Poly1305, AES-128-GCM, AES-256-GCM and AES-256 key wrap (RFC 3394).
 
 /// \defgroup p256 P-256
 /// \ingroup crypto
@@ -53,6 +53,7 @@
 #include <snicholls/crypto/secret.hpp>
 #include <snicholls/crypto/version.hpp>
 #include <snicholls/crypto/address/base58.hpp>
+#include <snicholls/crypto/aead/aes128_gcm.hpp>
 #include <snicholls/crypto/aead/aes256_gcm.hpp>
 #include <snicholls/crypto/aead/aes_key_wrap.hpp>
 #include <snicholls/crypto/aead/chacha20_poly1305.hpp>
