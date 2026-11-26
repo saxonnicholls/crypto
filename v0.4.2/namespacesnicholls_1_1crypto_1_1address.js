@@ -1,0 +1,36 @@
+var namespacesnicholls_1_1crypto_1_1address =
+[
+    [ "base58_alphabet", "structsnicholls_1_1crypto_1_1address_1_1base58__alphabet.html", "structsnicholls_1_1crypto_1_1address_1_1base58__alphabet" ],
+    [ "bech32_decoded", "structsnicholls_1_1crypto_1_1address_1_1bech32__decoded.html", "structsnicholls_1_1crypto_1_1address_1_1bech32__decoded" ],
+    [ "witness_program", "structsnicholls_1_1crypto_1_1address_1_1witness__program.html", "structsnicholls_1_1crypto_1_1address_1_1witness__program" ],
+    [ "base58_text", "group__address.html#ga3a75710be57e5aa3b5646c968b769f9c", null ],
+    [ "base58check_text", "group__address.html#ga29b8ad91307f2ecab0384dac7c6c2d1b", null ],
+    [ "bech32_text", "group__address.html#ga54040fd734211346aeae7c79d2a7befd", null ],
+    [ "bech32_variant", "group__address.html#ga7c7b0c7d93e1cf9825efa191b1e8d08b", [
+      [ "bech32", "group__address.html#gga7c7b0c7d93e1cf9825efa191b1e8d08ba111288825d21cc419a32b306ff7d254a", null ],
+      [ "bech32m", "group__address.html#gga7c7b0c7d93e1cf9825efa191b1e8d08ba5b4831184576802a5e2789c86c8401dc", null ]
+    ] ],
+    [ "base58_decode", "namespacesnicholls_1_1crypto_1_1address.html#a5b2845daf076c873672456e2d5c07214", null ],
+    [ "base58_decode_to", "namespacesnicholls_1_1crypto_1_1address.html#af1fca5676b0fd983ead1b7be660ee39c", null ],
+    [ "base58_encode", "namespacesnicholls_1_1crypto_1_1address.html#a6ab5e3df10f2dc2949d43c844756d1b1", null ],
+    [ "base58_encode_to", "namespacesnicholls_1_1crypto_1_1address.html#a7ddbc6683d46a90710494af7e8d36324", null ],
+    [ "base58_encoded_capacity", "namespacesnicholls_1_1crypto_1_1address.html#a1e822d6344ac8418e18d68046b13ce35", null ],
+    [ "base58check_checksum", "namespacesnicholls_1_1crypto_1_1address.html#aa0dd7ee49b5e857252908de9201ff6be", null ],
+    [ "base58check_decode", "namespacesnicholls_1_1crypto_1_1address.html#a4901622a74adc02dfe61c35360273ba8", null ],
+    [ "base58check_decode_exact", "namespacesnicholls_1_1crypto_1_1address.html#a7c565165feeec998f98593a18b4ed158", null ],
+    [ "base58check_encode", "namespacesnicholls_1_1crypto_1_1address.html#ae2a4109fc0607ca17536473cff562688", null ],
+    [ "base58check_encode_exact", "namespacesnicholls_1_1crypto_1_1address.html#a32cedd73d56c36e304a7091b5a4bf49f", null ],
+    [ "bech32_decode", "namespacesnicholls_1_1crypto_1_1address.html#acc84effe1b0d619f2c390ff956a8f6b6", null ],
+    [ "bech32_encode", "namespacesnicholls_1_1crypto_1_1address.html#abe04e33012333960a1a0e9fefe8d59b8", null ],
+    [ "bech32_polymod", "namespacesnicholls_1_1crypto_1_1address.html#a7112512270bf54ef3507b31e78c188d9", null ],
+    [ "convert_bits", "namespacesnicholls_1_1crypto_1_1address.html#a5e8f8821276b6c9a93feb49f3bd52ae0", null ],
+    [ "make_base58_alphabet", "namespacesnicholls_1_1crypto_1_1address.html#a19c7edd351b2d935af8d5635859a44bf", null ],
+    [ "segwit_decode", "namespacesnicholls_1_1crypto_1_1address.html#aab75e5929f37f365585c37e62f0c1f1a", null ],
+    [ "segwit_encode", "namespacesnicholls_1_1crypto_1_1address.html#a044bc5d74d921e62f43ae6033f3ccc0f", null ],
+    [ "base58_default_max_bytes", "namespacesnicholls_1_1crypto_1_1address.html#ab63950bb4c5131749985044bd290467d", null ],
+    [ "bech32_charset", "namespacesnicholls_1_1crypto_1_1address.html#a17fe740990fbad494167aded3b65bc47", null ],
+    [ "bech32_max_length", "namespacesnicholls_1_1crypto_1_1address.html#a999b7c45c24e4f63b74e2d440758eece", null ],
+    [ "bitcoin_base58", "namespacesnicholls_1_1crypto_1_1address.html#a095627a05ae9735e5c9e6e70c2dca30b", null ],
+    [ "flickr_base58", "namespacesnicholls_1_1crypto_1_1address.html#a964b13c1e6cdfa72f40502f355225571", null ],
+    [ "xrpl_base58", "namespacesnicholls_1_1crypto_1_1address.html#a95acf08c795b98ab31994bf6bfcb37a8", null ]
+];
