@@ -162,7 +162,8 @@ Not in this library yet, each waiting on a user that needs it:
 
 - **Key generation and key formats.** Keys are taken, never made: an X25519 or P-256 ephemeral key for a JWE, a
   signing key, a CEK come from the caller's system random source. Generating them here needs a source of
-  randomness in the family (core is the place for it, with a test seam), and exchanging them needs PKCS#8
+  randomness in the family, reached through a seam the tests can replace (an operating-system call, so not core's,
+  whose rule is no I/O; where it lives is the owner's decision), and exchanging them needs PKCS#8
   (`PrivateKeyInfo`) and SubjectPublicKeyInfo for EC and OKP keys, in DER and PEM; PEM needs base64, which core does
   not have yet. Parsing would follow rule 8 (strict DER, no repair); serialising a private key would be constant
   time and wipe its buffers.
