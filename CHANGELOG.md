@@ -2,8 +2,12 @@
 
 ## 0.5.0 (2026-11-24)
 
-JWE's key agreement. Pins snicholls-core at v0.23.1 and requires it (the Concat KDF). Experimental and not
-independently audited.
+JWE's key agreement, AES-128-GCM and RSA with SHA-384 and SHA-512. Pins snicholls-core at v0.24.1 (requires
+0.23.1, the Concat KDF) and tooling at v0.3.1. Experimental and not independently audited.
+
+- Tooling v0.3.1's one-version rules: the version header's two-versions check before its guard (checked by
+  `check_version.py`), and `check_pins` (one version of each library, each pinned where it is used) in `make
+  check`, CI and the CTest `check.pins`.
 
 - ECDH on P-256 (`p256/ecdh.hpp`): `shared_secret(private_key, public_key)`, the x-coordinate of d Q, constant time
   in the key; the peer's point is checked to be on the curve again before it is multiplied, so a `public_key` built
