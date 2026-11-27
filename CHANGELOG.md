@@ -1,9 +1,10 @@
 # Changelog
 
-## 0.5.0 (unreleased)
+## 0.5.0 (2026-11-27)
 
-JWE's key agreement, AES-128-GCM, RSA with SHA-384 and SHA-512, and P-384. Requires snicholls-core 0.23.1 or later
-(the Concat KDF); pinned at v0.28.0, tooling at v0.3.2. Experimental and not independently audited.
+JWE's key agreement, AES-128-GCM, RSA with SHA-384 and SHA-512, P-384, and an experimental RSA signer. Requires
+snicholls-core 0.23.1 or later (the Concat KDF); pinned at v0.28.0, tooling at v0.3.2. Experimental and not
+independently audited.
 
 - RSA signing, experimental (`rsa/sign.hpp`): `rsa::private_key` (from a JWK's components, a PKCS#1
   RSAPrivateKey or an unencrypted PKCS#8 PrivateKeyInfo; 2048 to 4096 bits) and `sign_pkcs1v15_sha256` / `_sha384`
