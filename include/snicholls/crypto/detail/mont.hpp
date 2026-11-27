@@ -9,7 +9,9 @@
 //  fully reduced, below m, as a R mod m.
 //
 //  Constant time throughout: every loop has a fixed trip count, the final subtraction of each operation is selected
-//  by a mask, never a branch, and the exponentiations take a public exponent (Fermat's inverse, the square root).
+//  by a mask, never a branch, and mont_pow takes a public exponent (Fermat's inverse, the square root). For RSA's
+//  private operation, where the modulus (a prime factor) and the exponent are secret, make_mont_ct computes the
+//  constants without a branch on the modulus and mont_pow_ct is a fixed 4-bit window whose table is scanned whole.
 //  constexpr throughout; the 64 x 64 -> 128 multiply is core's.
 //
 
@@ -19,6 +21,7 @@
 #include <snicholls/core/detail/wide_mul.hpp>
 #include <snicholls/crypto/constant_time.hpp>
 #include <snicholls/crypto/detail/limbs.hpp>
+#include <snicholls/crypto/secret.hpp>
 
 #include <array>
 #include <cstddef>
@@ -226,6 +229,56 @@ constexpr limbs_n<N> mont_from(const limbs_n<N>& a, const mont_params<N>& p) noe
     limbs_n<N> one{};
     one[0] = 1;
     return mont_mul<N>(a, one, p);
+}
+
+// The constants of a secret odd modulus (an RSA prime): as make_mont, each doubling reduced by a masked subtraction
+template <std::size_t N>
+constexpr mont_params<N> make_mont_ct(const limbs_n<N>& m) noexcept
+{
+    mont_params<N> p;
+    p.m = m;
+    std::uint64_t inv = 1;
+    for (int i = 0; i < 6; ++i)
+        inv *= 2 - m[0] * inv;
+    p.m0 = ~inv + 1;
+    limbs_n<N> x{};
+    x[0] = 1;
+    for (std::size_t i = 0; i < 128 * N; ++i) {   // x < m before each step, so 2 x < 2 m: one subtraction reduces it
+        const std::uint64_t top = x[N - 1] >> 63;
+        for (std::size_t j = N; j-- > 1;)
+            x[j] = (x[j] << 1) | (x[j - 1] >> 63);
+        x[0] <<= 1;
+        x = mont_reduce_once<N>(x, top, m);
+        if (i == 64 * N - 1)   // the position is public
+            p.one = x;
+    }
+    p.r2 = x;
+    secure_wipe(x);
+    return p;
+}
+
+// a^e for a secret exponent e of 64 N bits (a in and out of Montgomery form): a fixed 4-bit window, four squarings and
+// one multiplication for every nibble whatever its value, the table entry read by a masked scan of all 16
+template <std::size_t N>
+constexpr limbs_n<N> mont_pow_ct(const limbs_n<N>& a, const limbs_n<N>& e, const mont_params<N>& p) noexcept
+{
+    std::array<limbs_n<N>, 16> table{};
+    table[0] = p.one;
+    for (std::size_t j = 1; j < 16; ++j)
+        table[j] = mont_mul<N>(table[j - 1], a, p);
+    limbs_n<N> r = p.one;
+    for (std::size_t i = 16 * N; i-- > 0;) {
+        for (int k = 0; k < 4; ++k)
+            r = mont_mul<N>(r, r, p);
+        const std::uint64_t nib = (e[i / 16] >> (4 * (i % 16))) & 0xf;
+        limbs_n<N> t{};
+        for (std::size_t j = 0; j < 16; ++j)
+            t = select_n<N>(ct::mask_equal(j, nib), table[j], t);
+        r = mont_mul<N>(r, t, p);
+        secure_wipe(t);
+    }
+    secure_wipe(table);
+    return r;
 }
 
 // a^e for a public exponent e (both in and out of Montgomery form as a is): square and multiply, every bit squared

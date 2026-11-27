@@ -80,6 +80,7 @@
 #include <snicholls/crypto/p384/ecdh.hpp>
 #include <snicholls/crypto/p384/ecdsa.hpp>
 #include <snicholls/crypto/rsa/rsa.hpp>
+#include <snicholls/crypto/rsa/sign.hpp>
 #include <snicholls/crypto/secp256k1/ecdsa.hpp>
 #include <snicholls/crypto/secp256k1/field.hpp>
 #include <snicholls/crypto/secp256k1/keys.hpp>

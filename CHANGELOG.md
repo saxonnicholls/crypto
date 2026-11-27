@@ -5,6 +5,15 @@
 JWE's key agreement, AES-128-GCM, RSA with SHA-384 and SHA-512, and P-384. Requires snicholls-core 0.23.1 or later
 (the Concat KDF); pinned at v0.28.0, tooling at v0.3.2. Experimental and not independently audited.
 
+- RSA signing, experimental (`rsa/sign.hpp`): `rsa::private_key` (from a JWK's components, a PKCS#1
+  RSAPrivateKey or an unencrypted PKCS#8 PrivateKeyInfo; 2048 to 4096 bits) and `sign_pkcs1v15_sha256` / `_sha384`
+  / `_sha512` with prehashed forms (RS256, RS384, RS512). CRT with the primes' Montgomery constants computed in
+  constant time (`make_mont_ct`) and a fixed 4-bit-window exponentiation (`mont_pow_ct`), on the Montgomery
+  arithmetic P-256 and P-384 use. Every key is checked and proved by a signature when it is read; every signature
+  is verified with the public key before it is released (`errc::signing_fault`), against CRT fault attacks. All 77
+  Wycheproof `rsa_pkcs1_*_sig_gen` cases byte for byte. Not the family's production signer, which is the OpenSSL
+  one above this library; no PSS signing and no blinding yet.
+
 P-384 is for TLS 1.3's secp384r1 and ecdsa_secp384r1_sha384, X.509's ecdsa-with-SHA384 and JOSE's ES384.
 
 - P-384 (`p384/`): `field`, `scalar`, `point`, `ecdsa` (keys, SEC1, verification over SHA-384 with

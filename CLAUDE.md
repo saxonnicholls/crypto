@@ -84,7 +84,7 @@ Valgrind secret-marking check and the timing test) and its limits are in README.
   `scalar`, `point`, `keys`, `rfc6979`, `ecdsa`, `schnorr`; `snicholls::crypto::secp256k1`), `curve25519/` (`field`,
   `scalar`, `edwards` in `snicholls::crypto::curve25519`; `ed25519`, `x25519` in `snicholls::crypto::ed25519` and
   `snicholls::crypto::x25519`), `bip39/` (`wordlist`, `mnemonic`; `snicholls::crypto::bip39`), `hd/` (`path`,
-  `bip32`, `slip10`; `snicholls::crypto::hd`), `rsa/` (`rsa`, verification only; `snicholls::crypto::rsa`), `p256/` (`field`, `scalar`, `point`,
+  `bip32`, `slip10`; `snicholls::crypto::hd`), `rsa/` (`rsa`, verification; `sign`, experimental signing; `snicholls::crypto::rsa`), `p256/` (`field`, `scalar`, `point`,
   `ecdsa`, `ecdh`; `snicholls::crypto::p256`), `p384/` (`field`, `scalar`, `point`, `ecdsa` verification only,
   `ecdh`; `snicholls::crypto::p384`; the NIST curves share `detail/mont.hpp`, `detail/mont_residue.hpp` and
   `detail/weierstrass_a3.hpp`), `jose/` (`ecdh_es`; `snicholls::crypto::jose`), `aead/` (`chacha20_poly1305`, `aes128_gcm`, `aes256_gcm`,

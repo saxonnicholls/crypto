@@ -152,6 +152,46 @@ def rsa(data, sha="SHA-256"):
     return ["msg", "sig (key lines: key - spki_der rsapublickey_der n e salt_length)"], lines
 
 
+def der_items(b):
+    """The (tag, contents) pairs of a DER byte string, definite lengths only."""
+    out, i = [], 0
+    while i < len(b):
+        tag, n, i = b[i], b[i + 1], i + 2
+        if n & 0x80:
+            k = n & 0x7f
+            n, i = int.from_bytes(b[i:i + k], "big"), i + k
+        out.append((tag, b[i:i + n]))
+        i += n
+    return out
+
+
+def rsa_sig_gen(data):
+    """rsa_pkcs1_*_sig_gen_test.json: the groups with SHA-256, SHA-384 or SHA-512 (SHA-1 and SHA-224 are not in
+    this library). A "key" line per group: the PKCS#8 PrivateKeyInfo, then n, e, p, q, dP, dQ and qInv read out of
+    it as minimal big-endian numbers (a JWK's fields), and the hash; then its tests."""
+    lines = []
+    for g in data["testGroups"]:
+        if g["sha"] not in ("SHA-256", "SHA-384", "SHA-512"):
+            continue
+        assert g["type"] == "RsassaPkcs1Generate", g["type"]
+        pkcs8 = bytes.fromhex(g["privateKeyPkcs8"])
+        (_, outer), = der_items(pkcs8)
+        (_, version), (_, alg), (_, octets) = der_items(outer)
+        (_, inner), = der_items(octets)
+        ints = [int.from_bytes(v, "big") for _, v in der_items(inner)]
+        assert version == b"\x00" and len(ints) == 9 and ints[0] == 0
+        n, e, d, p, q, dp, dq, qinv = ints[1:]
+        assert p * q == n and n == int(g["privateKey"]["modulus"], 16)
+
+        def hx(v):
+            return "%x" % v if len("%x" % v) % 2 == 0 else "0%x" % v
+        lines.append("key - %s %s %s %s %s %s %s %s %s" % (g["privateKeyPkcs8"], hx(n), hx(e), hx(p), hx(q), hx(dp), hx(dq),
+                                                          hx(qinv), g["sha"]))
+        for t in g["tests"]:
+            lines.append("%d %s %s %s" % (t["tcId"], t["result"], field(t["msg"]), field(t["sig"])))
+    return ["msg", "sig (key lines: key - pkcs8_der n e p q dp dq qinv hash)"], lines
+
+
 CONVERTERS = {
     "ecdsa_secp256k1_sha256_bitcoin_test.json": ("ecdsa_secp256k1_sha256_bitcoin.txt", ecdsa_secp256k1),
     "ecdsa_secp256k1_sha256_p1363_test.json": ("ecdsa_secp256k1_sha256_p1363.txt", ecdsa_secp256k1),
@@ -182,6 +222,9 @@ CONVERTERS = {
     "rsa_pss_4096_sha384_mgf1_48_test.json": ("rsa_pss_4096_sha384_mgf1_48.txt", lambda d: rsa(d, "SHA-384")),
     "rsa_pss_4096_sha512_mgf1_32_test.json": ("rsa_pss_4096_sha512_mgf1_32.txt", lambda d: rsa(d, "SHA-512")),
     "rsa_pss_4096_sha512_mgf1_64_test.json": ("rsa_pss_4096_sha512_mgf1_64.txt", lambda d: rsa(d, "SHA-512")),
+    "rsa_pkcs1_2048_sig_gen_test.json": ("rsa_pkcs1_2048_sig_gen.txt", rsa_sig_gen),
+    "rsa_pkcs1_3072_sig_gen_test.json": ("rsa_pkcs1_3072_sig_gen.txt", rsa_sig_gen),
+    "rsa_pkcs1_4096_sig_gen_test.json": ("rsa_pkcs1_4096_sig_gen.txt", rsa_sig_gen),
     "rsa_pss_2048_sha256_mgf1_0_test.json": ("rsa_pss_2048_sha256_mgf1_0.txt", rsa),
     "rsa_pss_2048_sha256_mgf1_32_test.json": ("rsa_pss_2048_sha256_mgf1_32.txt", rsa),
     "rsa_pss_3072_sha256_mgf1_32_test.json": ("rsa_pss_3072_sha256_mgf1_32.txt", rsa),

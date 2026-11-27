@@ -59,6 +59,7 @@ add_executable(snicholls_crypto_tests
     p384/point_test.cpp
     p384/scalar_test.cpp
     rsa/rsa_test.cpp
+    rsa/sign_test.cpp
     rsa/rsa_oracles_test.cpp
     secp256k1/ecdsa_test.cpp
     secp256k1/ecdsa_oracles_test.cpp

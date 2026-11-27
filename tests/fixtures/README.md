@@ -24,6 +24,9 @@ Project Wycheproof, <https://github.com/C2SP/wycheproof>, licensed under the Apa
 | `wycheproof/ecdsa_p256_sha256.txt` | `ecdsa_secp256r1_sha256_test.json (DER)` | `182db4f3e230f6f9fa9f800d2a614dede30284b8e8438bbfe1171905402e9332` | 484 |
 | `wycheproof/ecdsa_p256_sha256_p1363.txt` | `ecdsa_secp256r1_sha256_p1363_test.json` | `c60de693930e386c3a5472d08081623ef8504decc54b38ac01ec6b2a2575c986` | 262 |
 | `wycheproof/ecdh_p256.txt` | `ecdh_secp256r1_ecpoint_test.json` (the private key as 32 bytes) | `648f16d077caf2400d02331ca51f44744c72c799830c8d0595d0b18b6dd9f886` | 355 |
+| `wycheproof/rsa_pkcs1_2048_sig_gen.txt` | `rsa_pkcs1_2048_sig_gen_test.json` (SHA-256, SHA-384, SHA-512 groups; published test private keys) | `587b3d27d3429f2118cb02818da4d08eb3f36f50c747939eb550fae4337ccbf0` | 27 |
+| `wycheproof/rsa_pkcs1_3072_sig_gen.txt` | `rsa_pkcs1_3072_sig_gen_test.json` (SHA-256, SHA-384, SHA-512 groups; published test private keys) | `45153219d486fd135d35aa968a957a0c015c7829e8dc59bea5f87e6c30912677` | 26 |
+| `wycheproof/rsa_pkcs1_4096_sig_gen.txt` | `rsa_pkcs1_4096_sig_gen_test.json` (SHA-256, SHA-384, SHA-512 groups; published test private keys) | `f13eadbec6c45291cb33e6b2fa0a0c2b862d0bd2eaec29f930d3b78067cd48c7` | 24 |
 | `wycheproof/ecdh_p384.txt` | `ecdh_secp384r1_ecpoint_test.json` (the private key as 48 bytes) | `ffa7835fe1de359dff762c8f1272b98acebd5578e2f855d969051ff956c6dca3` | 790 |
 | `wycheproof/ecdsa_p384_sha384.txt` | `ecdsa_secp384r1_sha384_test.json` (DER) | `8a5b3ae1760975143414811f13588c24d951d9d8c904195087ba327591dfe9cc` | 504 |
 | `wycheproof/ecdsa_p384_sha384_p1363.txt` | `ecdsa_secp384r1_sha384_p1363_test.json` | `e27344bf6daae75fa19663620883809f91c79fc4b4420eff9eae8036b34476be` | 280 |

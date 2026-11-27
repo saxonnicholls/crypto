@@ -20,7 +20,7 @@ release at the root, every version under `/vX.Y.Z/`, the latest `main` under `/m
 | `p256/` | `field`, `scalar`, `point`, `ecdsa`, `ecdh` | P-256 (secp256r1): keys and SEC1, ECDSA with SHA-256 (ES256) with RFC 6979 nonces in constant time, verification, JOSE r \|\| s and DER; ECDH, refusing a point off the curve |
 | `p384/` | `field`, `scalar`, `point`, `ecdsa`, `ecdh` | P-384 (secp384r1), on the same code as P-256 at six limbs: keys and SEC1, ECDSA verification with SHA-384 (ES384, TLS's ecdsa_secp384r1_sha384), JOSE r \|\| s and DER; ECDH (TLS's secp384r1), refusing a point off the curve; no signing |
 | `jose/` | `ecdh_es` | JWE's key agreement: ECDH-ES and ECDH-ES+A*KW on X25519 (RFC 8037) and P-256, with JOSE's Concat KDF (RFC 7518 4.6, core's); with `aead/` a JWE recipient's whole cryptography (A256GCM, A256KW) |
-| `rsa/` | `rsa` | RSA signature verification only: RSASSA-PKCS1-v1_5 and PSS with SHA-256, SHA-384 and SHA-512 (RS256 to RS512, PS256 to PS512, TLS's rsa_pkcs1_* and rsa_pss_rsae_*), keys from JWK `n` / `e`, SubjectPublicKeyInfo or RSAPublicKey, 2048 to 4096 bits |
+| `rsa/` | `rsa`, `sign` | RSA signing, experimental (`sign`: RSASSA-PKCS1-v1_5 with SHA-256/384/512, CRT in constant time, every signature verified before release, keys from PKCS#1, PKCS#8 or JWK components); and RSA signature verification (`rsa`): RSASSA-PKCS1-v1_5 and PSS with SHA-256, SHA-384 and SHA-512 (RS256 to RS512, PS256 to PS512, TLS's rsa_pkcs1_* and rsa_pss_rsae_*), keys from JWK `n` / `e`, SubjectPublicKeyInfo or RSAPublicKey, 2048 to 4096 bits |
 | `curve25519/` | `field`, `scalar`, `edwards`, `ed25519`, `x25519` | Ed25519 (RFC 8032, cofactorless verification with S < L) and X25519 (RFC 7748, refusing the all-zero secret) |
 | `bip39/` | `wordlist`, `mnemonic` | entropy to words and back, constant-time word lookup, the seed (PBKDF2-HMAC-SHA512) |
 | `hd/` | `path`, `bip32`, `slip10` | derivation paths and BIP-44/49/84/86; BIP-32 with xprv / xpub (tprv, yprv, zprv); SLIP-10 for Ed25519, hardened only |
@@ -58,6 +58,7 @@ All from the standards or their reference suites; each fixture records its sourc
 | Wycheproof `ecdh_secp256r1_ecpoint_test.json`; RFC 7518 appendix C (ECDH-ES on P-256), RFC 8037 A.6 (X25519) | 355; 2 | all as expected (the one "acceptable" compressed point accepted; the 24 invalid points, invalid-curve attacks among them, refused) |
 | Wycheproof `rsa_signature_{2048,3072,4096}_sha256`, `rsa_pss_{2048,3072,4096}_sha256_mgf1_32`, `rsa_pss_2048_sha256_mgf1_0` | 776, 324, 103 | all as expected (3 "acceptable" DigestInfos without NULL refused, stated) |
 | Wycheproof `rsa_signature_{2048,3072,4096}_sha{384,512}`, `rsa_pss_{2048,4096}_sha384_mgf1_48`, `rsa_pss_4096_sha512_mgf1_{32,64}` | 1,562, 642 | all as expected ("acceptable" DigestInfos without NULL refused, stated) |
+| Wycheproof `rsa_pkcs1_{2048,3072,4096}_sig_gen_test.json` (SHA-256, SHA-384, SHA-512) | 77 | every signature byte for byte, each key read from PKCS#8 and from its components (e = 3 keys included) |
 | Wycheproof `aes_gcm_test.json` (AES-128, 128-bit tags); FIPS 197 C.1; the GCM specification's test cases 1 to 4 | 108; 5 | all as expected for 96-bit nonces |
 | Wycheproof `ed25519_test.json`, `x25519_test.json` | 210, 518 | all as expected (29 "acceptable" small-order keys accepted, stated) |
 | RFC 6979 A.2.5 (P-256 nonces), secp256k1 RFC 6979 signatures | 2 + 16 | pass |
@@ -172,12 +173,10 @@ Not in this library yet, each waiting on a user that needs it:
   (`PrivateKeyInfo`) and SubjectPublicKeyInfo for EC and OKP keys, in DER and PEM; PEM needs base64, which core does
   not have yet. Parsing would follow rule 8 (strict DER, no repair); serialising a private key would be constant
   time and wipe its buffers.
-- **RSA signing (RS256, PS256).** RSA is verification only, and the library holds no RSA private key. Signing would
-  need a private exponentiation in constant time (CRT with blinding, a fixed-window ladder over Montgomery
-  multiplication on secret limbs), a fault check (verify each signature before releasing it, against the
-  Bellcore attack on CRT), constant-time PKCS#1 v1.5 and PSS encoding, and strict PKCS#1 / PKCS#8 private-key
-  parsing; it would also end the "no RSA private key" property the threat model relies on. It is worth doing only
-  for a provider that requires an RS256 client assertion and offers nothing else (ES256 or EdDSA cover the rest).
+- **RSA-PSS signing, and blinding.** RSASSA-PKCS1-v1_5 signing is here (`rsa/sign.hpp`, experimental; the
+  family's production RSA signer is the OpenSSL one above this library). PSS signing needs a random salt, so it
+  waits for the random source; base blinding (protection against power and electromagnetic analysis, which the
+  constant-time arithmetic does not need for timing) would take the same source.
 
 ## Building
 

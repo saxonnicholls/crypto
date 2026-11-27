@@ -16,7 +16,7 @@ static_assert(noexcept(snicholls::crypto::to_string(errc::high_s)));
 
 TEST(CryptoError, EveryValueHasItsOwnName)
 {
-    for (int v = 1; v <= static_cast<int>(errc::authentication_failed); ++v) {
+    for (int v = 1; v <= static_cast<int>(errc::signing_fault); ++v) {
         const auto name = snicholls::crypto::to_string(static_cast<errc>(v));
         EXPECT_NE(name, "unknown") << v;
         for (int w = 1; w < v; ++w)
