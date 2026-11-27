@@ -1,6 +1,4 @@
 var searchData=
 [
-  ['base58_5ftext_0',['base58_text',['../group__address.html#ga3a75710be57e5aa3b5646c968b769f9c',1,'snicholls::crypto::address']]],
-  ['base58check_5ftext_1',['base58check_text',['../group__address.html#ga29b8ad91307f2ecab0384dac7c6c2d1b',1,'snicholls::crypto::address']]],
-  ['bech32_5ftext_2',['bech32_text',['../group__address.html#ga54040fd734211346aeae7c79d2a7befd',1,'snicholls::crypto::address']]]
+  ['affine_5fpoint_0',['affine_point',['../group__p256.html#ga3575f22019e96a47f474a188d062bd83',1,'snicholls::crypto::p256::affine_point'],['../group__p384.html#gacf89cc445744d4abd02b552b76c034f3',1,'snicholls::crypto::p384::affine_point']]]
 ];

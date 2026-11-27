@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['performance_0',['Performance',['../index.html#autotoc_md4',1,'']]]
+  ['implementations_0',['Testing against other implementations',['../index.html#autotoc_md2',1,'']]]
 ];

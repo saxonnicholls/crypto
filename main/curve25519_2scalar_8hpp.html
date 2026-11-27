@@ -26,7 +26,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">snicholls-crypto<span id="projectnumber">&#160;0.4.2</span>
+   <div id="projectname">snicholls-crypto<span id="projectnumber">&#160;0.5.0</span>
    </div>
    <div id="projectbrief">Elliptic curves, signatures and wallet key derivation for the snicholls libraries</div>
   </td>
@@ -163,8 +163,8 @@ Namespaces</h2></td></tr>
 <div class="fragment"><div class="line">    <span class="keyword">using </span><a class="code hl_class" href="classsnicholls_1_1crypto_1_1curve25519_1_1scalar.html">snicholls::crypto::curve25519::scalar</a>;</div>
 <div class="line">    std::array&lt;std::uint8_t, 64&gt; digest{};</div>
 <div class="line">    digest.fill(0xff);                                                   <span class="comment">// a 64-byte hash, as SHA-512 gives</span></div>
-<div class="line">    <span class="keyword">const</span> scalar h = scalar::reduce(digest);                             <span class="comment">// reduced modulo L</span></div>
-<div class="line">    <span class="keyword">const</span> scalar s = scalar::mul_add(scalar::from_u64(6), scalar::from_u64(7), scalar::from_u64(8));   <span class="comment">// 6 * 7 + 8</span></div>
+<div class="line">    <span class="keyword">const</span> <a class="code hl_typedef" href="group__p256.html#ga2b5a51a3a2e130dca376bd58ce0f8a12">scalar</a> h = scalar::reduce(digest);                             <span class="comment">// reduced modulo L</span></div>
+<div class="line">    <span class="keyword">const</span> <a class="code hl_typedef" href="group__p256.html#ga2b5a51a3a2e130dca376bd58ce0f8a12">scalar</a> s = scalar::mul_add(scalar::from_u64(6), scalar::from_u64(7), scalar::from_u64(8));   <span class="comment">// 6 * 7 + 8</span></div>
 <div class="line">    <span class="keyword">const</span> <span class="keyword">auto</span> order = snicholls::crypto::test::hex&lt;32&gt;(<span class="stringliteral">&quot;edd3f55c1a631258d69cf7a2def9de1400000000000000000000000000000010&quot;</span>);</div>
 <div class="line">    <span class="keyword">const</span> <span class="keywordtype">bool</span> l_is_canonical = scalar::is_canonical(order);             <span class="comment">// S = L would be malleable: refused</span></div>
 </div><!-- fragment --><dl class="section user"><dt>Performance</dt><dd></dd></dl>

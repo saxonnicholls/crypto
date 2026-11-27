@@ -1,21 +1,14 @@
 var searchData=
 [
-  ['ecdsa_2ehpp_0',['ecdsa.hpp',['../p256_2ecdsa_8hpp.html',1,'(Global Namespace)'],['../secp256k1_2ecdsa_8hpp.html',1,'(Global Namespace)']]],
-  ['ed25519_2ehpp_1',['ed25519.hpp',['../ed25519_8hpp.html',1,'']]],
-  ['edwards_2ehpp_2',['edwards.hpp',['../edwards_8hpp.html',1,'']]],
-  ['empty_3',['empty',['../classsnicholls_1_1crypto_1_1hd_1_1derivation__path.html#a8f145d75fec653d606f360026a59ef3a',1,'snicholls::crypto::hd::derivation_path']]],
-  ['encode_4',['encode',['../classsnicholls_1_1crypto_1_1curve25519_1_1point.html#a0c8801e7a1b9118883d277fadcfa43e8',1,'snicholls::crypto::curve25519::point']]],
-  ['encryption_5',['Authenticated encryption',['../group__aead.html',1,'']]],
-  ['english_6',['english',['../group__wallet.html#ga7fd555bb593d384913ca64911003b9b5',1,'snicholls::crypto::bip39']]],
-  ['english_5fpacked_7',['english_packed',['../group__wallet.html#gaff081db07fc5d8f0bba7a74dd362b192',1,'snicholls::crypto::bip39']]],
-  ['entropy_5fsize_8',['entropy_size',['../classsnicholls_1_1crypto_1_1bip39_1_1mnemonic.html#a352e92f983dec0be5b23f16a45bb85b7',1,'snicholls::crypto::bip39::mnemonic']]],
-  ['equal_9',['equal',['../namespacesnicholls_1_1crypto_1_1ct.html#a81d18f71e228601acc043ec3de1520eb',1,'snicholls::crypto::ct']]],
-  ['equal_5fmask_10',['equal_mask',['../classsnicholls_1_1crypto_1_1curve25519_1_1field__element.html#a2bad5532813b465cf89c5a0e83638e8c',1,'snicholls::crypto::curve25519::field_element']]],
-  ['errc_11',['errc',['../group__crypto.html#gaa314007c5b3658974966bfdaeb2c3625',1,'snicholls::crypto']]],
-  ['error_2ehpp_12',['error.hpp',['../error_8hpp.html',1,'']]],
-  ['ethereum_13',['ethereum',['../structsnicholls_1_1crypto_1_1secp256k1_1_1recoverable__signature.html#a8911e7379c7ecbd27b0a4e805b15a0fb',1,'snicholls::crypto::secp256k1::recoverable_signature::ethereum()'],['../namespacesnicholls_1_1crypto_1_1hd_1_1coin__type.html#a18da3adf1c131ac1561ebd1a3f0c4ef4',1,'snicholls::crypto::hd::coin_type::ethereum']]],
-  ['exponent_14',['exponent',['../classsnicholls_1_1crypto_1_1rsa_1_1public__key.html#ab02b4de8e01b65a12d11206b6db1a1bc',1,'snicholls::crypto::rsa::public_key']]],
-  ['extended_5fkey_5ftext_15',['extended_key_text',['../namespacesnicholls_1_1crypto_1_1hd.html#ac9690f351937084a2a798f1e574bfff6',1,'snicholls::crypto::hd']]],
-  ['extended_5fprivate_5fkey_16',['extended_private_key',['../classsnicholls_1_1crypto_1_1hd_1_1extended__private__key.html',1,'snicholls::crypto::hd::extended_private_key'],['../classsnicholls_1_1crypto_1_1hd_1_1extended__private__key.html#ae1f60f53eb74e885c56c57c9bb39d1c3',1,'snicholls::crypto::hd::extended_private_key::extended_private_key()']]],
-  ['extended_5fpublic_5fkey_17',['extended_public_key',['../structsnicholls_1_1crypto_1_1hd_1_1extended__public__key.html',1,'snicholls::crypto::hd']]]
+  ['d_0',['d',['../classsnicholls_1_1crypto_1_1curve25519_1_1point.html#a481636fd5cf0252c8645655405e1285b',1,'snicholls::crypto::curve25519::point']]],
+  ['dbl_1',['dbl',['../classsnicholls_1_1crypto_1_1curve25519_1_1point.html#a7eefeb98fde28cbf48b81f4c2bddbc6b',1,'snicholls::crypto::curve25519::point::dbl()'],['../classsnicholls_1_1crypto_1_1secp256k1_1_1point.html#a88288918e0f586ce980bc3bea85fe942',1,'snicholls::crypto::secp256k1::point::dbl()']]],
+  ['declassify_2',['declassify',['../namespacesnicholls_1_1crypto_1_1ct.html#a5117d2d4d242b342e5e47aa5b25f00c3',1,'snicholls::crypto::ct']]],
+  ['decode_3',['decode',['../classsnicholls_1_1crypto_1_1curve25519_1_1point.html#af6c69bbed2b219e849ad93dd668dc2cb',1,'snicholls::crypto::curve25519::point']]],
+  ['decompress_4',['decompress',['../namespacesnicholls_1_1crypto_1_1secp256k1.html#ae98c8203e3d1d2f3aaf4f8625cb44106',1,'snicholls::crypto::secp256k1']]],
+  ['depth_5',['depth',['../structsnicholls_1_1crypto_1_1hd_1_1extended__public__key.html#ac6c6f3a00486f24876df61859523c821',1,'snicholls::crypto::hd::extended_public_key::depth'],['../classsnicholls_1_1crypto_1_1hd_1_1extended__private__key.html#adaed022a937deb1285ead36af3defde6',1,'snicholls::crypto::hd::extended_private_key::depth()'],['../classsnicholls_1_1crypto_1_1hd_1_1slip10__ed25519__key.html#a7ba34116962637615f17fe3438b77b62',1,'snicholls::crypto::hd::slip10_ed25519_key::depth()']]],
+  ['der_6',['der',['../structsnicholls_1_1crypto_1_1p256_1_1signature.html#aadece60d46ba8dfd7de3e763ce2a34cc',1,'snicholls::crypto::p256::signature::der()'],['../structsnicholls_1_1crypto_1_1p384_1_1signature.html#abb925e4e19988ef96477e987ab317b74',1,'snicholls::crypto::p384::signature::der()'],['../structsnicholls_1_1crypto_1_1secp256k1_1_1signature.html#aa9e93274a207806626efc34b0f3f30d8',1,'snicholls::crypto::secp256k1::signature::der()']]],
+  ['derivation_5fpath_7',['derivation_path',['../classsnicholls_1_1crypto_1_1hd_1_1derivation__path.html',1,'snicholls::crypto::hd::derivation_path'],['../classsnicholls_1_1crypto_1_1hd_1_1derivation__path.html#af8a1656daf10c22b2b382b9175cf4732',1,'snicholls::crypto::hd::derivation_path::derivation_path()']]],
+  ['derive_8',['derive',['../structsnicholls_1_1crypto_1_1hd_1_1extended__public__key.html#a470bc70ab4fc1953a15187d8dd9d0a42',1,'snicholls::crypto::hd::extended_public_key::derive()'],['../classsnicholls_1_1crypto_1_1hd_1_1extended__private__key.html#a3caa3daec8a72ec2f410465147692084',1,'snicholls::crypto::hd::extended_private_key::derive()'],['../classsnicholls_1_1crypto_1_1hd_1_1slip10__ed25519__key.html#ab3d6eb815642f5cd66aad789f198eef2',1,'snicholls::crypto::hd::slip10_ed25519_key::derive()']]],
+  ['derive_5fchild_9',['derive_child',['../structsnicholls_1_1crypto_1_1hd_1_1extended__public__key.html#a9cf55d0b5f20171142b64262643ce43f',1,'snicholls::crypto::hd::extended_public_key::derive_child()'],['../classsnicholls_1_1crypto_1_1hd_1_1extended__private__key.html#a1f83d43b80eed2ef99e0f16ea5abce92',1,'snicholls::crypto::hd::extended_private_key::derive_child()'],['../classsnicholls_1_1crypto_1_1hd_1_1slip10__ed25519__key.html#a0a1abc9d254d764a3e684ab7cd77a202',1,'snicholls::crypto::hd::slip10_ed25519_key::derive_child()']]],
+  ['directions_10',['Future directions',['../index.html#autotoc_md5',1,'']]]
 ];

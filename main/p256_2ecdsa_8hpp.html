@@ -26,7 +26,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">snicholls-crypto<span id="projectnumber">&#160;0.4.2</span>
+   <div id="projectname">snicholls-crypto<span id="projectnumber">&#160;0.5.0</span>
    </div>
    <div id="projectbrief">Elliptic curves, signatures and wallet key derivation for the snicholls libraries</div>
   </td>
@@ -162,7 +162,7 @@ Functions</h2></td></tr>
 <li><span class="tt">private_key</span> (32 bytes, 1 to n - 1) and its <span class="tt">public_key</span> (SEC1 compressed or uncompressed).</li>
 <li><span class="tt">sign(key, hash)</span>: RFC 6979 deterministic nonces (HMAC-SHA256), the signature (r, s) as computed; s is not reduced to the lower half, as ES256 and FIPS 186-5 do not require it.</li>
 <li><span class="tt">verify(key, hash, signature)</span>: FIPS 186-5 / SEC 1 verification, either s accepted.</li>
-<li><span class="tt">signature::from_jose</span> / <span class="tt">jose()</span>: JWS's 64-byte r || s; <span class="tt">from_der</span> / <span class="tt">der()</span>: strict DER.</li>
+<li><span class="tt">signature::from_jose</span> / <span class="tt"><a class="el" href="group__jose.html" title="JWE&#39;s key agreement: ECDH-ES and ECDH-ES+A*KW on X25519 and P-256, with JOSE&#39;s Concat KDF (RFC 7518 4...">JOSE</a></span>: JWS's 64-byte r || s; <span class="tt">from_der</span> / <span class="tt">der()</span>: strict DER.</li>
 </ul>
 <p>The hash is the SHA-256 of the message, 32 bytes (for a JWS, of the ASCII <span class="tt">header.payload</span>); with P-256's 256-bit order it is used whole, reduced modulo n.</p>
 <dl class="section user"><dt>Relationships</dt><dd></dd></dl>

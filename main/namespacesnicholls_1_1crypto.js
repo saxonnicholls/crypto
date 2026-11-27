@@ -3,6 +3,8 @@ var namespacesnicholls_1_1crypto =
     [ "address", "namespacesnicholls_1_1crypto_1_1address.html", "namespacesnicholls_1_1crypto_1_1address" ],
     [ "aead", "namespacesnicholls_1_1crypto_1_1aead.html", [
       [ "tag", "namespacesnicholls_1_1crypto_1_1aead.html#a6416b3a47fa4d034458c765b733ea95e", null ],
+      [ "aes128_gcm_open", "group__aead.html#ga18ba805ad67ae04323c9be7c07fa4535", null ],
+      [ "aes128_gcm_seal", "group__aead.html#ga602cf4ff59535936244e32c46f0775d9", null ],
       [ "aes256_gcm_open", "group__aead.html#ga1e9d3283b937a14902df2c3d5676de2d", null ],
       [ "aes256_gcm_seal", "group__aead.html#ga96d9d4108a70983af8482e0bc2b0c7a5", null ],
       [ "aes256_key_unwrap", "group__aead.html#ga053c26421cb7244326a624a4ff1fe1f8", null ],
@@ -34,7 +36,13 @@ var namespacesnicholls_1_1crypto =
     [ "curve25519", "namespacesnicholls_1_1crypto_1_1curve25519.html", "namespacesnicholls_1_1crypto_1_1curve25519" ],
     [ "ed25519", "namespacesnicholls_1_1crypto_1_1ed25519.html", "namespacesnicholls_1_1crypto_1_1ed25519" ],
     [ "hd", "namespacesnicholls_1_1crypto_1_1hd.html", "namespacesnicholls_1_1crypto_1_1hd" ],
+    [ "jose", "namespacesnicholls_1_1crypto_1_1jose.html", [
+      [ "ecdh_es_kdf", "group__jose.html#ga5b5b56dfa51683c7c6f17dd26cfc62e8", null ],
+      [ "ecdh_es_p256", "group__jose.html#gad160acb0e81798a6a0b38a497577eeea", null ],
+      [ "ecdh_es_x25519", "group__jose.html#ga8e910b474d5123b0d0af2344d70adf68", null ]
+    ] ],
     [ "p256", "namespacesnicholls_1_1crypto_1_1p256.html", "namespacesnicholls_1_1crypto_1_1p256" ],
+    [ "p384", "namespacesnicholls_1_1crypto_1_1p384.html", "namespacesnicholls_1_1crypto_1_1p384" ],
     [ "rsa", "namespacesnicholls_1_1crypto_1_1rsa.html", "namespacesnicholls_1_1crypto_1_1rsa" ],
     [ "secp256k1", "namespacesnicholls_1_1crypto_1_1secp256k1.html", "namespacesnicholls_1_1crypto_1_1secp256k1" ],
     [ "x25519", "namespacesnicholls_1_1crypto_1_1x25519.html", "namespacesnicholls_1_1crypto_1_1x25519" ],
@@ -61,7 +69,8 @@ var namespacesnicholls_1_1crypto =
       [ "invalid_hrp", "group__crypto.html#ggaa314007c5b3658974966bfdaeb2c3625ac773270d518c9d9c0f2d98f3e59abcf9", null ],
       [ "invalid_witness_version", "group__crypto.html#ggaa314007c5b3658974966bfdaeb2c3625a3830eedc1ebf7207f10ac8239650001e", null ],
       [ "invalid_witness_program", "group__crypto.html#ggaa314007c5b3658974966bfdaeb2c3625ac20ddc41cc208191634e2ec6163e53cc", null ],
-      [ "authentication_failed", "group__crypto.html#ggaa314007c5b3658974966bfdaeb2c3625a047ef5b1ba6d5dcc4dbee37c075a2088", null ]
+      [ "authentication_failed", "group__crypto.html#ggaa314007c5b3658974966bfdaeb2c3625a047ef5b1ba6d5dcc4dbee37c075a2088", null ],
+      [ "signing_fault", "group__crypto.html#ggaa314007c5b3658974966bfdaeb2c3625a293a80a07f18f02b7c97c0ba6c8f1c39", null ]
     ] ],
     [ "secure_wipe", "namespacesnicholls_1_1crypto.html#a1ca93c7d6a42579f7ef5cd91bde65f3d", null ],
     [ "secure_wipe", "namespacesnicholls_1_1crypto.html#a753cb859a11f7816769a5eb9c1da8631", null ],

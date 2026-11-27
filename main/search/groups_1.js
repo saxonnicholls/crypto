@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['addresses_0',['Addresses',['../group__address.html',1,'']]],
-  ['authenticated_20encryption_1',['Authenticated encryption',['../group__aead.html',1,'']]]
+  ['384_0',['P-384',['../group__p384.html',1,'']]]
 ];

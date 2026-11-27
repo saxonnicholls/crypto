@@ -26,7 +26,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">snicholls-crypto<span id="projectnumber">&#160;0.4.2</span>
+   <div id="projectname">snicholls-crypto<span id="projectnumber">&#160;0.5.0</span>
    </div>
    <div id="projectbrief">Elliptic curves, signatures and wallet key derivation for the snicholls libraries</div>
   </td>
@@ -126,11 +126,15 @@ Topics</h2></td></tr>
 <tr class="memitem:curve25519" id="r_curve25519"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="group__curve25519.html">Curve25519</a></td></tr>
 <tr class="memdesc:group__curve25519"><td class="mdescLeft">&#160;</td><td class="mdescRight">The field and scalars of Curve25519, edwards25519, Ed25519 signatures and X25519 key agreement. <br /></td></tr>
 <tr class="memitem:aead" id="r_aead"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="group__aead.html">Authenticated encryption</a></td></tr>
-<tr class="memdesc:group__aead"><td class="mdescLeft">&#160;</td><td class="mdescRight">ChaCha20-Poly1305 (RFC 8439), XChaCha20-Poly1305, AES-256-GCM and AES-256 key wrap (RFC 3394). <br /></td></tr>
+<tr class="memdesc:group__aead"><td class="mdescLeft">&#160;</td><td class="mdescRight">ChaCha20-Poly1305 (RFC 8439), XChaCha20-Poly1305, AES-128-GCM, AES-256-GCM and AES-256 key wrap (RFC 3394). <br /></td></tr>
 <tr class="memitem:p256" id="r_p256"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="group__p256.html">P-256</a></td></tr>
-<tr class="memdesc:group__p256"><td class="mdescLeft">&#160;</td><td class="mdescRight">P-256 (secp256r1): its field, scalars and points, and ECDSA with SHA-256 (ES256) with RFC 6979 nonces. <br /></td></tr>
+<tr class="memdesc:group__p256"><td class="mdescLeft">&#160;</td><td class="mdescRight">P-256 (secp256r1): its field, scalars and points, ECDSA with SHA-256 (ES256) with RFC 6979 nonces, and ECDH. <br /></td></tr>
+<tr class="memitem:p384" id="r_p384"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="group__p384.html">P-384</a></td></tr>
+<tr class="memdesc:group__p384"><td class="mdescLeft">&#160;</td><td class="mdescRight">P-384 (secp384r1): its field, scalars and points (the code P-256 uses, at six limbs), ECDSA verification with SHA-384 (ES384, TLS's ecdsa_secp384r1_sha384) and ECDH. <br /></td></tr>
+<tr class="memitem:jose" id="r_jose"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="group__jose.html">JOSE</a></td></tr>
+<tr class="memdesc:group__jose"><td class="mdescLeft">&#160;</td><td class="mdescRight">JWE's key agreement: ECDH-ES and ECDH-ES+A*KW on X25519 and P-256, with JOSE's Concat KDF (RFC 7518 4.6). <br /></td></tr>
 <tr class="memitem:rsa" id="r_rsa"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="group__rsa.html">RSA</a></td></tr>
-<tr class="memdesc:group__rsa"><td class="mdescLeft">&#160;</td><td class="mdescRight">RSA signature verification: RSASSA-PKCS1-v1_5 and RSASSA-PSS with SHA-256 (RS256, PS256). <br /></td></tr>
+<tr class="memdesc:group__rsa"><td class="mdescLeft">&#160;</td><td class="mdescRight">RSA signature verification: RSASSA-PKCS1-v1_5 and RSASSA-PSS with SHA-256, SHA-384 and SHA-512. <br /></td></tr>
 <tr class="memitem:wallet" id="r_wallet"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="group__wallet.html">Wallets</a></td></tr>
 <tr class="memdesc:group__wallet"><td class="mdescLeft">&#160;</td><td class="mdescRight">BIP-39 mnemonics, BIP-32 and SLIP-10 derivation, and derivation paths. <br /></td></tr>
 </table><table class="memberdecls">
@@ -156,9 +160,9 @@ Classes</h2></td></tr>
 Macros</h2></td></tr>
 <tr class="memitem:ga54161ed5eeea29786c330f33f17859a2" id="r_ga54161ed5eeea29786c330f33f17859a2"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ga54161ed5eeea29786c330f33f17859a2">SNICHOLLS_CRYPTO_VERSION_MAJOR</a>&#160;&#160;&#160;0</td></tr>
 <tr class="memdesc:ga54161ed5eeea29786c330f33f17859a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Major version of snicholls-crypto.  <br /></td></tr>
-<tr class="memitem:ga9f127f473a417f0e4670b9c9e8b874cd" id="r_ga9f127f473a417f0e4670b9c9e8b874cd"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ga9f127f473a417f0e4670b9c9e8b874cd">SNICHOLLS_CRYPTO_VERSION_MINOR</a>&#160;&#160;&#160;4</td></tr>
+<tr class="memitem:ga9f127f473a417f0e4670b9c9e8b874cd" id="r_ga9f127f473a417f0e4670b9c9e8b874cd"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ga9f127f473a417f0e4670b9c9e8b874cd">SNICHOLLS_CRYPTO_VERSION_MINOR</a>&#160;&#160;&#160;5</td></tr>
 <tr class="memdesc:ga9f127f473a417f0e4670b9c9e8b874cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Minor version of snicholls-crypto.  <br /></td></tr>
-<tr class="memitem:ga46adf5d826fcc6e97324b882df225091" id="r_ga46adf5d826fcc6e97324b882df225091"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ga46adf5d826fcc6e97324b882df225091">SNICHOLLS_CRYPTO_VERSION_PATCH</a>&#160;&#160;&#160;2</td></tr>
+<tr class="memitem:ga46adf5d826fcc6e97324b882df225091" id="r_ga46adf5d826fcc6e97324b882df225091"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ga46adf5d826fcc6e97324b882df225091">SNICHOLLS_CRYPTO_VERSION_PATCH</a>&#160;&#160;&#160;0</td></tr>
 <tr class="memdesc:ga46adf5d826fcc6e97324b882df225091"><td class="mdescLeft">&#160;</td><td class="mdescRight">Patch version of snicholls-crypto.  <br /></td></tr>
 <tr class="memitem:ga7c936243716bd77a7f1e3f6a5a52210d" id="r_ga7c936243716bd77a7f1e3f6a5a52210d"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ga7c936243716bd77a7f1e3f6a5a52210d">SNICHOLLS_CRYPTO_VERSION_CHECK</a>(major,  minor,  patch)</td></tr>
 <tr class="memdesc:ga7c936243716bd77a7f1e3f6a5a52210d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Encode a version as one integer the preprocessor can compare.  <br /></td></tr>
@@ -203,6 +207,7 @@ Enumerations</h2></td></tr>
 , <br />
 &#160;&#160;<a class="el" href="#ggaa314007c5b3658974966bfdaeb2c3625ac20ddc41cc208191634e2ec6163e53cc">snicholls::crypto::errc::invalid_witness_program</a>
 , <a class="el" href="#ggaa314007c5b3658974966bfdaeb2c3625a047ef5b1ba6d5dcc4dbee37c075a2088">snicholls::crypto::errc::authentication_failed</a>
+, <a class="el" href="#ggaa314007c5b3658974966bfdaeb2c3625a293a80a07f18f02b7c97c0ba6c8f1c39">snicholls::crypto::errc::signing_fault</a>
 <br />
  }</td></tr>
 <tr class="memdesc:gaa314007c5b3658974966bfdaeb2c3625"><td class="mdescLeft">&#160;</td><td class="mdescRight">Why an operation failed. The values are stable: new ones are only ever appended.  <a href="#gaa314007c5b3658974966bfdaeb2c3625">More...</a><br /></td></tr>
@@ -249,9 +254,9 @@ Functions</h2></td></tr>
 <b>Value:</b><div class="fragment"><div class="line"><span class="keyword">static_assert</span>(<a class="code hl_define" href="#ga11191561d1b706fc6f57840ac1f76364">SNICHOLLS_CRYPTO_VERSION</a> &gt;= <a class="code hl_define" href="#ga7c936243716bd77a7f1e3f6a5a52210d">SNICHOLLS_CRYPTO_VERSION_CHECK</a>(major, minor, patch),  \</div>
 <div class="line">              <span class="stringliteral">&quot;snicholls-crypto &quot;</span> <a class="code hl_define" href="#gac1a47a60e1c29c98312a5a9633ff7871">SNICHOLLS_CRYPTO_VERSION_STRING</a> <span class="stringliteral">&quot; is older than the &quot;</span> #major \</div>
 <div class="line">              <span class="stringliteral">&quot;.&quot;</span> #minor <span class="stringliteral">&quot;.&quot;</span> #patch <span class="stringliteral">&quot; this code requires&quot;</span>)</div>
-<div class="ttc" id="agroup__crypto_html_ga11191561d1b706fc6f57840ac1f76364"><div class="ttname"><a href="#ga11191561d1b706fc6f57840ac1f76364">SNICHOLLS_CRYPTO_VERSION</a></div><div class="ttdeci">#define SNICHOLLS_CRYPTO_VERSION</div><div class="ttdoc">This version of snicholls-crypto, encoded by SNICHOLLS_CRYPTO_VERSION_CHECK.</div><div class="ttdef"><b>Definition</b> <a href="version_8hpp_source.html#l00064">version.hpp:64</a></div></div>
-<div class="ttc" id="agroup__crypto_html_ga7c936243716bd77a7f1e3f6a5a52210d"><div class="ttname"><a href="#ga7c936243716bd77a7f1e3f6a5a52210d">SNICHOLLS_CRYPTO_VERSION_CHECK</a></div><div class="ttdeci">#define SNICHOLLS_CRYPTO_VERSION_CHECK(major, minor, patch)</div><div class="ttdoc">Encode a version as one integer the preprocessor can compare.</div><div class="ttdef"><b>Definition</b> <a href="version_8hpp_source.html#l00061">version.hpp:61</a></div></div>
-<div class="ttc" id="agroup__crypto_html_gac1a47a60e1c29c98312a5a9633ff7871"><div class="ttname"><a href="#gac1a47a60e1c29c98312a5a9633ff7871">SNICHOLLS_CRYPTO_VERSION_STRING</a></div><div class="ttdeci">#define SNICHOLLS_CRYPTO_VERSION_STRING</div><div class="ttdoc">This version of snicholls-crypto as a string literal, &quot;major.minor.patch&quot;.</div><div class="ttdef"><b>Definition</b> <a href="version_8hpp_source.html#l00075">version.hpp:75</a></div></div>
+<div class="ttc" id="agroup__crypto_html_ga11191561d1b706fc6f57840ac1f76364"><div class="ttname"><a href="#ga11191561d1b706fc6f57840ac1f76364">SNICHOLLS_CRYPTO_VERSION</a></div><div class="ttdeci">#define SNICHOLLS_CRYPTO_VERSION</div><div class="ttdoc">This version of snicholls-crypto, encoded by SNICHOLLS_CRYPTO_VERSION_CHECK.</div><div class="ttdef"><b>Definition</b> <a href="version_8hpp_source.html#l00075">version.hpp:75</a></div></div>
+<div class="ttc" id="agroup__crypto_html_ga7c936243716bd77a7f1e3f6a5a52210d"><div class="ttname"><a href="#ga7c936243716bd77a7f1e3f6a5a52210d">SNICHOLLS_CRYPTO_VERSION_CHECK</a></div><div class="ttdeci">#define SNICHOLLS_CRYPTO_VERSION_CHECK(major, minor, patch)</div><div class="ttdoc">Encode a version as one integer the preprocessor can compare.</div><div class="ttdef"><b>Definition</b> <a href="version_8hpp_source.html#l00072">version.hpp:72</a></div></div>
+<div class="ttc" id="agroup__crypto_html_gac1a47a60e1c29c98312a5a9633ff7871"><div class="ttname"><a href="#gac1a47a60e1c29c98312a5a9633ff7871">SNICHOLLS_CRYPTO_VERSION_STRING</a></div><div class="ttdeci">#define SNICHOLLS_CRYPTO_VERSION_STRING</div><div class="ttdoc">This version of snicholls-crypto as a string literal, &quot;major.minor.patch&quot;.</div><div class="ttdef"><b>Definition</b> <a href="version_8hpp_source.html#l00086">version.hpp:86</a></div></div>
 </div><!-- fragment -->
 <p>Fail to compile unless snicholls-crypto is at least <span class="tt">major.minor.patch</span>. </p>
 <p>Put one in a header of yours that depends on a crypto feature, and a build against an older crypto stops with a message that names the number rather than deep inside a template. No trailing semicolon in the expansion: write <span class="tt"><a class="el" href="#ga9c430719e3acdbf4b976d1195035e94c" title="Fail to compile unless snicholls-crypto is at least major.minor.patch.">SNICHOLLS_CRYPTO_REQUIRE_VERSION(0, 1, 0)</a>;</span> like any declaration. </p><dl class="params"><dt>Parameters</dt><dd>
@@ -263,7 +268,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="version_8hpp_source.html#l00089">89</a> of file <a class="el" href="version_8hpp_source.html">version.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="version_8hpp_source.html#l00100">100</a> of file <a class="el" href="version_8hpp_source.html">version.hpp</a>.</p>
 
 </div>
 </div>
@@ -281,7 +286,7 @@ Functions</h2></td></tr>
 
 <p>This version of snicholls-crypto, encoded by <a class="el" href="#ga7c936243716bd77a7f1e3f6a5a52210d" title="Encode a version as one integer the preprocessor can compare.">SNICHOLLS_CRYPTO_VERSION_CHECK</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="version_8hpp_source.html#l00064">64</a> of file <a class="el" href="version_8hpp_source.html">version.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="version_8hpp_source.html#l00075">75</a> of file <a class="el" href="version_8hpp_source.html">version.hpp</a>.</p>
 
 </div>
 </div>
@@ -320,7 +325,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="version_8hpp_source.html#l00061">61</a> of file <a class="el" href="version_8hpp_source.html">version.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="version_8hpp_source.html#l00072">72</a> of file <a class="el" href="version_8hpp_source.html">version.hpp</a>.</p>
 
 </div>
 </div>
@@ -338,7 +343,7 @@ Functions</h2></td></tr>
 
 <p>Major version of snicholls-crypto. </p>
 
-<p class="definition">Definition at line <a class="el" href="version_8hpp_source.html#l00048">48</a> of file <a class="el" href="version_8hpp_source.html">version.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="version_8hpp_source.html#l00059">59</a> of file <a class="el" href="version_8hpp_source.html">version.hpp</a>.</p>
 
 </div>
 </div>
@@ -349,14 +354,14 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define SNICHOLLS_CRYPTO_VERSION_MINOR&#160;&#160;&#160;4</td>
+          <td class="memname">#define SNICHOLLS_CRYPTO_VERSION_MINOR&#160;&#160;&#160;5</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 <p>Minor version of snicholls-crypto. </p>
 
-<p class="definition">Definition at line <a class="el" href="version_8hpp_source.html#l00050">50</a> of file <a class="el" href="version_8hpp_source.html">version.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="version_8hpp_source.html#l00061">61</a> of file <a class="el" href="version_8hpp_source.html">version.hpp</a>.</p>
 
 </div>
 </div>
@@ -367,14 +372,14 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define SNICHOLLS_CRYPTO_VERSION_PATCH&#160;&#160;&#160;2</td>
+          <td class="memname">#define SNICHOLLS_CRYPTO_VERSION_PATCH&#160;&#160;&#160;0</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 <p>Patch version of snicholls-crypto. </p>
 
-<p class="definition">Definition at line <a class="el" href="version_8hpp_source.html#l00052">52</a> of file <a class="el" href="version_8hpp_source.html">version.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="version_8hpp_source.html#l00063">63</a> of file <a class="el" href="version_8hpp_source.html">version.hpp</a>.</p>
 
 </div>
 </div>
@@ -392,14 +397,14 @@ Functions</h2></td></tr>
 <b>Value:</b><div class="fragment"><div class="line"><a class="code hl_define" href="#gae253b59bba119942f022c4e94a87dd6b">SNICHOLLS_CRYPTO_VERSION_STRINGIFY</a>(<a class="code hl_define" href="#ga54161ed5eeea29786c330f33f17859a2">SNICHOLLS_CRYPTO_VERSION_MAJOR</a>) <span class="stringliteral">&quot;.&quot;</span> \</div>
 <div class="line">SNICHOLLS_CRYPTO_VERSION_STRINGIFY(<a class="code hl_define" href="#ga9f127f473a417f0e4670b9c9e8b874cd">SNICHOLLS_CRYPTO_VERSION_MINOR</a>) <span class="stringliteral">&quot;.&quot;</span> \</div>
 <div class="line">SNICHOLLS_CRYPTO_VERSION_STRINGIFY(<a class="code hl_define" href="#ga46adf5d826fcc6e97324b882df225091">SNICHOLLS_CRYPTO_VERSION_PATCH</a>)</div>
-<div class="ttc" id="agroup__crypto_html_ga46adf5d826fcc6e97324b882df225091"><div class="ttname"><a href="#ga46adf5d826fcc6e97324b882df225091">SNICHOLLS_CRYPTO_VERSION_PATCH</a></div><div class="ttdeci">#define SNICHOLLS_CRYPTO_VERSION_PATCH</div><div class="ttdoc">Patch version of snicholls-crypto.</div><div class="ttdef"><b>Definition</b> <a href="version_8hpp_source.html#l00052">version.hpp:52</a></div></div>
-<div class="ttc" id="agroup__crypto_html_ga54161ed5eeea29786c330f33f17859a2"><div class="ttname"><a href="#ga54161ed5eeea29786c330f33f17859a2">SNICHOLLS_CRYPTO_VERSION_MAJOR</a></div><div class="ttdeci">#define SNICHOLLS_CRYPTO_VERSION_MAJOR</div><div class="ttdoc">Major version of snicholls-crypto.</div><div class="ttdef"><b>Definition</b> <a href="version_8hpp_source.html#l00048">version.hpp:48</a></div></div>
-<div class="ttc" id="agroup__crypto_html_ga9f127f473a417f0e4670b9c9e8b874cd"><div class="ttname"><a href="#ga9f127f473a417f0e4670b9c9e8b874cd">SNICHOLLS_CRYPTO_VERSION_MINOR</a></div><div class="ttdeci">#define SNICHOLLS_CRYPTO_VERSION_MINOR</div><div class="ttdoc">Minor version of snicholls-crypto.</div><div class="ttdef"><b>Definition</b> <a href="version_8hpp_source.html#l00050">version.hpp:50</a></div></div>
-<div class="ttc" id="agroup__crypto_html_gae253b59bba119942f022c4e94a87dd6b"><div class="ttname"><a href="#gae253b59bba119942f022c4e94a87dd6b">SNICHOLLS_CRYPTO_VERSION_STRINGIFY</a></div><div class="ttdeci">#define SNICHOLLS_CRYPTO_VERSION_STRINGIFY(x)</div><div class="ttdoc">Implementation detail of SNICHOLLS_CRYPTO_VERSION_STRING: expand, then stringise.</div><div class="ttdef"><b>Definition</b> <a href="version_8hpp_source.html#l00072">version.hpp:72</a></div></div>
+<div class="ttc" id="agroup__crypto_html_ga46adf5d826fcc6e97324b882df225091"><div class="ttname"><a href="#ga46adf5d826fcc6e97324b882df225091">SNICHOLLS_CRYPTO_VERSION_PATCH</a></div><div class="ttdeci">#define SNICHOLLS_CRYPTO_VERSION_PATCH</div><div class="ttdoc">Patch version of snicholls-crypto.</div><div class="ttdef"><b>Definition</b> <a href="version_8hpp_source.html#l00063">version.hpp:63</a></div></div>
+<div class="ttc" id="agroup__crypto_html_ga54161ed5eeea29786c330f33f17859a2"><div class="ttname"><a href="#ga54161ed5eeea29786c330f33f17859a2">SNICHOLLS_CRYPTO_VERSION_MAJOR</a></div><div class="ttdeci">#define SNICHOLLS_CRYPTO_VERSION_MAJOR</div><div class="ttdoc">Major version of snicholls-crypto.</div><div class="ttdef"><b>Definition</b> <a href="version_8hpp_source.html#l00059">version.hpp:59</a></div></div>
+<div class="ttc" id="agroup__crypto_html_ga9f127f473a417f0e4670b9c9e8b874cd"><div class="ttname"><a href="#ga9f127f473a417f0e4670b9c9e8b874cd">SNICHOLLS_CRYPTO_VERSION_MINOR</a></div><div class="ttdeci">#define SNICHOLLS_CRYPTO_VERSION_MINOR</div><div class="ttdoc">Minor version of snicholls-crypto.</div><div class="ttdef"><b>Definition</b> <a href="version_8hpp_source.html#l00061">version.hpp:61</a></div></div>
+<div class="ttc" id="agroup__crypto_html_gae253b59bba119942f022c4e94a87dd6b"><div class="ttname"><a href="#gae253b59bba119942f022c4e94a87dd6b">SNICHOLLS_CRYPTO_VERSION_STRINGIFY</a></div><div class="ttdeci">#define SNICHOLLS_CRYPTO_VERSION_STRINGIFY(x)</div><div class="ttdoc">Implementation detail of SNICHOLLS_CRYPTO_VERSION_STRING: expand, then stringise.</div><div class="ttdef"><b>Definition</b> <a href="version_8hpp_source.html#l00083">version.hpp:83</a></div></div>
 </div><!-- fragment -->
 <p>This version of snicholls-crypto as a string literal, <span class="tt">"major.minor.patch"</span>. </p>
 
-<p class="definition">Definition at line <a class="el" href="version_8hpp_source.html#l00075">75</a> of file <a class="el" href="version_8hpp_source.html">version.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="version_8hpp_source.html#l00086">86</a> of file <a class="el" href="version_8hpp_source.html">version.hpp</a>.</p>
 
 </div>
 </div>
@@ -418,7 +423,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line"><a class="code hl_define" href="#ga01260f6c21f81d0082230c171ceddc90">SNICHOLLS_CRYPTO_VERSION_STRINGIFY_</a>(x)</div>
-<div class="ttc" id="agroup__crypto_html_ga01260f6c21f81d0082230c171ceddc90"><div class="ttname"><a href="#ga01260f6c21f81d0082230c171ceddc90">SNICHOLLS_CRYPTO_VERSION_STRINGIFY_</a></div><div class="ttdeci">#define SNICHOLLS_CRYPTO_VERSION_STRINGIFY_(x)</div><div class="ttdoc">Implementation detail of SNICHOLLS_CRYPTO_VERSION_STRING: stringise a token.</div><div class="ttdef"><b>Definition</b> <a href="version_8hpp_source.html#l00069">version.hpp:69</a></div></div>
+<div class="ttc" id="agroup__crypto_html_ga01260f6c21f81d0082230c171ceddc90"><div class="ttname"><a href="#ga01260f6c21f81d0082230c171ceddc90">SNICHOLLS_CRYPTO_VERSION_STRINGIFY_</a></div><div class="ttdeci">#define SNICHOLLS_CRYPTO_VERSION_STRINGIFY_(x)</div><div class="ttdoc">Implementation detail of SNICHOLLS_CRYPTO_VERSION_STRING: stringise a token.</div><div class="ttdef"><b>Definition</b> <a href="version_8hpp_source.html#l00080">version.hpp:80</a></div></div>
 </div><!-- fragment -->
 <p>Implementation detail of <a class="el" href="#gac1a47a60e1c29c98312a5a9633ff7871" title="This version of snicholls-crypto as a string literal, &quot;major.minor.patch&quot;.">SNICHOLLS_CRYPTO_VERSION_STRING</a>: expand, then stringise. </p>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -428,7 +433,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="version_8hpp_source.html#l00072">72</a> of file <a class="el" href="version_8hpp_source.html">version.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="version_8hpp_source.html#l00083">83</a> of file <a class="el" href="version_8hpp_source.html">version.hpp</a>.</p>
 
 </div>
 </div>
@@ -456,7 +461,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="version_8hpp_source.html#l00069">69</a> of file <a class="el" href="version_8hpp_source.html">version.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="version_8hpp_source.html#l00080">80</a> of file <a class="el" href="version_8hpp_source.html">version.hpp</a>.</p>
 
 </div>
 </div>
@@ -527,6 +532,8 @@ Functions</h2></td></tr>
 </td></tr>
 <tr><td class="fieldname"><a id="ggaa314007c5b3658974966bfdaeb2c3625a047ef5b1ba6d5dcc4dbee37c075a2088" name="ggaa314007c5b3658974966bfdaeb2c3625a047ef5b1ba6d5dcc4dbee37c075a2088"></a>authentication_failed&#160;</td><td class="fielddoc"><p>An AEAD tag did not match: the ciphertext, the associated data, the nonce or the key differ. </p>
 </td></tr>
+<tr><td class="fieldname"><a id="ggaa314007c5b3658974966bfdaeb2c3625a293a80a07f18f02b7c97c0ba6c8f1c39" name="ggaa314007c5b3658974966bfdaeb2c3625a293a80a07f18f02b7c97c0ba6c8f1c39"></a>signing_fault&#160;</td><td class="fielddoc"><p>A signature did not verify after it was made (a fault, or input out of range): nothing was released. </p>
+</td></tr>
 </table>
 
 <p class="definition">Definition at line <a class="el" href="error_8hpp_source.html#l00059">59</a> of file <a class="el" href="error_8hpp_source.html">error.hpp</a>.</p>
@@ -560,7 +567,7 @@ Functions</h2></td></tr>
 <p>The encoded version, the same as <a class="el" href="#ga11191561d1b706fc6f57840ac1f76364" title="This version of snicholls-crypto, encoded by SNICHOLLS_CRYPTO_VERSION_CHECK.">SNICHOLLS_CRYPTO_VERSION</a>. </p>
 <dl class="section return"><dt>Returns</dt><dd>major * 10000 + minor * 100 + patch. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="version_8hpp_source.html#l00115">115</a> of file <a class="el" href="version_8hpp_source.html">version.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="version_8hpp_source.html#l00126">126</a> of file <a class="el" href="version_8hpp_source.html">version.hpp</a>.</p>
 
 </div>
 </div>
@@ -590,7 +597,7 @@ Functions</h2></td></tr>
 <p>Major version, the same as <a class="el" href="#ga54161ed5eeea29786c330f33f17859a2" title="Major version of snicholls-crypto.">SNICHOLLS_CRYPTO_VERSION_MAJOR</a>; usable in a <span class="tt">static_assert</span>. </p>
 <dl class="section return"><dt>Returns</dt><dd>The major version number. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="version_8hpp_source.html#l00106">106</a> of file <a class="el" href="version_8hpp_source.html">version.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="version_8hpp_source.html#l00117">117</a> of file <a class="el" href="version_8hpp_source.html">version.hpp</a>.</p>
 
 </div>
 </div>
@@ -620,7 +627,7 @@ Functions</h2></td></tr>
 <p>Minor version, the same as <a class="el" href="#ga9f127f473a417f0e4670b9c9e8b874cd" title="Minor version of snicholls-crypto.">SNICHOLLS_CRYPTO_VERSION_MINOR</a>. </p>
 <dl class="section return"><dt>Returns</dt><dd>The minor version number. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="version_8hpp_source.html#l00109">109</a> of file <a class="el" href="version_8hpp_source.html">version.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="version_8hpp_source.html#l00120">120</a> of file <a class="el" href="version_8hpp_source.html">version.hpp</a>.</p>
 
 </div>
 </div>
@@ -650,7 +657,7 @@ Functions</h2></td></tr>
 <p>Patch version, the same as <a class="el" href="#ga46adf5d826fcc6e97324b882df225091" title="Patch version of snicholls-crypto.">SNICHOLLS_CRYPTO_VERSION_PATCH</a>. </p>
 <dl class="section return"><dt>Returns</dt><dd>The patch version number. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="version_8hpp_source.html#l00112">112</a> of file <a class="el" href="version_8hpp_source.html">version.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="version_8hpp_source.html#l00123">123</a> of file <a class="el" href="version_8hpp_source.html">version.hpp</a>.</p>
 
 </div>
 </div>
@@ -680,7 +687,7 @@ Functions</h2></td></tr>
 <p>The version as text, <span class="tt">"major.minor.patch"</span>, the same as <a class="el" href="#gac1a47a60e1c29c98312a5a9633ff7871" title="This version of snicholls-crypto as a string literal, &quot;major.minor.patch&quot;.">SNICHOLLS_CRYPTO_VERSION_STRING</a>. </p>
 <dl class="section return"><dt>Returns</dt><dd>A view of a string literal; valid for the life of the program. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="version_8hpp_source.html#l00118">118</a> of file <a class="el" href="version_8hpp_source.html">version.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="version_8hpp_source.html#l00129">129</a> of file <a class="el" href="version_8hpp_source.html">version.hpp</a>.</p>
 
 </div>
 </div>

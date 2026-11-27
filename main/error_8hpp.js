@@ -22,7 +22,8 @@ var error_8hpp =
       [ "snicholls::crypto::errc::invalid_hrp", "group__crypto.html#ggaa314007c5b3658974966bfdaeb2c3625ac773270d518c9d9c0f2d98f3e59abcf9", null ],
       [ "snicholls::crypto::errc::invalid_witness_version", "group__crypto.html#ggaa314007c5b3658974966bfdaeb2c3625a3830eedc1ebf7207f10ac8239650001e", null ],
       [ "snicholls::crypto::errc::invalid_witness_program", "group__crypto.html#ggaa314007c5b3658974966bfdaeb2c3625ac20ddc41cc208191634e2ec6163e53cc", null ],
-      [ "snicholls::crypto::errc::authentication_failed", "group__crypto.html#ggaa314007c5b3658974966bfdaeb2c3625a047ef5b1ba6d5dcc4dbee37c075a2088", null ]
+      [ "snicholls::crypto::errc::authentication_failed", "group__crypto.html#ggaa314007c5b3658974966bfdaeb2c3625a047ef5b1ba6d5dcc4dbee37c075a2088", null ],
+      [ "snicholls::crypto::errc::signing_fault", "group__crypto.html#ggaa314007c5b3658974966bfdaeb2c3625a293a80a07f18f02b7c97c0ba6c8f1c39", null ]
     ] ],
     [ "snicholls::crypto::to_string", "namespacesnicholls_1_1crypto.html#a62cbc3205a6e6e1bc673319f2d277e74", null ]
 ];

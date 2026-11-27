@@ -28,15 +28,17 @@ var annotated_dup =
           [ "slip10_ed25519_key", "classsnicholls_1_1crypto_1_1hd_1_1slip10__ed25519__key.html", "classsnicholls_1_1crypto_1_1hd_1_1slip10__ed25519__key" ]
         ] ],
         [ "p256", "namespacesnicholls_1_1crypto_1_1p256.html", [
-          [ "affine_point", "structsnicholls_1_1crypto_1_1p256_1_1affine__point.html", "structsnicholls_1_1crypto_1_1p256_1_1affine__point" ],
-          [ "field_element", "classsnicholls_1_1crypto_1_1p256_1_1field__element.html", "classsnicholls_1_1crypto_1_1p256_1_1field__element" ],
-          [ "point", "classsnicholls_1_1crypto_1_1p256_1_1point.html", "classsnicholls_1_1crypto_1_1p256_1_1point" ],
-          [ "private_key", "classsnicholls_1_1crypto_1_1p256_1_1private__key.html", "classsnicholls_1_1crypto_1_1p256_1_1private__key" ],
           [ "public_key", "classsnicholls_1_1crypto_1_1p256_1_1public__key.html", "classsnicholls_1_1crypto_1_1p256_1_1public__key" ],
-          [ "scalar", "classsnicholls_1_1crypto_1_1p256_1_1scalar.html", "classsnicholls_1_1crypto_1_1p256_1_1scalar" ],
+          [ "private_key", "classsnicholls_1_1crypto_1_1p256_1_1private__key.html", "classsnicholls_1_1crypto_1_1p256_1_1private__key" ],
           [ "signature", "structsnicholls_1_1crypto_1_1p256_1_1signature.html", "structsnicholls_1_1crypto_1_1p256_1_1signature" ]
         ] ],
+        [ "p384", "namespacesnicholls_1_1crypto_1_1p384.html", [
+          [ "public_key", "classsnicholls_1_1crypto_1_1p384_1_1public__key.html", "classsnicholls_1_1crypto_1_1p384_1_1public__key" ],
+          [ "private_key", "classsnicholls_1_1crypto_1_1p384_1_1private__key.html", "classsnicholls_1_1crypto_1_1p384_1_1private__key" ],
+          [ "signature", "structsnicholls_1_1crypto_1_1p384_1_1signature.html", "structsnicholls_1_1crypto_1_1p384_1_1signature" ]
+        ] ],
         [ "rsa", "namespacesnicholls_1_1crypto_1_1rsa.html", [
+          [ "private_key", "classsnicholls_1_1crypto_1_1rsa_1_1private__key.html", "classsnicholls_1_1crypto_1_1rsa_1_1private__key" ],
           [ "public_key", "classsnicholls_1_1crypto_1_1rsa_1_1public__key.html", "classsnicholls_1_1crypto_1_1rsa_1_1public__key" ]
         ] ],
         [ "secp256k1", "namespacesnicholls_1_1crypto_1_1secp256k1.html", [

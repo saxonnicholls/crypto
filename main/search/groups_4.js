@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['p_20256_0',['P-256',['../group__p256.html',1,'']]]
+  ['encryption_0',['Authenticated encryption',['../group__aead.html',1,'']]]
 ];

@@ -26,7 +26,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">snicholls-crypto<span id="projectnumber">&#160;0.4.2</span>
+   <div id="projectname">snicholls-crypto<span id="projectnumber">&#160;0.5.0</span>
    </div>
    <div id="projectbrief">Elliptic curves, signatures and wallet key derivation for the snicholls libraries</div>
   </td>
@@ -124,6 +124,10 @@ Typedefs</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:ga602cf4ff59535936244e32c46f0775d9" id="r_ga602cf4ff59535936244e32c46f0775d9"><td class="memItemLeft">constexpr result&lt; <a class="el" href="#a6416b3a47fa4d034458c765b733ea95e">tag</a>, <a class="el" href="group__crypto.html#gaa314007c5b3658974966bfdaeb2c3625">errc</a> &gt;&#160;</td><td class="memItemRight"><a class="el" href="group__aead.html#ga602cf4ff59535936244e32c46f0775d9">aes128_gcm_seal</a> (std::span&lt; const std::uint8_t, 16 &gt; key, std::span&lt; const std::uint8_t, 12 &gt; nonce, std::span&lt; const std::uint8_t &gt; aad, std::span&lt; const std::uint8_t &gt; plaintext, std::span&lt; std::uint8_t &gt; ciphertext) noexcept</td></tr>
+<tr class="memdesc:ga602cf4ff59535936244e32c46f0775d9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Encrypts and authenticates with AES-128-GCM. Constant time in the key and the plaintext.  <br /></td></tr>
+<tr class="memitem:ga18ba805ad67ae04323c9be7c07fa4535" id="r_ga18ba805ad67ae04323c9be7c07fa4535"><td class="memItemLeft">constexpr result&lt; void, <a class="el" href="group__crypto.html#gaa314007c5b3658974966bfdaeb2c3625">errc</a> &gt;&#160;</td><td class="memItemRight"><a class="el" href="group__aead.html#ga18ba805ad67ae04323c9be7c07fa4535">aes128_gcm_open</a> (std::span&lt; const std::uint8_t, 16 &gt; key, std::span&lt; const std::uint8_t, 12 &gt; nonce, std::span&lt; const std::uint8_t &gt; aad, std::span&lt; const std::uint8_t &gt; ciphertext, std::span&lt; const std::uint8_t, 16 &gt; received, std::span&lt; std::uint8_t &gt; plaintext) noexcept</td></tr>
+<tr class="memdesc:ga18ba805ad67ae04323c9be7c07fa4535"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks the tag and decrypts with AES-128-GCM. Constant time in the key, the plaintext and the tag.  <br /></td></tr>
 <tr class="memitem:ga96d9d4108a70983af8482e0bc2b0c7a5" id="r_ga96d9d4108a70983af8482e0bc2b0c7a5"><td class="memItemLeft">constexpr result&lt; <a class="el" href="#a6416b3a47fa4d034458c765b733ea95e">tag</a>, <a class="el" href="group__crypto.html#gaa314007c5b3658974966bfdaeb2c3625">errc</a> &gt;&#160;</td><td class="memItemRight"><a class="el" href="group__aead.html#ga96d9d4108a70983af8482e0bc2b0c7a5">aes256_gcm_seal</a> (std::span&lt; const std::uint8_t, 32 &gt; key, std::span&lt; const std::uint8_t, 12 &gt; nonce, std::span&lt; const std::uint8_t &gt; aad, std::span&lt; const std::uint8_t &gt; plaintext, std::span&lt; std::uint8_t &gt; ciphertext) noexcept</td></tr>
 <tr class="memdesc:ga96d9d4108a70983af8482e0bc2b0c7a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Encrypts and authenticates with AES-256-GCM. Constant time in the key and the plaintext.  <br /></td></tr>
 <tr class="memitem:ga1e9d3283b937a14902df2c3d5676de2d" id="r_ga1e9d3283b937a14902df2c3d5676de2d"><td class="memItemLeft">constexpr result&lt; void, <a class="el" href="group__crypto.html#gaa314007c5b3658974966bfdaeb2c3625">errc</a> &gt;&#160;</td><td class="memItemRight"><a class="el" href="group__aead.html#ga1e9d3283b937a14902df2c3d5676de2d">aes256_gcm_open</a> (std::span&lt; const std::uint8_t, 32 &gt; key, std::span&lt; const std::uint8_t, 12 &gt; nonce, std::span&lt; const std::uint8_t &gt; aad, std::span&lt; const std::uint8_t &gt; ciphertext, std::span&lt; const std::uint8_t, 16 &gt; received, std::span&lt; std::uint8_t &gt; plaintext) noexcept</td></tr>

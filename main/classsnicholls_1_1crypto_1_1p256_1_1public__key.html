@@ -26,7 +26,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">snicholls-crypto<span id="projectnumber">&#160;0.4.2</span>
+   <div id="projectname">snicholls-crypto<span id="projectnumber">&#160;0.5.0</span>
    </div>
    <div id="projectbrief">Elliptic curves, signatures and wallet key derivation for the snicholls libraries</div>
   </td>
@@ -121,13 +121,13 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('classsnicholls
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a5b80f4c7baff7312f7b9c1533f667a91" id="r_a5b80f4c7baff7312f7b9c1533f667a91"><td class="memItemLeft">constexpr&#160;</td><td class="memItemRight"><a class="el" href="#a5b80f4c7baff7312f7b9c1533f667a91">public_key</a> (const <a class="el" href="structsnicholls_1_1crypto_1_1p256_1_1affine__point.html">affine_point</a> &amp;p) noexcept</td></tr>
+<tr class="memitem:a5b80f4c7baff7312f7b9c1533f667a91" id="r_a5b80f4c7baff7312f7b9c1533f667a91"><td class="memItemLeft">constexpr&#160;</td><td class="memItemRight"><a class="el" href="#a5b80f4c7baff7312f7b9c1533f667a91">public_key</a> (const <a class="el" href="group__p256.html#ga3575f22019e96a47f474a188d062bd83">affine_point</a> &amp;p) noexcept</td></tr>
 <tr class="memdesc:a5b80f4c7baff7312f7b9c1533f667a91"><td class="mdescLeft">&#160;</td><td class="mdescRight">A key from a point (which must be on the curve; <span class="tt"><a class="el" href="#a93d09c336a90d65a2fd17eef0e0691d7" title="A SEC1 encoding, compressed (33 bytes) or uncompressed (65), checked. Variable time; public data only...">parse</a></span> checks).  <br /></td></tr>
 <tr class="memitem:a20df0a868331cba69d15838b7051d867" id="r_a20df0a868331cba69d15838b7051d867"><td class="memItemLeft">constexpr std::array&lt; std::uint8_t, 33 &gt;&#160;</td><td class="memItemRight"><a class="el" href="#a20df0a868331cba69d15838b7051d867">compressed</a> () const noexcept</td></tr>
 <tr class="memdesc:a20df0a868331cba69d15838b7051d867"><td class="mdescLeft">&#160;</td><td class="mdescRight">The compressed SEC1 encoding.  <br /></td></tr>
 <tr class="memitem:a11df9d7c48896c048594faf833d477ee" id="r_a11df9d7c48896c048594faf833d477ee"><td class="memItemLeft">constexpr std::array&lt; std::uint8_t, 65 &gt;&#160;</td><td class="memItemRight"><a class="el" href="#a11df9d7c48896c048594faf833d477ee">uncompressed</a> () const noexcept</td></tr>
 <tr class="memdesc:a11df9d7c48896c048594faf833d477ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">The uncompressed SEC1 encoding (as in a JWK, x and y after the 0x04).  <br /></td></tr>
-<tr class="memitem:a870f30ca4a1fa9285d584406939f14de" id="r_a870f30ca4a1fa9285d584406939f14de"><td class="memItemLeft">constexpr const <a class="el" href="structsnicholls_1_1crypto_1_1p256_1_1affine__point.html">affine_point</a> &amp;&#160;</td><td class="memItemRight"><a class="el" href="#a870f30ca4a1fa9285d584406939f14de">point</a> () const noexcept</td></tr>
+<tr class="memitem:a870f30ca4a1fa9285d584406939f14de" id="r_a870f30ca4a1fa9285d584406939f14de"><td class="memItemLeft">constexpr const <a class="el" href="group__p256.html#ga3575f22019e96a47f474a188d062bd83">affine_point</a> &amp;&#160;</td><td class="memItemRight"><a class="el" href="#a870f30ca4a1fa9285d584406939f14de">point</a> () const noexcept</td></tr>
 <tr class="memdesc:a870f30ca4a1fa9285d584406939f14de"><td class="mdescLeft">&#160;</td><td class="mdescRight">The point.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-static-methods" class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
@@ -157,7 +157,7 @@ Friends</h2></td></tr>
         <tr>
           <td class="memname">snicholls::crypto::p256::public_key::public_key </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="structsnicholls_1_1crypto_1_1p256_1_1affine__point.html">affine_point</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>p</em></span></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="group__p256.html#ga3575f22019e96a47f474a188d062bd83">affine_point</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>p</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -257,7 +257,7 @@ Friends</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="structsnicholls_1_1crypto_1_1p256_1_1affine__point.html">affine_point</a> &amp; snicholls::crypto::p256::public_key::point </td>
+          <td class="memname">const <a class="el" href="group__p256.html#ga3575f22019e96a47f474a188d062bd83">affine_point</a> &amp; snicholls::crypto::p256::public_key::point </td>
           <td>(</td>
           <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>

@@ -26,7 +26,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">snicholls-crypto<span id="projectnumber">&#160;0.4.2</span>
+   <div id="projectname">snicholls-crypto<span id="projectnumber">&#160;0.5.0</span>
    </div>
    <div id="projectbrief">Elliptic curves, signatures and wallet key derivation for the snicholls libraries</div>
   </td>
@@ -129,9 +129,9 @@ Namespaces</h2></td></tr>
 Macros</h2></td></tr>
 <tr class="memitem:ga54161ed5eeea29786c330f33f17859a2" id="r_ga54161ed5eeea29786c330f33f17859a2"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="group__crypto.html#ga54161ed5eeea29786c330f33f17859a2">SNICHOLLS_CRYPTO_VERSION_MAJOR</a>&#160;&#160;&#160;0</td></tr>
 <tr class="memdesc:ga54161ed5eeea29786c330f33f17859a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Major version of snicholls-crypto.  <br /></td></tr>
-<tr class="memitem:ga9f127f473a417f0e4670b9c9e8b874cd" id="r_ga9f127f473a417f0e4670b9c9e8b874cd"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="group__crypto.html#ga9f127f473a417f0e4670b9c9e8b874cd">SNICHOLLS_CRYPTO_VERSION_MINOR</a>&#160;&#160;&#160;4</td></tr>
+<tr class="memitem:ga9f127f473a417f0e4670b9c9e8b874cd" id="r_ga9f127f473a417f0e4670b9c9e8b874cd"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="group__crypto.html#ga9f127f473a417f0e4670b9c9e8b874cd">SNICHOLLS_CRYPTO_VERSION_MINOR</a>&#160;&#160;&#160;5</td></tr>
 <tr class="memdesc:ga9f127f473a417f0e4670b9c9e8b874cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Minor version of snicholls-crypto.  <br /></td></tr>
-<tr class="memitem:ga46adf5d826fcc6e97324b882df225091" id="r_ga46adf5d826fcc6e97324b882df225091"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="group__crypto.html#ga46adf5d826fcc6e97324b882df225091">SNICHOLLS_CRYPTO_VERSION_PATCH</a>&#160;&#160;&#160;2</td></tr>
+<tr class="memitem:ga46adf5d826fcc6e97324b882df225091" id="r_ga46adf5d826fcc6e97324b882df225091"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="group__crypto.html#ga46adf5d826fcc6e97324b882df225091">SNICHOLLS_CRYPTO_VERSION_PATCH</a>&#160;&#160;&#160;0</td></tr>
 <tr class="memdesc:ga46adf5d826fcc6e97324b882df225091"><td class="mdescLeft">&#160;</td><td class="mdescRight">Patch version of snicholls-crypto.  <br /></td></tr>
 <tr class="memitem:ga7c936243716bd77a7f1e3f6a5a52210d" id="r_ga7c936243716bd77a7f1e3f6a5a52210d"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="group__crypto.html#ga7c936243716bd77a7f1e3f6a5a52210d">SNICHOLLS_CRYPTO_VERSION_CHECK</a>(major,  minor,  patch)</td></tr>
 <tr class="memdesc:ga7c936243716bd77a7f1e3f6a5a52210d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Encode a version as one integer the preprocessor can compare.  <br /></td></tr>
@@ -167,7 +167,7 @@ Functions</h2></td></tr>
 <div class="line"><span class="preprocessor">#endif</span></div>
 </div><!-- fragment --><p>A consumer that needs a minimum says so once, where the compiler can see it:</p>
 <div class="fragment"><div class="line"><a class="code hl_define" href="group__crypto.html#ga9c430719e3acdbf4b976d1195035e94c">SNICHOLLS_CRYPTO_REQUIRE_VERSION</a>(0, 1, 0);</div>
-<div class="ttc" id="agroup__crypto_html_ga9c430719e3acdbf4b976d1195035e94c"><div class="ttname"><a href="group__crypto.html#ga9c430719e3acdbf4b976d1195035e94c">SNICHOLLS_CRYPTO_REQUIRE_VERSION</a></div><div class="ttdeci">#define SNICHOLLS_CRYPTO_REQUIRE_VERSION(major, minor, patch)</div><div class="ttdoc">Fail to compile unless snicholls-crypto is at least major.minor.patch.</div><div class="ttdef"><b>Definition</b> <a href="version_8hpp_source.html#l00089">version.hpp:89</a></div></div>
+<div class="ttc" id="agroup__crypto_html_ga9c430719e3acdbf4b976d1195035e94c"><div class="ttname"><a href="group__crypto.html#ga9c430719e3acdbf4b976d1195035e94c">SNICHOLLS_CRYPTO_REQUIRE_VERSION</a></div><div class="ttdeci">#define SNICHOLLS_CRYPTO_REQUIRE_VERSION(major, minor, patch)</div><div class="ttdoc">Fail to compile unless snicholls-crypto is at least major.minor.patch.</div><div class="ttdef"><b>Definition</b> <a href="version_8hpp_source.html#l00100">version.hpp:100</a></div></div>
 </div><!-- fragment --><p>That is the compile-time half of the diamond rules in CMakeLists.txt; the CMake half is <span class="tt">snicholls_crypto_require(x.y.z)</span>. The number here, the <span class="tt">project(... VERSION)</span> in CMakeLists.txt and the release tag are three copies of one fact, checked against each other by <span class="tt">scripts/check_version.py</span> on every CI job. Three places holding one number is exactly how a number goes quietly wrong.</p>
 <div class="fragment"><div class="line"><a class="code hl_define" href="group__crypto.html#ga9c430719e3acdbf4b976d1195035e94c">SNICHOLLS_CRYPTO_REQUIRE_VERSION</a>(0, 1, 0);   <span class="comment">// stops the build against anything older</span></div>
 <div class="line"> </div>

@@ -10,8 +10,10 @@ var searchData=
   ['snicholls_3a_3acrypto_3a_3ahd_7',['hd',['../namespacesnicholls_1_1crypto_1_1hd.html',1,'snicholls::crypto']]],
   ['snicholls_3a_3acrypto_3a_3ahd_3a_3acoin_5ftype_8',['coin_type',['../namespacesnicholls_1_1crypto_1_1hd_1_1coin__type.html',1,'snicholls::crypto::hd']]],
   ['snicholls_3a_3acrypto_3a_3ahd_3a_3apurpose_9',['purpose',['../namespacesnicholls_1_1crypto_1_1hd_1_1purpose.html',1,'snicholls::crypto::hd']]],
-  ['snicholls_3a_3acrypto_3a_3ap256_10',['p256',['../namespacesnicholls_1_1crypto_1_1p256.html',1,'snicholls::crypto']]],
-  ['snicholls_3a_3acrypto_3a_3arsa_11',['rsa',['../namespacesnicholls_1_1crypto_1_1rsa.html',1,'snicholls::crypto']]],
-  ['snicholls_3a_3acrypto_3a_3asecp256k1_12',['secp256k1',['../namespacesnicholls_1_1crypto_1_1secp256k1.html',1,'snicholls::crypto']]],
-  ['snicholls_3a_3acrypto_3a_3ax25519_13',['x25519',['../namespacesnicholls_1_1crypto_1_1x25519.html',1,'snicholls::crypto']]]
+  ['snicholls_3a_3acrypto_3a_3ajose_10',['jose',['../namespacesnicholls_1_1crypto_1_1jose.html',1,'snicholls::crypto']]],
+  ['snicholls_3a_3acrypto_3a_3ap256_11',['p256',['../namespacesnicholls_1_1crypto_1_1p256.html',1,'snicholls::crypto']]],
+  ['snicholls_3a_3acrypto_3a_3ap384_12',['p384',['../namespacesnicholls_1_1crypto_1_1p384.html',1,'snicholls::crypto']]],
+  ['snicholls_3a_3acrypto_3a_3arsa_13',['rsa',['../namespacesnicholls_1_1crypto_1_1rsa.html',1,'snicholls::crypto']]],
+  ['snicholls_3a_3acrypto_3a_3asecp256k1_14',['secp256k1',['../namespacesnicholls_1_1crypto_1_1secp256k1.html',1,'snicholls::crypto']]],
+  ['snicholls_3a_3acrypto_3a_3ax25519_15',['x25519',['../namespacesnicholls_1_1crypto_1_1x25519.html',1,'snicholls::crypto']]]
 ];

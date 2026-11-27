@@ -26,7 +26,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">snicholls-crypto<span id="projectnumber">&#160;0.4.2</span>
+   <div id="projectname">snicholls-crypto<span id="projectnumber">&#160;0.5.0</span>
    </div>
    <div id="projectbrief">Elliptic curves, signatures and wallet key derivation for the snicholls libraries</div>
   </td>
@@ -119,6 +119,7 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('p256_2scalar_8
 <div class="textblock"><code>#include &lt;<a class="el" href="constant__time_8hpp_source.html">snicholls/crypto/constant_time.hpp</a>&gt;</code><br />
 <code>#include &lt;snicholls/crypto/detail/limbs.hpp&gt;</code><br />
 <code>#include &lt;snicholls/crypto/detail/mont256.hpp&gt;</code><br />
+<code>#include &lt;snicholls/crypto/detail/mont_residue.hpp&gt;</code><br />
 <code>#include &lt;array&gt;</code><br />
 <code>#include &lt;cstddef&gt;</code><br />
 <code>#include &lt;cstdint&gt;</code><br />
@@ -127,17 +128,17 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('p256_2scalar_8
 </div>
 <p><a href="p256_2scalar_8hpp_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 id="header-nested-classes" class="groupheader"><a id="nested-classes" name="nested-classes"></a>
-Classes</h2></td></tr>
-<tr class="memitem:snicholls_3A_3Acrypto_3A_3Ap256_3A_3Ascalar" id="r_snicholls_3A_3Acrypto_3A_3Ap256_3A_3Ascalar"><td class="memItemLeft">class &#160;</td><td class="memItemRight"><a class="el" href="classsnicholls_1_1crypto_1_1p256_1_1scalar.html">snicholls::crypto::p256::scalar</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">An integer modulo n, kept in Montgomery form, fully reduced.  <a href="classsnicholls_1_1crypto_1_1p256_1_1scalar.html#details">More...</a><br /></td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-namespaces" class="groupheader"><a id="namespaces" name="namespaces"></a>
 Namespaces</h2></td></tr>
 <tr class="memitem:snicholls_3A_3Acrypto" id="r_snicholls_3A_3Acrypto"><td class="memItemLeft">namespace &#160;</td><td class="memItemRight"><a class="el" href="namespacesnicholls_1_1crypto.html">snicholls::crypto</a></td></tr>
 <tr class="memdesc:namespacesnicholls_1_1crypto"><td class="mdescLeft">&#160;</td><td class="mdescRight">snicholls-crypto: its version here, its algorithms in the nested namespaces. <br /></td></tr>
 <tr class="memitem:snicholls_3A_3Acrypto_3A_3Ap256" id="r_snicholls_3A_3Acrypto_3A_3Ap256"><td class="memItemLeft">namespace &#160;</td><td class="memItemRight"><a class="el" href="namespacesnicholls_1_1crypto_1_1p256.html">snicholls::crypto::p256</a></td></tr>
 <tr class="memdesc:namespacesnicholls_1_1crypto_1_1p256"><td class="mdescLeft">&#160;</td><td class="mdescRight">P-256 (secp256r1, NIST FIPS 186-5, SEC 2): its field, scalars, points and ECDSA. <br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-typedef-members" class="groupheader"><a id="typedef-members" name="typedef-members"></a>
+Typedefs</h2></td></tr>
+<tr class="memitem:ga2b5a51a3a2e130dca376bd58ce0f8a12" id="r_ga2b5a51a3a2e130dca376bd58ce0f8a12"><td class="memItemLeft">using&#160;</td><td class="memItemRight"><a class="el" href="group__p256.html#ga2b5a51a3a2e130dca376bd58ce0f8a12">snicholls::crypto::p256::scalar</a> = crypto::detail::mont_residue&lt;4, detail::order_modulus&gt;</td></tr>
+<tr class="memdesc:ga2b5a51a3a2e130dca376bd58ce0f8a12"><td class="mdescLeft">&#160;</td><td class="mdescRight">An integer modulo the group order n, kept in Montgomery form, fully reduced: <span class="tt">from_u64</span>, <span class="tt">from_bytes</span> (strict: refused at or above n), <span class="tt">from_bytes_ct</span>, <span class="tt">from_bytes_reduced</span> (a hash, reduced once), <span class="tt">order_bytes</span>, <span class="tt">to_bytes</span>, <span class="tt">+</span>, <span class="tt">-</span>, <span class="tt">*</span>, <span class="tt">inverse</span> (Fermat), <span class="tt">is_zero_mask</span>, <span class="tt">select</span>, <span class="tt">==</span>. The class is <span class="tt">detail::mont_residue&lt;4, ...&gt;</span>, shared with P-384.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Scalars of P-256: integers modulo the group order n. </p>
@@ -152,10 +153,10 @@ Namespaces</h2></td></tr>
 <dl class="section user"><dt>Errors</dt><dd></dd></dl>
 <p><span class="tt">from_bytes</span> returns std::nullopt for a value at or above n.</p>
 <dl class="section user"><dt>Examples</dt><dd></dd></dl>
-<div class="fragment"><div class="line">    <span class="keyword">using </span><a class="code hl_class" href="classsnicholls_1_1crypto_1_1p256_1_1scalar.html">snicholls::crypto::p256::scalar</a>;</div>
+<div class="fragment"><div class="line">    <span class="keyword">using </span><a class="code hl_typedef" href="group__p256.html#ga2b5a51a3a2e130dca376bd58ce0f8a12">snicholls::crypto::p256::scalar</a>;</div>
 <div class="line">    <span class="keyword">const</span> <span class="keyword">auto</span> n = scalar::order_bytes();</div>
 <div class="line">    <span class="keyword">const</span> <span class="keywordtype">bool</span> inverse_ok = scalar::from_u64(5) * scalar::from_u64(5).inverse() == scalar::from_u64(1);</div>
-<div class="line">    <span class="keyword">const</span> scalar reduced = scalar::from_bytes_reduced(hex&lt;32&gt;(<span class="stringliteral">&quot;ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff&quot;</span>));</div>
+<div class="line">    <span class="keyword">const</span> <a class="code hl_typedef" href="group__p256.html#ga2b5a51a3a2e130dca376bd58ce0f8a12">scalar</a> reduced = scalar::from_bytes_reduced(hex&lt;32&gt;(<span class="stringliteral">&quot;ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff&quot;</span>));</div>
 <div class="line">    <span class="keyword">const</span> <span class="keywordtype">bool</span> n_refused = !scalar::from_bytes(n).has_value();   <span class="comment">// a scalar is below n</span></div>
 </div><!-- fragment --><dl class="section user"><dt>Performance</dt><dd></dd></dl>
 <p>See BENCHMARKS.md (<span class="tt">p256/ecdsa</span>).</p>

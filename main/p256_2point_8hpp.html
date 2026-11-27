@@ -26,7 +26,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">snicholls-crypto<span id="projectnumber">&#160;0.4.2</span>
+   <div id="projectname">snicholls-crypto<span id="projectnumber">&#160;0.5.0</span>
    </div>
    <div id="projectbrief">Elliptic curves, signatures and wallet key derivation for the snicholls libraries</div>
   </td>
@@ -117,6 +117,7 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('p256_2point_8h
 <p>Points of P-256 (y^2 = x^3 - 3x + b): complete projective addition and scalar multiplication.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="constant__time_8hpp_source.html">snicholls/crypto/constant_time.hpp</a>&gt;</code><br />
+<code>#include &lt;snicholls/crypto/detail/weierstrass_a3.hpp&gt;</code><br />
 <code>#include &lt;<a class="el" href="p256_2field_8hpp_source.html">snicholls/crypto/p256/field.hpp</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="p256_2scalar_8hpp_source.html">snicholls/crypto/p256/scalar.hpp</a>&gt;</code><br />
 <code>#include &lt;array&gt;</code><br />
@@ -127,19 +128,19 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('p256_2point_8h
 </div>
 <p><a href="p256_2point_8hpp_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 id="header-nested-classes" class="groupheader"><a id="nested-classes" name="nested-classes"></a>
-Classes</h2></td></tr>
-<tr class="memitem:snicholls_3A_3Acrypto_3A_3Ap256_3A_3Aaffine_5Fpoint" id="r_snicholls_3A_3Acrypto_3A_3Ap256_3A_3Aaffine_5Fpoint"><td class="memItemLeft">struct &#160;</td><td class="memItemRight"><a class="el" href="structsnicholls_1_1crypto_1_1p256_1_1affine__point.html">snicholls::crypto::p256::affine_point</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A point of P-256 in affine coordinates (never the identity).  <a href="structsnicholls_1_1crypto_1_1p256_1_1affine__point.html#details">More...</a><br /></td></tr>
-<tr class="memitem:snicholls_3A_3Acrypto_3A_3Ap256_3A_3Apoint" id="r_snicholls_3A_3Acrypto_3A_3Ap256_3A_3Apoint"><td class="memItemLeft">class &#160;</td><td class="memItemRight"><a class="el" href="classsnicholls_1_1crypto_1_1p256_1_1point.html">snicholls::crypto::p256::point</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A point of P-256 in homogeneous projective coordinates, the identity included.  <a href="classsnicholls_1_1crypto_1_1p256_1_1point.html#details">More...</a><br /></td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-namespaces" class="groupheader"><a id="namespaces" name="namespaces"></a>
 Namespaces</h2></td></tr>
 <tr class="memitem:snicholls_3A_3Acrypto" id="r_snicholls_3A_3Acrypto"><td class="memItemLeft">namespace &#160;</td><td class="memItemRight"><a class="el" href="namespacesnicholls_1_1crypto.html">snicholls::crypto</a></td></tr>
 <tr class="memdesc:namespacesnicholls_1_1crypto"><td class="mdescLeft">&#160;</td><td class="mdescRight">snicholls-crypto: its version here, its algorithms in the nested namespaces. <br /></td></tr>
 <tr class="memitem:snicholls_3A_3Acrypto_3A_3Ap256" id="r_snicholls_3A_3Acrypto_3A_3Ap256"><td class="memItemLeft">namespace &#160;</td><td class="memItemRight"><a class="el" href="namespacesnicholls_1_1crypto_1_1p256.html">snicholls::crypto::p256</a></td></tr>
 <tr class="memdesc:namespacesnicholls_1_1crypto_1_1p256"><td class="mdescLeft">&#160;</td><td class="mdescRight">P-256 (secp256r1, NIST FIPS 186-5, SEC 2): its field, scalars, points and ECDSA. <br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-typedef-members" class="groupheader"><a id="typedef-members" name="typedef-members"></a>
+Typedefs</h2></td></tr>
+<tr class="memitem:ga3575f22019e96a47f474a188d062bd83" id="r_ga3575f22019e96a47f474a188d062bd83"><td class="memItemLeft">using&#160;</td><td class="memItemRight"><a class="el" href="group__p256.html#ga3575f22019e96a47f474a188d062bd83">snicholls::crypto::p256::affine_point</a> = crypto::detail::affine_point_t&lt;detail::curve&gt;</td></tr>
+<tr class="memdesc:ga3575f22019e96a47f474a188d062bd83"><td class="mdescLeft">&#160;</td><td class="mdescRight">A point of P-256 in affine coordinates (never the identity): <span class="tt">x</span>, <span class="tt">y</span>, <span class="tt">is_on_curve</span>, <span class="tt">compressed</span> (33 bytes), <span class="tt">uncompressed</span> (65), <span class="tt">decode</span> (SEC1, checked; variable time, public data only), <span class="tt">==</span>. The class is <span class="tt">detail::affine_point_t</span>, shared with P-384.  <br /></td></tr>
+<tr class="memitem:gae39b282b027cb6265e3ed588805deaa8" id="r_gae39b282b027cb6265e3ed588805deaa8"><td class="memItemLeft">using&#160;</td><td class="memItemRight"><a class="el" href="group__p256.html#gae39b282b027cb6265e3ed588805deaa8">snicholls::crypto::p256::point</a> = crypto::detail::point_t&lt;detail::curve&gt;</td></tr>
+<tr class="memdesc:gae39b282b027cb6265e3ed588805deaa8"><td class="mdescLeft">&#160;</td><td class="mdescRight">A point of P-256 in homogeneous projective coordinates, the identity included: complete addition for a = -3 (<span class="tt">+</span>, <span class="tt">dbl</span>, <span class="tt">-</span>), <span class="tt">mul</span> and <span class="tt">mul_base</span> in constant time (a 4-bit fixed window, masked table scans), <span class="tt">mul_add_public</span> for verification (variable time), <span class="tt">to_affine_ct</span>, <span class="tt">to_affine</span>, <span class="tt">select</span>, <span class="tt">==</span>. The class is <span class="tt">detail::point_t</span>, shared with P-384.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Points of P-256 (y^2 = x^3 - 3x + b): complete projective addition and scalar multiplication. </p>

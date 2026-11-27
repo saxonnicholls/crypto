@@ -29,7 +29,8 @@ var NAVTREE =
     [ "Testing against other implementations", "index.html#autotoc_md2", null ],
     [ "Constant time", "index.html#autotoc_md3", null ],
     [ "Performance", "index.html#autotoc_md4", null ],
-    [ "Building", "index.html#autotoc_md5", null ],
+    [ "Future directions", "index.html#autotoc_md5", null ],
+    [ "Building", "index.html#autotoc_md6", null ],
     [ "Topics", "topics.html", "topics" ],
     [ "Namespaces", "namespaces.html", [
       [ "Namespace List", "namespaces.html", "namespaces_dup" ],
@@ -64,9 +65,9 @@ var NAVTREE =
 
 var NAVTREEINDEX =
 [
-"aes256__gcm_8hpp.html",
-"functions_func.html",
-"schnorr_8hpp.html"
+"aes128__gcm_8hpp.html",
+"functions_func_s.html",
+"namespacesnicholls_1_1crypto_1_1p384.html"
 ];
 
 const SYNCONMSG = 'click to disable panel synchronization';

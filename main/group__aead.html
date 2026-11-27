@@ -26,7 +26,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">snicholls-crypto<span id="projectnumber">&#160;0.4.2</span>
+   <div id="projectname">snicholls-crypto<span id="projectnumber">&#160;0.5.0</span>
    </div>
    <div id="projectbrief">Elliptic curves, signatures and wallet key derivation for the snicholls libraries</div>
   </td>
@@ -114,11 +114,13 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('group__aead.ht
 </div><!--header-->
 <div class="contents">
 
-<p>ChaCha20-Poly1305 (RFC 8439), XChaCha20-Poly1305, AES-256-GCM and AES-256 key wrap (RFC 3394).  
+<p>ChaCha20-Poly1305 (RFC 8439), XChaCha20-Poly1305, AES-128-GCM, AES-256-GCM and AES-256 key wrap (RFC 3394).  
 <a href="#details">More...</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-files" class="groupheader"><a id="files" name="files"></a>
 Files</h2></td></tr>
+<tr class="memitem:snicholls_2Fcrypto_2Faead_2Faes128_5Fgcm_2Ehpp" id="r_snicholls_2Fcrypto_2Faead_2Faes128_5Fgcm_2Ehpp"><td class="memItemLeft">file &#160;</td><td class="memItemRight"><a class="el" href="aes128__gcm_8hpp.html">snicholls/crypto/aead/aes128_gcm.hpp</a></td></tr>
+<tr class="memdesc:aes128__gcm_8hpp"><td class="mdescLeft">&#160;</td><td class="mdescRight">AES-128-GCM (NIST SP 800-38D): authenticated encryption with associated data, 96-bit nonces. <br /></td></tr>
 <tr class="memitem:snicholls_2Fcrypto_2Faead_2Faes256_5Fgcm_2Ehpp" id="r_snicholls_2Fcrypto_2Faead_2Faes256_5Fgcm_2Ehpp"><td class="memItemLeft">file &#160;</td><td class="memItemRight"><a class="el" href="aes256__gcm_8hpp.html">snicholls/crypto/aead/aes256_gcm.hpp</a></td></tr>
 <tr class="memdesc:aes256__gcm_8hpp"><td class="mdescLeft">&#160;</td><td class="mdescRight">AES-256-GCM (NIST SP 800-38D): authenticated encryption with associated data, 96-bit nonces. <br /></td></tr>
 <tr class="memitem:snicholls_2Fcrypto_2Faead_2Faes_5Fkey_5Fwrap_2Ehpp" id="r_snicholls_2Fcrypto_2Faead_2Faes_5Fkey_5Fwrap_2Ehpp"><td class="memItemLeft">file &#160;</td><td class="memItemRight"><a class="el" href="aes__key__wrap_8hpp.html">snicholls/crypto/aead/aes_key_wrap.hpp</a></td></tr>
@@ -128,6 +130,10 @@ Files</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:ga602cf4ff59535936244e32c46f0775d9" id="r_ga602cf4ff59535936244e32c46f0775d9"><td class="memItemLeft">constexpr result&lt; <a class="el" href="namespacesnicholls_1_1crypto_1_1aead.html#a6416b3a47fa4d034458c765b733ea95e">tag</a>, <a class="el" href="group__crypto.html#gaa314007c5b3658974966bfdaeb2c3625">errc</a> &gt;&#160;</td><td class="memItemRight"><a class="el" href="#ga602cf4ff59535936244e32c46f0775d9">snicholls::crypto::aead::aes128_gcm_seal</a> (std::span&lt; const std::uint8_t, 16 &gt; key, std::span&lt; const std::uint8_t, 12 &gt; nonce, std::span&lt; const std::uint8_t &gt; aad, std::span&lt; const std::uint8_t &gt; plaintext, std::span&lt; std::uint8_t &gt; ciphertext) noexcept</td></tr>
+<tr class="memdesc:ga602cf4ff59535936244e32c46f0775d9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Encrypts and authenticates with AES-128-GCM. Constant time in the key and the plaintext.  <br /></td></tr>
+<tr class="memitem:ga18ba805ad67ae04323c9be7c07fa4535" id="r_ga18ba805ad67ae04323c9be7c07fa4535"><td class="memItemLeft">constexpr result&lt; void, <a class="el" href="group__crypto.html#gaa314007c5b3658974966bfdaeb2c3625">errc</a> &gt;&#160;</td><td class="memItemRight"><a class="el" href="#ga18ba805ad67ae04323c9be7c07fa4535">snicholls::crypto::aead::aes128_gcm_open</a> (std::span&lt; const std::uint8_t, 16 &gt; key, std::span&lt; const std::uint8_t, 12 &gt; nonce, std::span&lt; const std::uint8_t &gt; aad, std::span&lt; const std::uint8_t &gt; ciphertext, std::span&lt; const std::uint8_t, 16 &gt; received, std::span&lt; std::uint8_t &gt; plaintext) noexcept</td></tr>
+<tr class="memdesc:ga18ba805ad67ae04323c9be7c07fa4535"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks the tag and decrypts with AES-128-GCM. Constant time in the key, the plaintext and the tag.  <br /></td></tr>
 <tr class="memitem:ga96d9d4108a70983af8482e0bc2b0c7a5" id="r_ga96d9d4108a70983af8482e0bc2b0c7a5"><td class="memItemLeft">constexpr result&lt; <a class="el" href="namespacesnicholls_1_1crypto_1_1aead.html#a6416b3a47fa4d034458c765b733ea95e">tag</a>, <a class="el" href="group__crypto.html#gaa314007c5b3658974966bfdaeb2c3625">errc</a> &gt;&#160;</td><td class="memItemRight"><a class="el" href="#ga96d9d4108a70983af8482e0bc2b0c7a5">snicholls::crypto::aead::aes256_gcm_seal</a> (std::span&lt; const std::uint8_t, 32 &gt; key, std::span&lt; const std::uint8_t, 12 &gt; nonce, std::span&lt; const std::uint8_t &gt; aad, std::span&lt; const std::uint8_t &gt; plaintext, std::span&lt; std::uint8_t &gt; ciphertext) noexcept</td></tr>
 <tr class="memdesc:ga96d9d4108a70983af8482e0bc2b0c7a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Encrypts and authenticates with AES-256-GCM. Constant time in the key and the plaintext.  <br /></td></tr>
 <tr class="memitem:ga1e9d3283b937a14902df2c3d5676de2d" id="r_ga1e9d3283b937a14902df2c3d5676de2d"><td class="memItemLeft">constexpr result&lt; void, <a class="el" href="group__crypto.html#gaa314007c5b3658974966bfdaeb2c3625">errc</a> &gt;&#160;</td><td class="memItemRight"><a class="el" href="#ga1e9d3283b937a14902df2c3d5676de2d">snicholls::crypto::aead::aes256_gcm_open</a> (std::span&lt; const std::uint8_t, 32 &gt; key, std::span&lt; const std::uint8_t, 12 &gt; nonce, std::span&lt; const std::uint8_t &gt; aad, std::span&lt; const std::uint8_t &gt; ciphertext, std::span&lt; const std::uint8_t, 16 &gt; received, std::span&lt; std::uint8_t &gt; plaintext) noexcept</td></tr>
@@ -146,8 +152,132 @@ Functions</h2></td></tr>
 <tr class="memdesc:gab406f1f01f58690a153ce7a76fa9c8f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks the tag and decrypts, with a 24-byte nonce (XChaCha20-Poly1305). Constant time in the key, the plaintext and the tag.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>ChaCha20-Poly1305 (RFC 8439), XChaCha20-Poly1305, AES-256-GCM and AES-256 key wrap (RFC 3394). </p>
+<div class="textblock"><p>ChaCha20-Poly1305 (RFC 8439), XChaCha20-Poly1305, AES-128-GCM, AES-256-GCM and AES-256 key wrap (RFC 3394). </p>
 </div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
+<a id="ga18ba805ad67ae04323c9be7c07fa4535" name="ga18ba805ad67ae04323c9be7c07fa4535"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga18ba805ad67ae04323c9be7c07fa4535">&#9670;&#160;</a></span>aes128_gcm_open()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">result&lt; void, <a class="el" href="group__crypto.html#gaa314007c5b3658974966bfdaeb2c3625">errc</a> &gt; snicholls::crypto::aead::aes128_gcm_open </td>
+          <td>(</td>
+          <td class="paramtype">std::span&lt; const std::uint8_t, 16 &gt;</td>          <td class="paramname"><span class="paramname"><em>key</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::span&lt; const std::uint8_t, 12 &gt;</td>          <td class="paramname"><span class="paramname"><em>nonce</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::span&lt; const std::uint8_t &gt;</td>          <td class="paramname"><span class="paramname"><em>aad</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::span&lt; const std::uint8_t &gt;</td>          <td class="paramname"><span class="paramname"><em>ciphertext</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::span&lt; const std::uint8_t, 16 &gt;</td>          <td class="paramname"><span class="paramname"><em>received</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::span&lt; std::uint8_t &gt;</td>          <td class="paramname"><span class="paramname"><em>plaintext</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel nodiscard">nodiscard</span><span class="mlabel constexpr">constexpr</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Checks the tag and decrypts with AES-128-GCM. Constant time in the key, the plaintext and the tag. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">key</td><td>The 16-byte key. </td></tr>
+    <tr><td class="paramname">nonce</td><td>The 12-byte nonce used to seal. </td></tr>
+    <tr><td class="paramname">aad</td><td>The associated data used to seal. </td></tr>
+    <tr><td class="paramname">ciphertext</td><td>The ciphertext. </td></tr>
+    <tr><td class="paramname">received</td><td>The 16-byte tag. </td></tr>
+    <tr><td class="paramname">plaintext</td><td>Where the plaintext goes: exactly as long as the ciphertext (may be the same span). Zeroed when the tag does not match. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Success, <span class="tt"><a class="el" href="group__crypto.html#ggaa314007c5b3658974966bfdaeb2c3625a047ef5b1ba6d5dcc4dbee37c075a2088" title="An AEAD tag did not match: the ciphertext, the associated data, the nonce or the key differ.">errc::authentication_failed</a></span> or <span class="tt"><a class="el" href="group__crypto.html#ggaa314007c5b3658974966bfdaeb2c3625a2970685bea59a5d3e9bbd92de36caccc" title="An input had the wrong number of bytes.">errc::invalid_length</a></span>. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="aes128__gcm_8hpp_source.html#l00097">97</a> of file <a class="el" href="aes128__gcm_8hpp_source.html">aes128_gcm.hpp</a>.</p>
+
+</div>
+</div>
+<a id="ga602cf4ff59535936244e32c46f0775d9" name="ga602cf4ff59535936244e32c46f0775d9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga602cf4ff59535936244e32c46f0775d9">&#9670;&#160;</a></span>aes128_gcm_seal()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">result&lt; <a class="el" href="namespacesnicholls_1_1crypto_1_1aead.html#a6416b3a47fa4d034458c765b733ea95e">tag</a>, <a class="el" href="group__crypto.html#gaa314007c5b3658974966bfdaeb2c3625">errc</a> &gt; snicholls::crypto::aead::aes128_gcm_seal </td>
+          <td>(</td>
+          <td class="paramtype">std::span&lt; const std::uint8_t, 16 &gt;</td>          <td class="paramname"><span class="paramname"><em>key</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::span&lt; const std::uint8_t, 12 &gt;</td>          <td class="paramname"><span class="paramname"><em>nonce</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::span&lt; const std::uint8_t &gt;</td>          <td class="paramname"><span class="paramname"><em>aad</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::span&lt; const std::uint8_t &gt;</td>          <td class="paramname"><span class="paramname"><em>plaintext</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::span&lt; std::uint8_t &gt;</td>          <td class="paramname"><span class="paramname"><em>ciphertext</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel nodiscard">nodiscard</span><span class="mlabel constexpr">constexpr</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Encrypts and authenticates with AES-128-GCM. Constant time in the key and the plaintext. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">key</td><td>The 16-byte key. </td></tr>
+    <tr><td class="paramname">nonce</td><td>The 12-byte nonce, never repeated under this key. </td></tr>
+    <tr><td class="paramname">aad</td><td>Associated data, authenticated but not encrypted. </td></tr>
+    <tr><td class="paramname">plaintext</td><td>The message. </td></tr>
+    <tr><td class="paramname">ciphertext</td><td>Where the ciphertext goes: exactly as long as the plaintext (may be the same span). </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The tag, or <span class="tt"><a class="el" href="group__crypto.html#ggaa314007c5b3658974966bfdaeb2c3625a2970685bea59a5d3e9bbd92de36caccc" title="An input had the wrong number of bytes.">errc::invalid_length</a></span>. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="aes128__gcm_8hpp_source.html#l00080">80</a> of file <a class="el" href="aes128__gcm_8hpp_source.html">aes128_gcm.hpp</a>.</p>
+
+</div>
+</div>
 <a id="ga1e9d3283b937a14902df2c3d5676de2d" name="ga1e9d3283b937a14902df2c3d5676de2d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ga1e9d3283b937a14902df2c3d5676de2d">&#9670;&#160;</a></span>aes256_gcm_open()</h2>
 
@@ -209,7 +339,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Success, <span class="tt"><a class="el" href="group__crypto.html#ggaa314007c5b3658974966bfdaeb2c3625a047ef5b1ba6d5dcc4dbee37c075a2088" title="An AEAD tag did not match: the ciphertext, the associated data, the nonce or the key differ.">errc::authentication_failed</a></span> or <span class="tt"><a class="el" href="group__crypto.html#ggaa314007c5b3658974966bfdaeb2c3625a2970685bea59a5d3e9bbd92de36caccc" title="An input had the wrong number of bytes.">errc::invalid_length</a></span>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="aes256__gcm_8hpp_source.html#l00175">175</a> of file <a class="el" href="aes256__gcm_8hpp_source.html">aes256_gcm.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="aes256__gcm_8hpp_source.html#l00204">204</a> of file <a class="el" href="aes256__gcm_8hpp_source.html">aes256_gcm.hpp</a>.</p>
 
 </div>
 </div>
@@ -268,7 +398,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The tag, or <span class="tt"><a class="el" href="group__crypto.html#ggaa314007c5b3658974966bfdaeb2c3625a2970685bea59a5d3e9bbd92de36caccc" title="An input had the wrong number of bytes.">errc::invalid_length</a></span>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="aes256__gcm_8hpp_source.html#l00153">153</a> of file <a class="el" href="aes256__gcm_8hpp_source.html">aes256_gcm.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="aes256__gcm_8hpp_source.html#l00187">187</a> of file <a class="el" href="aes256__gcm_8hpp_source.html">aes256_gcm.hpp</a>.</p>
 
 </div>
 </div>

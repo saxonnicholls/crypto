@@ -1,19 +1,5 @@
 var searchData=
 [
-  ['valid_0',['valid',['../structsnicholls_1_1crypto_1_1address_1_1base58__alphabet.html#a4dd080046b6b233a2e0653edf178a3db',1,'snicholls::crypto::address::base58_alphabet']]],
-  ['value_5fbarrier_1',['value_barrier',['../namespacesnicholls_1_1crypto_1_1ct.html#a50b3b89430b4c9f136db45c8c6351eaf',1,'snicholls::crypto::ct']]],
-  ['values_2',['values',['../structsnicholls_1_1crypto_1_1address_1_1base58__alphabet.html#a8ca4afae6a9fa0b0ac3ddf93a041b798',1,'snicholls::crypto::address::base58_alphabet::values'],['../structsnicholls_1_1crypto_1_1address_1_1bech32__decoded.html#a943dfcc242619b7b2292a2edfefa7e29',1,'snicholls::crypto::address::bech32_decoded::values']]],
-  ['variant_3',['variant',['../structsnicholls_1_1crypto_1_1address_1_1bech32__decoded.html#af804ec767efd37ca0ca75528c76a6a96',1,'snicholls::crypto::address::bech32_decoded']]],
-  ['vectors_4',['Test vectors',['../index.html#autotoc_md1',1,'']]],
-  ['verify_5',['verify',['../namespacesnicholls_1_1crypto_1_1ed25519.html#af70519145365c21920e5c416b6e1aa19',1,'snicholls::crypto::ed25519::verify()'],['../group__p256.html#gac61a5e75a51637c941a573f5c9468c22',1,'snicholls::crypto::p256::verify()'],['../group__secp256k1.html#ga2fb234278df3f9dc2e72bd900e33b5da',1,'snicholls::crypto::secp256k1::verify()']]],
-  ['verify_5fpkcs1v15_5fsha256_6',['verify_pkcs1v15_sha256',['../group__rsa.html#ga02dab261f2424a83d0b09f75b5b8e9e9',1,'snicholls::crypto::rsa']]],
-  ['verify_5fpkcs1v15_5fsha256_5fprehashed_7',['verify_pkcs1v15_sha256_prehashed',['../group__rsa.html#ga33c8e7236a395e36ffd4afc003fce0d8',1,'snicholls::crypto::rsa']]],
-  ['verify_5fpss_5fsha256_8',['verify_pss_sha256',['../group__rsa.html#ga2233d934cbcf1f0e37e97f766d2212e5',1,'snicholls::crypto::rsa']]],
-  ['verify_5fpss_5fsha256_5fprehashed_9',['verify_pss_sha256_prehashed',['../group__rsa.html#ga8ce3c6b0074b331cb7b70feb38fa6825',1,'snicholls::crypto::rsa']]],
-  ['version_10',['version',['../structsnicholls_1_1crypto_1_1address_1_1witness__program.html#ad59901bf9d633d8d087348572634ae2c',1,'snicholls::crypto::address::witness_program::version'],['../group__crypto.html#ga7518429385f6f3c7893c5719f90ba202',1,'snicholls::crypto::version()']]],
-  ['version_2ehpp_11',['version.hpp',['../version_8hpp.html',1,'']]],
-  ['version_5fmajor_12',['version_major',['../group__crypto.html#ga25f0fb710a29b569702366f46e262eca',1,'snicholls::crypto']]],
-  ['version_5fminor_13',['version_minor',['../group__crypto.html#ga8beedd3f42bbe2bb5a6093a936697643',1,'snicholls::crypto']]],
-  ['version_5fpatch_14',['version_patch',['../group__crypto.html#ga85290cc1c936449c36b8a445fa8dc03c',1,'snicholls::crypto']]],
-  ['version_5fstring_15',['version_string',['../group__crypto.html#gaa10283b54fbc06232df7260b9caaacd0',1,'snicholls::crypto']]]
+  ['uncompressed_0',['uncompressed',['../classsnicholls_1_1crypto_1_1p256_1_1public__key.html#a11df9d7c48896c048594faf833d477ee',1,'snicholls::crypto::p256::public_key::uncompressed()'],['../classsnicholls_1_1crypto_1_1p384_1_1public__key.html#acd50a42e2445b8d7f46a07bbe9402bf4',1,'snicholls::crypto::p384::public_key::uncompressed()'],['../classsnicholls_1_1crypto_1_1secp256k1_1_1public__key.html#a45effff6cee350042f19ce59d9c6fb25',1,'snicholls::crypto::secp256k1::public_key::uncompressed()']]],
+  ['unknown_5fword_1',['unknown_word',['../group__crypto.html#ggaa314007c5b3658974966bfdaeb2c3625a2046cba78dc6afad4567adcd6377bfd4',1,'snicholls::crypto']]]
 ];
