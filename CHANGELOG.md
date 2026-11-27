@@ -1,5 +1,51 @@
 # Changelog
 
+## 0.5.0 (unreleased)
+
+JWE's key agreement, AES-128-GCM, RSA with SHA-384 and SHA-512, and P-384. Requires snicholls-core 0.23.1 or later
+(the Concat KDF); pinned at v0.28.0, tooling at v0.3.2. Experimental and not independently audited.
+
+P-384 is for TLS 1.3's secp384r1 and ecdsa_secp384r1_sha384, X.509's ecdsa-with-SHA384 and JOSE's ES384.
+
+- P-384 (`p384/`): `field`, `scalar`, `point`, `ecdsa` (keys, SEC1, verification over SHA-384 with
+  `verify_message` hashing for you, JOSE's 96-byte r || s and strict DER) and `ecdh` (`shared_secret`, constant
+  time, the peer's point checked on the curve again before it is multiplied). Verification only: no P-384 signing.
+- One implementation for both NIST curves: the Montgomery arithmetic is a template over the limb count
+  (`detail/mont.hpp`; `detail/mont256.hpp` keeps its names at four limbs), the field elements and scalars are one
+  class (`detail/mont_residue.hpp`), and the points are one class over the curve (`detail/weierstrass_a3.hpp`, the
+  complete addition for a = -3 and the fixed-window multiplication). P-256's `field_element`, `scalar`,
+  `affine_point` and `point` are now its instances, with the same interface and behaviour. The ECDSA DER codec is
+  a template over the scalar width (`detail/ecdsa_der.hpp`).
+- Tests: every Wycheproof `ecdsa_secp384r1_sha384` (DER and P1363) and `ecdh_secp384r1_ecpoint` case, RFC 6979
+  A.2.6's key and SHA-384 signature; oracle fixtures from OpenSSL, `@noble/curves` and Node's crypto (keys,
+  verification of RFC 6979 signatures and their mutations, ECDH, SEC1); a fuzz target `p384` against OpenSSL; the
+  secret paths in the Valgrind check.
+
+- Tooling's one-version rules: the version header's two-versions check before its guard (checked by
+  `check_version.py`), and `check_pins` (one version of each library, each pinned where it is used) in `make
+  check`, CI and the CTest `check.pins`.
+
+- ECDH on P-256 (`p256/ecdh.hpp`): `shared_secret(private_key, public_key)`, the x-coordinate of d Q, constant time
+  in the key; the peer's point is checked to be on the curve again before it is multiplied, so a `public_key` built
+  from an unchecked point (an invalid-curve attack) is refused.
+- JOSE's ECDH-ES (`jose/ecdh_es.hpp`, RFC 7518 4.6, RFC 8037): `ecdh_es_x25519<N>`, `ecdh_es_p256<N>` and
+  `ecdh_es_kdf<N>`, the content encryption key for `"alg": "ECDH-ES"` or the key-encryption key for
+  `"ECDH-ES+A256KW"`, through core's `jwa_concat_kdf` with SHA-256, its hash states wiped. With `aead/` this is a
+  JWE recipient's whole cryptography (A256GCM, A256KW); the JOSE text is the caller's.
+- Tests: RFC 7518 appendix C byte for byte (also as a `static_assert`), RFC 8037 A.6, all 355 Wycheproof
+  `ecdh_secp256r1_ecpoint` cases; oracle fixtures of keys against OpenSSL and cryptography's ConcatKDFHash, and of
+  whole JWEs made by jose and opened by cryptography, opened and remade here; the secret paths in the Valgrind check.
+- AES-128-GCM (`aead/aes128_gcm.hpp`): TLS 1.3's mandatory TLS_AES_128_GCM_SHA256 and JOSE's A128GCM. AES is now
+  one template over the key size (`detail::aes_cipher<16>` and `<32>`), so both share the same table-free,
+  constant-time code; AES-256-GCM is unchanged. Tests: FIPS 197 C.1 and the GCM specification's test cases 1 to 4
+  (also as `static_assert`s), every Wycheproof AES-128 case with a 96-bit nonce, oracle fixtures from OpenSSL and
+  Node's crypto, the secret path in the Valgrind check.
+- RSA verification with SHA-384 and SHA-512: `verify_pkcs1v15_sha384` / `_sha512` and `verify_pss_sha384` /
+  `_sha512` (MGF1 on the same hash, salt the hash's length by default), with prehashed forms: RS384, RS512, PS384,
+  PS512, X.509's sha384WithRSAEncryption and TLS's rsa_pss_rsae_sha384 / _sha512. PKCS#1 v1.5 and PSS are now
+  one implementation over the hash. Every Wycheproof case for 2048, 3072 and 4096 bits.
+- The README's "Future directions": key generation and key formats (PKCS#8, SPKI, PEM), and RSA signing.
+
 ## 0.4.2 (2026-11-27)
 
 Pins snicholls-core at v0.28.0 (still required at 0.17.0 or later) and tooling at v0.3.2. No change to the library.

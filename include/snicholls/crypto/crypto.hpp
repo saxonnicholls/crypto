@@ -27,15 +27,24 @@
 
 /// \defgroup aead Authenticated encryption
 /// \ingroup crypto
-/// \brief ChaCha20-Poly1305 (RFC 8439), XChaCha20-Poly1305, AES-256-GCM and AES-256 key wrap (RFC 3394).
+/// \brief ChaCha20-Poly1305 (RFC 8439), XChaCha20-Poly1305, AES-128-GCM, AES-256-GCM and AES-256 key wrap (RFC 3394).
 
 /// \defgroup p256 P-256
 /// \ingroup crypto
-/// \brief P-256 (secp256r1): its field, scalars and points, and ECDSA with SHA-256 (ES256) with RFC 6979 nonces.
+/// \brief P-256 (secp256r1): its field, scalars and points, ECDSA with SHA-256 (ES256) with RFC 6979 nonces, and ECDH.
+
+/// \defgroup p384 P-384
+/// \ingroup crypto
+/// \brief P-384 (secp384r1): its field, scalars and points (the code P-256 uses, at six limbs), ECDSA verification with
+/// SHA-384 (ES384, TLS's ecdsa_secp384r1_sha384) and ECDH.
+
+/// \defgroup jose JOSE
+/// \ingroup crypto
+/// \brief JWE's key agreement: ECDH-ES and ECDH-ES+A*KW on X25519 and P-256, with JOSE's Concat KDF (RFC 7518 4.6).
 
 /// \defgroup rsa RSA
 /// \ingroup crypto
-/// \brief RSA signature verification: RSASSA-PKCS1-v1_5 and RSASSA-PSS with SHA-256 (RS256, PS256).
+/// \brief RSA signature verification: RSASSA-PKCS1-v1_5 and RSASSA-PSS with SHA-256, SHA-384 and SHA-512.
 
 /// \defgroup wallet Wallets
 /// \ingroup crypto
@@ -49,6 +58,7 @@
 #include <snicholls/crypto/secret.hpp>
 #include <snicholls/crypto/version.hpp>
 #include <snicholls/crypto/address/base58.hpp>
+#include <snicholls/crypto/aead/aes128_gcm.hpp>
 #include <snicholls/crypto/aead/aes256_gcm.hpp>
 #include <snicholls/crypto/aead/aes_key_wrap.hpp>
 #include <snicholls/crypto/aead/chacha20_poly1305.hpp>
@@ -64,7 +74,11 @@
 #include <snicholls/crypto/hd/bip32.hpp>
 #include <snicholls/crypto/hd/path.hpp>
 #include <snicholls/crypto/hd/slip10.hpp>
+#include <snicholls/crypto/jose/ecdh_es.hpp>
+#include <snicholls/crypto/p256/ecdh.hpp>
 #include <snicholls/crypto/p256/ecdsa.hpp>
+#include <snicholls/crypto/p384/ecdh.hpp>
+#include <snicholls/crypto/p384/ecdsa.hpp>
 #include <snicholls/crypto/rsa/rsa.hpp>
 #include <snicholls/crypto/secp256k1/ecdsa.hpp>
 #include <snicholls/crypto/secp256k1/field.hpp>

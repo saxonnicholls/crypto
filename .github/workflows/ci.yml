@@ -151,6 +151,7 @@ jobs:
           python scripts/check_version.py
           python scripts/check_mirror.py
           python scripts/check_public.py --commits
+          python third_party/tooling/scripts/check_pins.py
 
       - name: Configure (warnings are errors)
         run: cmake -B build -DSNICHOLLS_CRYPTO_WERROR=ON -DSNICHOLLS_CRYPTO_BUILD_BENCHMARKS=ON

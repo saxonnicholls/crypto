@@ -1435,17 +1435,126 @@ def gen_p256(pool, fx):
 
 
 # ---------------------------------------------------------------------------------------------------------------
+# P-384
+
+P384_P = 2**384 - 2**128 - 2**96 + 2**32 - 1
+P384_N = 0xffffffffffffffffffffffffffffffffffffffffffffffffc7634d81f4372ddf581a0db248b0a77aecec196accc52973
+
+
+def i48(v):
+    assert 0 <= v < 2**384, v
+    return "%096x" % v
+
+
+def gen_p384(pool, fx):
+    rng = random.Random("p384 v1")
+    edges = [0, 1, 2, P384_N - 1, P384_N, P384_N + 1, 2**384 - 1]
+    keys = [i48(k) for k in edges] + [hx(rand_bytes(rng, 48)) for _ in range(300)]
+    f = Fixture("p384_keys.txt", "P-384 private keys to public keys (SEC1)",
+                "private key, compressed, uncompressed ('-' '-': refused, 0 or at or above n)")
+    answers = pool.ask("p384_pub", [{"sk": k} for k in keys])
+    good = []
+    for k, ans in zip(keys, answers):
+        v, libs = consensus(pool, f.name, {"sk": k}, ans, lambda lib, a: refused_or(a, "c", "u"))
+        if libs:
+            f.add([k] + (v or [None, None]), libs)
+            if v:
+                good.append((k, v[0], v[1]))
+    fx.append(f)
+
+    # Signatures to verify: RFC 6979 with SHA-384, byte for byte across OpenSSL and noble, then mutated
+    cases = []
+    for k, c, u in good[:200]:
+        m = rand_bytes(rng, rng.choice([0, 1, 48, 100]))
+        cases.append({"sk": k, "m": hx(m), "h": hx(hashlib.sha384(m).digest())})
+    answers = pool.ask("p384_sign", [{"sk": c["sk"], "h": c["h"]} for c in cases])
+    signed = []
+    pub_of = {k: (c, u) for k, c, u in good}
+    for case, ans in zip(cases, answers):
+        v, libs = consensus(pool, "p384 sign", case, ans, lambda lib, a: [a["r"], a["s"]])
+        if libs:
+            signed.append((case, int(v[0], 16), int(v[1], 16)))
+    vcases = []
+    for i, (case, ri, si) in enumerate(signed):
+        c, u = pub_of[case["sk"]]
+        pub = u if i % 2 else c
+
+        def add(why, pub_, m, h, rr, ss):
+            vcases.append({"why": why, "pub": pub_, "m": m, "h": h, "sig": i48(rr % 2**384) + i48(ss % 2**384)})
+        add("valid", pub, case["m"], case["h"], ri, si)
+        add("n - s", pub, case["m"], case["h"], ri, P384_N - si)   # either s verifies
+        add("r bit flipped", pub, case["m"], case["h"], ri ^ (1 << rng.randrange(384)), si)
+        add("s bit flipped", pub, case["m"], case["h"], ri, si ^ (1 << rng.randrange(384)))
+        m2 = case["m"] + "00"
+        add("another message", pub, m2, hx(hashlib.sha384(bytes.fromhex(m2)).digest()), ri, si)
+        add("another key", good[(i + 1) % len(good)][2], case["m"], case["h"], ri, si)
+        if i < 20:
+            for rr, ss, why in ((0, si, "r = 0"), (ri, 0, "s = 0"), (P384_N, si, "r = n"), (ri, P384_N, "s = n"),
+                                (ri + P384_N, si, "r + n"), (ri, 2**384 - 1, "s = 2^384 - 1")):
+                add(why, pub, case["m"], case["h"], rr, ss)
+    f = Fixture("p384_verify.txt", "P-384 ECDSA verification with SHA-384 (either s accepted); the signatures are RFC 6979's, "
+                "OpenSSL's and noble's byte for byte", "case, public key (SEC1), message, SHA-384, r || s, valid (1 or 0)",
+                ["Node's crypto verifies the message (it hashes it) with uncompressed keys only; the others verify the hash."])
+    answers = pool.ask("p384_verify", [{k: c[k] for k in ("pub", "m", "h", "sig")} for c in vcases])
+    for case, ans in zip(vcases, answers):
+        v, libs = consensus(pool, f.name, {"why": case["why"], "sig": case["sig"][:16]}, ans,
+                            lambda lib, a: int(bool(a.get("valid"))))
+        if libs:
+            f.add([case["why"].replace(" ", "_"), case["pub"], case["m"] or None, case["h"], case["sig"], v], libs)
+    fx.append(f)
+
+    # ECDH: a private key and a peer's key (compressed, uncompressed, or off the curve)
+    ecases = []
+    for i in range(min(200, len(good) - 1)):
+        sk = good[i][0]
+        c, u = good[i + 1][1], good[i + 1][2]
+        peer = (c, u)[i % 2]
+        if i % 10 == 9:   # y + 1: off the curve
+            x, y = int(u[2:98], 16), int(u[98:], 16)
+            peer = "04" + i48(x) + i48((y + 1) % P384_P)
+        ecases.append({"sk": sk, "pub": peer})
+    f = Fixture("p384_ecdh.txt", "P-384 ECDH: the shared secret, the x-coordinate of d Q",
+                "private key, peer's public key (SEC1), shared secret ('-': refused, the peer's point is not on the curve)")
+    answers = pool.ask("p384_ecdh", ecases)
+    for case, ans in zip(ecases, answers):
+        v, libs = consensus(pool, f.name, case, ans, lambda lib, a: refused_or(a, "z"))
+        if libs:
+            f.add([case["sk"], case["pub"], v[0] if v else None], libs)
+    fx.append(f)
+
+    # SEC1 parsing
+    pcases = []
+    for k, c, u in good[:150]:
+        x, y = int(u[2:98], 16), int(u[98:], 16)
+        pcases += [c, u, "04" + i48(x) + i48((y + 1) % P384_P), "%02x" % (6 + (y & 1)) + u[2:]]
+    for _ in range(100):
+        pcases.append(rng.choice(["02", "03"]) + hx(rand_bytes(rng, 48)))
+    for x in (P384_P, P384_P + 1, 2**384 - 1, 0):
+        pcases += ["02" + i48(x), "03" + i48(x)]
+    pcases += ["00", "04"]
+    f = Fixture("p384_sec1.txt", "P-384 SEC1 public-key parsing", "encoding, compressed form ('-': refused)",
+                ["Every oracle and this library refuse the hybrid form (0x06, 0x07), points off the curve and x or y",
+                 "at or above p."])
+    answers = pool.ask("p384_pub_parse", [{"pub": c} for c in pcases])
+    for c, ans in zip(pcases, answers):
+        v, libs = consensus(pool, f.name, {"pub": c}, ans, lambda lib, a: refused_or(a, "c"))
+        if libs:
+            f.add([c, v[0] if v else None], libs)
+    fx.append(f)
+
+
+# ---------------------------------------------------------------------------------------------------------------
 # ChaCha20-Poly1305 and XChaCha20-Poly1305
 
 def gen_aead(pool, fx):
     rng = random.Random("aead v1")
-    for op, nlen, name in (("chacha", 12, "chacha20_poly1305.txt"), ("xchacha", 24, "xchacha20_poly1305.txt"),
-                           ("gcm", 12, "aes256_gcm.txt")):
-        cases = [{"k": hx(rand_bytes(rng, 32)), "n": hx(rand_bytes(rng, nlen)),
+    for op, klen, nlen, name in (("chacha", 32, 12, "chacha20_poly1305.txt"), ("xchacha", 32, 24, "xchacha20_poly1305.txt"),
+                                 ("gcm", 32, 12, "aes256_gcm.txt"), ("gcm", 16, 12, "aes128_gcm.txt")):
+        cases = [{"k": hx(rand_bytes(rng, klen)), "n": hx(rand_bytes(rng, nlen)),
                   "ad": hx(rand_bytes(rng, rng.choice([0, 1, 12, 64]))),
                   "m": hx(rand_bytes(rng, rng.choice([0, 1, 15, 16, 17, 64, 65, 500])))} for _ in range(300)]
         f = Fixture(name, "%s: seal byte for byte, and open of the sealed and of a tampered message" %
-                    {"chacha": "ChaCha20-Poly1305", "xchacha": "XChaCha20-Poly1305", "gcm": "AES-256-GCM"}[op],
+                    {"chacha": "ChaCha20-Poly1305", "xchacha": "XChaCha20-Poly1305", "gcm": "AES-%d-GCM" % (8 * klen)}[op],
                     "key, nonce, associated data, message, ciphertext, tag, tampered (ciphertext or tag), opens (1 or 0)")
         sealed = pool.ask(op + "_seal", cases)
         rows = []
@@ -1477,6 +1586,102 @@ def gen_aead(pool, fx):
 
 
 # ---------------------------------------------------------------------------------------------------------------
+# JOSE: ECDH-ES (RFC 7518 4.6, RFC 8037)
+
+# Every algorithm whose name goes into the OtherInfo, with its key length (RFC 7518 4.6.2)
+JOSE_ALGS = [("A128GCM", 16), ("A192GCM", 24), ("A256GCM", 32), ("ECDH-ES+A128KW", 16), ("ECDH-ES+A192KW", 24),
+             ("ECDH-ES+A256KW", 32), ("A128CBC-HS256", 32), ("A192CBC-HS384", 48), ("A256CBC-HS512", 64)]
+
+
+def jose_keys(pool, rng, crv, count):
+    """count (secret, public) pairs on the curve, the public keys by consensus of the curve's oracles."""
+    secrets = []
+    while len(secrets) < count:
+        k = rand_bytes(rng, 32)
+        if crv == "X25519" or 0 < int.from_bytes(k, "big") < P256_N:
+            secrets.append(hx(k))
+    if crv == "X25519":
+        answers = pool.ask("x25519", [{"k": k, "u": "09" + "00" * 31} for k in secrets])
+        pubs = [consensus(pool, "jose keys", {"k": k}, a, lambda lib, x: x["out"])[0] for k, a in zip(secrets, answers)]
+    else:
+        answers = pool.ask("p256_pub", [{"sk": k} for k in secrets])
+        pubs = [consensus(pool, "jose keys", {"sk": k}, a, lambda lib, x: x["u"])[0] for k, a in zip(secrets, answers)]
+    return list(zip(secrets, pubs))
+
+
+def gen_jose(pool, fx):
+    import base64
+
+    def d64(t):
+        return base64.urlsafe_b64decode(t + "=" * (-len(t) % 4))
+    rng = random.Random("jose v1")
+    lens = [0, 0, 3, 5, 32, 65]
+
+    # The key alone, every algorithm and length: OpenSSL's ECDH and cryptography's ConcatKDFHash
+    f = Fixture("jose_ecdh_es.txt", "JOSE ECDH-ES keys (RFC 7518 4.6): ECDH, then the Concat KDF with SHA-256",
+                "curve, recipient secret, ephemeral secret, ephemeral public key (the epk), algorithm (enc, or alg "
+                "with key wrapping), apu, apv, key length in bytes, key")
+    cases = []
+    for crv in ("X25519", "P-256"):
+        rk = jose_keys(pool, rng, crv, 150)
+        ek = jose_keys(pool, rng, crv, 150)
+        for (rsk, _), (esk, epk) in zip(rk, ek):
+            alg, n = rng.choice(JOSE_ALGS)
+            cases.append({"crv": crv, "rsk": rsk, "esk": esk, "epk": epk, "alg": alg, "n": n,
+                          "apu": hx(rand_bytes(rng, rng.choice(lens))), "apv": hx(rand_bytes(rng, rng.choice(lens)))})
+    answers = pool.ask("jwe_ecdh_es_key", [{k: c[k] for k in ("crv", "rsk", "epk", "alg", "n", "apu", "apv")} for c in cases])
+    for case, ans in zip(cases, answers):
+        v, libs = consensus(pool, f.name, case, ans, lambda lib, a: a["k"])
+        if libs:
+            f.add([case["crv"], case["rsk"], case["esk"], case["epk"], case["alg"], case["apu"] or None,
+                   case["apv"] or None, case["n"], v], libs)
+    fx.append(f)
+
+    # Whole JWEs: made by jose with every random choice fixed, opened by cryptography
+    f = Fixture("jose_jwe.txt", "Compact JWEs, ECDH-ES and ECDH-ES+A256KW with A256GCM, made by jose and opened by "
+                "cryptography", "curve, alg, recipient secret, ephemeral secret, epk, apu, apv, CEK ('-' for "
+                "ECDH-ES, where it is derived), IV, plaintext, protected header (its base64url text, as bytes: the "
+                "associated data), encrypted key ('-' for ECDH-ES), ciphertext, tag")
+    cases = []
+    for crv in ("X25519", "P-256"):
+        rk = jose_keys(pool, rng, crv, 60)
+        ek = jose_keys(pool, rng, crv, 60)
+        for i, ((rsk, rpub), (esk, epk)) in enumerate(zip(rk, ek)):
+            alg = ("ECDH-ES", "ECDH-ES+A256KW")[i % 2]
+            cases.append({"crv": crv, "alg": alg, "rsk": rsk, "rpub": rpub, "esk": esk, "epk": epk,
+                          "apu": hx(rand_bytes(rng, rng.choice(lens))), "apv": hx(rand_bytes(rng, rng.choice(lens))),
+                          "cek": hx(rand_bytes(rng, 32)) if alg != "ECDH-ES" else "", "iv": hx(rand_bytes(rng, 12)),
+                          "m": hx(rand_bytes(rng, rng.choice([0, 1, 16, 100])))})
+    made = pool.ask("jwe_ecdh_es", [{k: c[k] for k in ("crv", "alg", "rpub", "esk", "apu", "apv", "cek", "iv", "m")}
+                                    for c in cases])
+    rows = []
+    for case, ans in zip(cases, made):
+        v, libs = consensus(pool, f.name, case, ans, lambda lib, a: a["jwe"])
+        if not libs:
+            continue
+        parts = v.split(".")
+        hdr = json.loads(d64(parts[0]))
+        if len(parts) != 5 or d64(parts[2]).hex() != case["iv"] or bool(parts[1]) != bool(case["cek"]) or \
+                hdr.get("alg") != case["alg"] or d64(hdr.get("apu", "")).hex() != case["apu"] or \
+                d64(hdr.get("apv", "")).hex() != case["apv"]:
+            fail(f.name, case, "jose's JWE does not have the inputs: " + v)
+            continue
+        rows.append((case, v, parts, libs))
+    opened = pool.ask("jwe_open", [{"crv": c["crv"], "rsk": c["rsk"], "jwe": v} for c, v, _, _ in rows])
+    for (case, v, parts, libs), ans in zip(rows, opened):
+        w, libs2 = consensus(pool, f.name + " open", case, ans, lambda lib, a: refused_or(a, "m", "epk"))
+        if not libs2:
+            continue
+        if not w or w[0] != case["m"] or w[1] != case["epk"]:
+            fail(f.name, case, "cryptography opened jose's JWE to something else: %r" % (w,))
+            continue
+        f.add([case["crv"], case["alg"], case["rsk"], case["esk"], case["epk"], case["apu"] or None,
+               case["apv"] or None, case["cek"] or None, case["iv"], case["m"] or None, hx(parts[0].encode("ascii")),
+               d64(parts[1]).hex() or None, d64(parts[3]).hex() or None, d64(parts[4]).hex()], set(libs) | set(libs2))
+    fx.append(f)
+
+
+# ---------------------------------------------------------------------------------------------------------------
 
 def generate():
     pool = Pool()
@@ -1495,6 +1700,8 @@ def generate():
         gen_rsa(pool, fx)
         gen_p256(pool, fx)
         gen_aead(pool, fx)
+        gen_jose(pool, fx)
+        gen_p384(pool, fx)
         files = {f.name: f.text(pool) for f in fx}
         manifest = pool.manifest()
         manifest["fixtures"] = {f.name: {"cases": len(f.rows), "oracles": sorted(f.libs)} for f in fx}

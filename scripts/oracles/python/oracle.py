@@ -17,7 +17,9 @@
 #
 #      coincurve      libsecp256k1 (bundled in the wheel): keys, ECDSA (RFC 6979, low-S), recovery, BIP-340
 #      openssl        OpenSSL through cryptography: ECDSA on secp256k1 (RFC 6979 when OpenSSL is 3.2 or later),
-#                     Ed25519, X25519, RSA (PKCS#1 v1.5 signing and verification, PSS verification, SPKI)
+#                     Ed25519, X25519, RSA (PKCS#1 v1.5 signing and verification, PSS verification, SPKI),
+#                     P-256, P-384 (keys, ECDSA with SHA-384, ECDH), ChaCha20-Poly1305 and AES-GCM, and JOSE's
+#                     ECDH-ES (ConcatKDFHash, key unwrap)
 #      pynacl         libsodium: Ed25519, X25519
 #      mnemonic       python-mnemonic, Trezor's BIP-39 reference
 #      slip10         the SLIP-10 reference: BIP-32 (SLIP-10 on secp256k1 is BIP-32) and SLIP-10 Ed25519
@@ -222,6 +224,8 @@ def openssl_op(q):
             if type(e).__name__ == "InvalidTag":
                 raise Refused("authentication")
             raise
+    if op in ("jwe_ecdh_es_key", "jwe_open"):
+        return _jwe_op(q)
     if op == "p256_pub":
         try:
             k = ec.derive_private_key(int(q["sk"], 16), ec.SECP256R1())
@@ -253,6 +257,8 @@ def openssl_op(q):
             return {"valid": True}
         except InvalidSignature:
             return {"valid": False}
+    if op.startswith("p384_"):
+        return _p384_op(q)
     if op in ("rsa_verify_pkcs1", "rsa_verify_pss"):
         try:
             pub = rsa_lib.RSAPublicNumbers(int(q["e"], 16), int(q["n"], 16)).public_key()
@@ -291,6 +297,100 @@ def openssl_op(q):
 
 # ---------------------------------------------------------------------------------------------------------------
 # libsodium, through PyNaCl
+
+# JOSE's ECDH-ES (RFC 7518 4.6) from cryptography's parts: X25519 or ECDH on P-256, then ConcatKDFHash with the
+# OtherInfo of RFC 7518 4.6.2 (AlgorithmID, PartyUInfo, PartyVInfo, each length-prefixed, then the key length in bits)
+def _jwe_z(crv, rsk, epk):
+    try:
+        if crv == "X25519":
+            return x25519.X25519PrivateKey.from_private_bytes(b(rsk)).exchange(x25519.X25519PublicKey.from_public_bytes(b(epk)))
+        k = ec.derive_private_key(int(rsk, 16), ec.SECP256R1())
+        return k.exchange(ec.ECDH(), ec.EllipticCurvePublicKey.from_encoded_point(ec.SECP256R1(), b(epk)))
+    except Exception as e:
+        raise Refused(str(e))
+
+
+def _jwe_kdf(z, alg, apu, apv, n):
+    from cryptography.hazmat.primitives.kdf.concatkdf import ConcatKDFHash
+
+    def field(x):
+        return len(x).to_bytes(4, "big") + x
+    other = field(alg.encode("ascii")) + field(apu) + field(apv) + (8 * n).to_bytes(4, "big")
+    return ConcatKDFHash(algorithm=hashes.SHA256(), length=n, otherinfo=other).derive(z)
+
+
+def _jwe_op(q):
+    import base64
+    if q["op"] == "jwe_ecdh_es_key":
+        z = _jwe_z(q["crv"], q["rsk"], q["epk"])
+        return {"k": h(_jwe_kdf(z, q["alg"], b(q["apu"]), b(q["apv"]), q["n"]))}
+    # jwe_open: a compact JWE, ECDH-ES or ECDH-ES+A256KW with A256GCM, opened with the recipient's secret
+    from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+    from cryptography.hazmat.primitives.keywrap import aes_key_unwrap
+
+    def d64(s):
+        return base64.urlsafe_b64decode(s + "=" * (-len(s) % 4))
+    parts = q["jwe"].split(".")
+    hdr = json.loads(d64(parts[0]))
+    if hdr.get("enc") != "A256GCM" or hdr.get("alg") not in ("ECDH-ES", "ECDH-ES+A256KW"):
+        return {"unsupported": True}
+    epk = hdr["epk"]
+    raw = d64(epk["x"]) if epk["crv"] == "X25519" else b"\x04" + d64(epk["x"]) + d64(epk["y"])
+    if epk["crv"] != q["crv"]:
+        raise Refused("curve")
+    z = _jwe_z(q["crv"], q["rsk"], h(raw))
+    apu, apv = d64(hdr.get("apu", "")), d64(hdr.get("apv", ""))
+    if hdr["alg"] == "ECDH-ES":
+        cek = _jwe_kdf(z, "A256GCM", apu, apv, 32)
+    else:
+        cek = aes_key_unwrap(_jwe_kdf(z, "ECDH-ES+A256KW", apu, apv, 32), d64(parts[1]))
+    try:
+        m = AESGCM(cek).decrypt(d64(parts[2]), d64(parts[3]) + d64(parts[4]), parts[0].encode("ascii"))
+    except Exception:
+        raise Refused("authentication")
+    return {"m": h(m), "epk": h(raw)}
+
+
+# P-384 through cryptography: keys, RFC 6979 signatures with SHA-384 (prehashed), verification, SEC1, ECDH
+def _p384_op(q):
+    op, curve = q["op"], ec.SECP384R1()
+
+    def key(sk):
+        try:
+            return ec.derive_private_key(int(sk, 16), curve)
+        except Exception as e:
+            raise Refused(str(e))
+
+    def pub(p):
+        try:
+            return ec.EllipticCurvePublicKey.from_encoded_point(curve, b(p))
+        except Exception as e:
+            raise Refused(str(e))
+
+    def enc(p, compressed):
+        return h(p.public_bytes(serialization.Encoding.X962, serialization.PublicFormat.CompressedPoint if compressed
+                                else serialization.PublicFormat.UncompressedPoint))
+    if op == "p384_pub":
+        k = key(q["sk"]).public_key()
+        return {"c": enc(k, True), "u": enc(k, False)}
+    if op == "p384_sign":
+        der = key(q["sk"]).sign(b(q["h"]), ec.ECDSA(asym_utils.Prehashed(hashes.SHA384()), deterministic_signing=True))
+        r, s = asym_utils.decode_dss_signature(der)
+        return {"r": "%096x" % r, "s": "%096x" % s}
+    if op == "p384_pub_parse":
+        return {"c": enc(pub(q["pub"]), True)}
+    if op == "p384_verify":
+        p, rs = pub(q["pub"]), b(q["sig"])
+        try:
+            p.verify(asym_utils.encode_dss_signature(int.from_bytes(rs[:48], "big"), int.from_bytes(rs[48:], "big")),
+                     b(q["h"]), ec.ECDSA(asym_utils.Prehashed(hashes.SHA384())))
+            return {"valid": True}
+        except InvalidSignature:
+            return {"valid": False}
+    if op == "p384_ecdh":
+        return {"z": h(key(q["sk"]).exchange(ec.ECDH(), pub(q["pub"])))}
+    return {"unsupported": True}
+
 
 def _sodium_version():
     # PyNaCl links libsodium statically and exports neither sodium_version_string() nor the library version;
@@ -419,7 +519,8 @@ LIBS = {
                 (["ecdsa_sign"] if _deterministic_available() else []) +
                 ["ecdsa_verify", "ecdsa_verify_der", "ed25519_sign", "ed25519_verify", "x25519",
                  "rsa_sign_pkcs1", "rsa_verify_pkcs1", "rsa_verify_pss", "rsa_parse_spki",
-                 "p256_pub", "p256_sign", "p256_verify", "p256_pub_parse", "chacha_seal", "chacha_open", "gcm_seal", "gcm_open"]),
+                 "p256_pub", "p256_sign", "p256_verify", "p256_pub_parse", "chacha_seal", "chacha_open", "gcm_seal", "gcm_open",
+                 "jwe_ecdh_es_key", "jwe_open", "p384_pub", "p384_sign", "p384_pub_parse", "p384_verify", "p384_ecdh"]),
     "pynacl": (pynacl_op, lambda: "libsodium %s (PyNaCl %s)" % (_sodium_version(), nacl.__version__),
                ["ed25519_sign", "ed25519_verify", "x25519", "chacha_seal", "chacha_open", "xchacha_seal", "xchacha_open"]),
     "mnemonic": (mnemonic_op, lambda: mnemonic_lib.__version__ if hasattr(mnemonic_lib, "__version__") else "0.21",

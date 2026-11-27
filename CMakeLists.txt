@@ -22,7 +22,7 @@
 cmake_minimum_required(VERSION 3.20)
 
 project(snicholls_crypto
-    VERSION 0.4.2
+    VERSION 0.5.0
     DESCRIPTION "snicholls-crypto - elliptic curves, signatures and wallet key derivation"
     LANGUAGES CXX)
 
@@ -69,7 +69,7 @@ elseif(NOT TARGET snicholls::core)
     message(FATAL_ERROR "third_party/core is empty and no snicholls::core is in the build - "
                         "run: git submodule update --init third_party/core")
 endif()
-snicholls_core_require(0.17.0)   # the first core with the hashes (hash/)
+snicholls_core_require(0.23.1)   # the first core with the Concat KDF (hash/kdf.hpp, JOSE ECDH-ES)
 
 # The library
 add_library(snicholls_crypto INTERFACE)
@@ -169,7 +169,7 @@ if(SNICHOLLS_CRYPTO_BUILD_TESTS)
     include(${CMAKE_CURRENT_SOURCE_DIR}/third_party/tooling/cmake/SnichollsTooling.cmake)
     snicholls_single_include_check(snicholls_crypto_single_include)
     snicholls_crypto_compile_options(snicholls_crypto_single_include)
-    snicholls_tooling_add_checks(SINGLE_INCLUDE)
+    snicholls_tooling_add_checks(SINGLE_INCLUDE PINS)
 
     if(NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest/CMakeLists.txt)
         message(FATAL_ERROR "third_party/googletest is empty - run: git submodule update --init --recursive")

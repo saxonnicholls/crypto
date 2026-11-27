@@ -12,16 +12,18 @@
 //      noble_ed25519     @noble/curves ed25519 with RFC 8032 verification (zip215: false)
 //      noble_zip215      @noble/curves ed25519 with its default, ZIP-215 verification
 //      noble_x25519      @noble/curves x25519
+//      noble_p384        @noble/curves p384: keys, RFC 6979 signatures with SHA-384, verification, SEC1, ECDH
 //      ethers            ethers v6: ECDSA (SigningKey), ecrecover addresses, BIP-39 and BIP-32 (HDNodeWallet)
 //      bitcoinjs         bip32 on tiny-secp256k1, bitcoinjs-lib addresses, bs58check
 //      scure_bip39       @scure/bip39
 //      ed25519_hd_key    ed25519-hd-key: SLIP-10 Ed25519
 //      node_crypto       Node's built-in crypto (its bundled OpenSSL): RSA PKCS#1 v1.5 and PSS, SPKI
+//      jose              panva's jose: whole JWEs, ECDH-ES and ECDH-ES+A256KW with A256GCM on X25519 and P-256
 //
 
 import * as secp from "@noble/secp256k1";
 import { ed25519, x25519 } from "@noble/curves/ed25519.js";
-import { p256 } from "@noble/curves/nist.js";
+import { p256, p384 } from "@noble/curves/nist.js";
 import { hmac } from "@noble/hashes/hmac.js";
 import { sha256 } from "@noble/hashes/sha2.js";
 import * as bip39 from "@scure/bip39";
@@ -31,8 +33,9 @@ import * as bitcoin from "bitcoinjs-lib";
 import bs58check from "bs58check";
 import * as hdkey from "ed25519-hd-key";
 import { ethers } from "ethers";
+import * as jose from "jose";
 import * as ecc from "tiny-secp256k1";
-import { constants, createCipheriv, createDecipheriv, createPrivateKey, createPublicKey, sign as cryptoSign, verify as cryptoVerify } from "node:crypto";
+import { constants, createCipheriv, createDecipheriv, createECDH, createPrivateKey, createPublicKey, sign as cryptoSign, verify as cryptoVerify } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { createInterface } from "node:readline";
@@ -71,6 +74,19 @@ const refuse = (f) => {
 // Read from node_modules directly: not every package exports its package.json
 const version = (name) =>
   JSON.parse(readFileSync(join(import.meta.dirname, "node_modules", name, "package.json"), "utf8")).version;
+
+// Key objects from raw bytes: X25519 (the u-coordinate; the secret as PKCS#8) and P-256 (SEC1; the secret as a
+// SEC1 ECPrivateKey without its public key, which OpenSSL computes)
+const b64u = (u) => Buffer.from(u).toString("base64url");
+function joseKey(crv, pub, secret) {
+  if (secret)
+    return crv === "X25519"
+      ? createPrivateKey({ format: "der", type: "pkcs8", key: Buffer.from("302e020100300506032b656e04220420" + secret, "hex") })
+      : createPrivateKey({ format: "der", type: "sec1", key: Buffer.from("30310201010420" + secret + "a00a06082a8648ce3d030107", "hex") });
+  const u = bytes(pub);
+  return createPublicKey({ format: "jwk", key: crv === "X25519" ? { kty: "OKP", crv, x: b64u(u) }
+    : { kty: "EC", crv, x: b64u(u.slice(1, 33)), y: b64u(u.slice(33)) } });
+}
 
 const LIBS = {
   noble_secp256k1: {
@@ -140,6 +156,35 @@ const LIBS = {
         }
         return { valid };
       },
+    },
+  },
+  noble_p384: {
+    name: "@noble/curves",
+    ops: {
+      p384_pub: (q) => {
+        const sk = bytes(q.sk);
+        refuse(() => {
+          if (!p384.utils.isValidSecretKey(sk)) throw new Error("invalid secret key");
+        });
+        return { c: hex(p384.getPublicKey(sk, true)), u: hex(p384.getPublicKey(sk, false)) };
+      },
+      p384_sign: (q) => {
+        const sig = p384.Signature.fromBytes(p384.sign(bytes(q.h), bytes(q.sk), { prehash: false, lowS: false }));
+        return { r: sig.r.toString(16).padStart(96, "0"), s: sig.s.toString(16).padStart(96, "0") };
+      },
+      p384_pub_parse: (q) => ({ c: hex(refuse(() => p384.Point.fromBytes(bytes(q.pub)).toBytes(true))) }),
+      p384_verify: (q) => {
+        refuse(() => p384.Point.fromBytes(bytes(q.pub)));
+        let valid;
+        try {
+          valid = p384.verify(bytes(q.sig), bytes(q.h), bytes(q.pub), { prehash: false, lowS: false });
+        } catch {
+          valid = false;
+        }
+        return { valid };
+      },
+      // the shared point, compressed: its x-coordinate after the prefix byte
+      p384_ecdh: (q) => ({ z: hex(refuse(() => p384.getSharedSecret(bytes(q.sk), bytes(q.pub), true)).slice(1)) }),
     },
   },
   noble_ed25519: {
@@ -274,13 +319,13 @@ const LIBS = {
       rsa_verify_pkcs1: (q) => rsaVerify(q, { padding: constants.RSA_PKCS1_PADDING }),
       rsa_verify_pss: (q) => rsaVerify(q, { padding: constants.RSA_PKCS1_PSS_PADDING, saltLength: q.salt }),
       gcm_seal: (q) => {
-        const c = createCipheriv("aes-256-gcm", bytes(q.k), bytes(q.n), { authTagLength: 16 });
+        const c = createCipheriv(`aes-${q.k.length * 4}-gcm`, bytes(q.k), bytes(q.n), { authTagLength: 16 });
         c.setAAD(bytes(q.ad));
         const ct = Buffer.concat([c.update(bytes(q.m)), c.final()]);
         return { ct: hex(ct), tag: hex(c.getAuthTag()) };
       },
       gcm_open: (q) => {
-        const d = createDecipheriv("aes-256-gcm", bytes(q.k), bytes(q.n), { authTagLength: 16 });
+        const d = createDecipheriv(`aes-${q.k.length * 4}-gcm`, bytes(q.k), bytes(q.n), { authTagLength: 16 });
         d.setAAD(bytes(q.ad));
         d.setAuthTag(bytes(q.tag));
         return { m: hex(refuse(() => Buffer.concat([d.update(bytes(q.ct)), d.final()]))) };
@@ -311,12 +356,47 @@ const LIBS = {
         }
         return { valid };
       },
+      // ES384 as JOSE signs it (Node hashes the message with SHA-384), uncompressed keys
+      p384_verify: (q) => {
+        const u = bytes(q.pub);
+        if (u.length !== 97) return { unsupported: true };
+        const key = refuse(() => createPublicKey({ format: "jwk", key: { kty: "EC", crv: "P-384",
+          x: Buffer.from(u.slice(1, 49)).toString("base64url"), y: Buffer.from(u.slice(49)).toString("base64url") } }));
+        let valid;
+        try {
+          valid = cryptoVerify("sha384", bytes(q.m), { key, dsaEncoding: "ieee-p1363" }, bytes(q.sig));
+        } catch {
+          valid = false;
+        }
+        return { valid };
+      },
+      p384_ecdh: (q) => {
+        const e = createECDH("secp384r1");
+        e.setPrivateKey(Buffer.from(q.sk, "hex"));
+        return { z: hex(refuse(() => e.computeSecret(Buffer.from(q.pub, "hex")))) };
+      },
       rsa_parse_spki: (q) => {
         const k = refuse(() => createPublicKey({ key: Buffer.from(q.der, "hex"), format: "der", type: "spki" }));
         if (k.asymmetricKeyType !== "rsa") throw new Refused("not RSA");
         const j = k.export({ format: "jwk" });
         const h = (x) => Buffer.from(x, "base64url").toString("hex").replace(/^0+/, "");
         return { n: h(j.n), e: h(j.e) };
+      },
+    },
+  },
+  jose: {
+    name: "jose",
+    ops: {
+      // A compact JWE to the recipient's key, every random choice fixed (the ephemeral key, the IV and, with key
+      // wrapping, the CEK) so the answer is deterministic
+      jwe_ecdh_es: async (q) => {
+        const params = { epk: joseKey(q.crv, null, q.esk) };
+        if (q.apu) params.apu = bytes(q.apu);
+        if (q.apv) params.apv = bytes(q.apv);
+        const e = new jose.CompactEncrypt(bytes(q.m)).setProtectedHeader({ alg: q.alg, enc: "A256GCM" })
+          .setKeyManagementParameters(params).setInitializationVector(bytes(q.iv));
+        if (q.cek) e.setContentEncryptionKey(bytes(q.cek));
+        return { jwe: await e.encrypt(joseKey(q.crv, q.rpub)) };
       },
     },
   },
@@ -339,7 +419,7 @@ const LIBS = {
   },
 };
 
-function answer(q) {
+async function answer(q) {
   if (q.op === "version") {
     const libs = {};
     for (const [k, v] of Object.entries(LIBS)) libs[k] = { version: v.name === "node" ? "" : version(v.name), ops: Object.keys(v.ops) };
@@ -353,7 +433,7 @@ function answer(q) {
   const f = lib && lib.ops[q.op];
   if (!f) return { unsupported: true };
   try {
-    return f(q);
+    return await f(q);
   } catch (e) {
     if (e instanceof Refused) return { error: e.message || "refused" };
     return { crash: String(e && e.stack ? e.stack : e) };
@@ -364,7 +444,7 @@ const rl = createInterface({ input: process.stdin, crlfDelay: Infinity });
 for await (const line of rl) {
   if (!line.trim()) continue;
   const q = JSON.parse(line);
-  const a = answer(q);
+  const a = await answer(q);
   if ("id" in q) a.id = q.id;
   process.stdout.write(JSON.stringify(a) + "\n");
 }

@@ -77,6 +77,9 @@ def main():
     n += write(out, "p256", [bytes([i % 128 & ~3]) + b(r[0]) + b(r[2]) + bytes([i % 7, i % 7, i % 64, i % 8])
                              for i, r in enumerate(rows("p256_sign.txt"))] +
                [bytes([3]) + b(r[0]) for r in rows("p256_sec1.txt") if r[0]])
+    n += write(out, "p384", [bytes([i % 128 & ~3]) + b(r[0]) + b(r[0][::-1]) + bytes([i % 7, i % 7, i % 64, i % 8])
+                             for i, r in enumerate(rows("p384_keys.txt")) if r[1]] +
+               [bytes([3]) + b(r[0]) for r in rows("p384_sec1.txt") if r[0]])
     aead = []
     for name in ("chacha20_poly1305.txt", "xchacha20_poly1305.txt"):
         for line in open(os.path.join(ROOT, "tests", "fixtures", "wycheproof", name)):

@@ -45,6 +45,17 @@ def header_version():
     return ".".join(parts)
 
 
+def block_version():
+    """The two-versions check before the guard: its literals and its #error text, each must be the version."""
+    src = open(HEADER, encoding="utf-8").read()
+    guard = src.find("#ifndef snicholls_crypto_version_hpp")
+    m = re.search(r"#if defined\(SNICHOLLS_CRYPTO_VERSION_MAJOR\).*?VERSION_MAJOR != (\d+) \|\| SNICHOLLS_CRYPTO_VERSION_MINOR != "
+                  r"(\d+) \|\| SNICHOLLS_CRYPTO_VERSION_PATCH != (\d+)\)\s*#error \"[^\"]*: (\d+\.\d+\.\d+) here", src, re.S)
+    if not m or guard < 0 or m.start() > guard:
+        raise SystemExit("check_version: the two-versions check is missing before the guard in %s" % os.path.relpath(HEADER, ROOT))
+    return ".".join(m.groups()[:3]), m.group(4)
+
+
 def cmake_version():
     src = open(CMAKE, encoding="utf-8").read()
     # The VERSION belonging to project(), not to cmake_minimum_required()
@@ -68,6 +79,11 @@ def main():
     print("  CMakeLists.txt                       %s" % cml)
     if hdr != cml:
         print("check_version: header and CMakeLists disagree", file=sys.stderr)
+        ok = False
+    literals, text = block_version()
+    print("  version.hpp two-versions check      %s (%s in its #error)" % (literals, text))
+    if literals != hdr or text != hdr:
+        print("check_version: the two-versions check does not match the version", file=sys.stderr)
         ok = False
 
     if args.tag:

@@ -23,6 +23,21 @@ Project Wycheproof, <https://github.com/C2SP/wycheproof>, licensed under the Apa
 | `wycheproof/xchacha20_poly1305.txt` | `xchacha20_poly1305_test.json` | `a79de072571b90eb40c3a63ce0c7f75dcb4b62323c8870228e1f61dcc61d63a9` | 315 |
 | `wycheproof/ecdsa_p256_sha256.txt` | `ecdsa_secp256r1_sha256_test.json (DER)` | `182db4f3e230f6f9fa9f800d2a614dede30284b8e8438bbfe1171905402e9332` | 484 |
 | `wycheproof/ecdsa_p256_sha256_p1363.txt` | `ecdsa_secp256r1_sha256_p1363_test.json` | `c60de693930e386c3a5472d08081623ef8504decc54b38ac01ec6b2a2575c986` | 262 |
+| `wycheproof/ecdh_p256.txt` | `ecdh_secp256r1_ecpoint_test.json` (the private key as 32 bytes) | `648f16d077caf2400d02331ca51f44744c72c799830c8d0595d0b18b6dd9f886` | 355 |
+| `wycheproof/ecdh_p384.txt` | `ecdh_secp384r1_ecpoint_test.json` (the private key as 48 bytes) | `ffa7835fe1de359dff762c8f1272b98acebd5578e2f855d969051ff956c6dca3` | 790 |
+| `wycheproof/ecdsa_p384_sha384.txt` | `ecdsa_secp384r1_sha384_test.json` (DER) | `8a5b3ae1760975143414811f13588c24d951d9d8c904195087ba327591dfe9cc` | 504 |
+| `wycheproof/ecdsa_p384_sha384_p1363.txt` | `ecdsa_secp384r1_sha384_p1363_test.json` | `e27344bf6daae75fa19663620883809f91c79fc4b4420eff9eae8036b34476be` | 280 |
+| `wycheproof/aes128_gcm.txt` | `aes_gcm_test.json (AES-128, 128-bit tags)` | `985e5ecc172e181eaf49e89508b9470dcf478002eb7e8559c707eb42dc97dfe7` | 108 |
+| `wycheproof/rsa_pkcs1_2048_sha384.txt` | `rsa_signature_2048_sha384_test.json` | `c571c105d261c0ff588a2888a529f152563fb3b77894b7620d4e4f8f934f2c1d` | 258 |
+| `wycheproof/rsa_pkcs1_2048_sha512.txt` | `rsa_signature_2048_sha512_test.json` | `16ea24b039905d054bdb6004f5fd179374e150b7b6d73a7ba654b6d00eab12ef` | 259 |
+| `wycheproof/rsa_pkcs1_3072_sha384.txt` | `rsa_signature_3072_sha384_test.json` | `73499ee649d8fb703b3f0f455fa36f7682fde677c590a736958ebce05ab27dae` | 259 |
+| `wycheproof/rsa_pkcs1_3072_sha512.txt` | `rsa_signature_3072_sha512_test.json` | `09aa3336fdb7be216180ce944ca7b2a052e1de38c210435c19506327d4a36ebd` | 260 |
+| `wycheproof/rsa_pkcs1_4096_sha384.txt` | `rsa_signature_4096_sha384_test.json` | `bc26f16b9fc9a90628864d3d1111ef48a4bd00b9d4870bfab88ff326e309e073` | 259 |
+| `wycheproof/rsa_pkcs1_4096_sha512.txt` | `rsa_signature_4096_sha512_test.json` | `9d6e67b1eb0d7040db411835238efd20e9302399a258bdff82de3f38e0f2855a` | 259 |
+| `wycheproof/rsa_pss_2048_sha384_mgf1_48.txt` | `rsa_pss_2048_sha384_mgf1_48_test.json` | `66d464778b0b2f683a1d1a20e94f77e9472b8cc393b45f423fa08a48e677063c` | 141 |
+| `wycheproof/rsa_pss_4096_sha384_mgf1_48.txt` | `rsa_pss_4096_sha384_mgf1_48_test.json` | `d632649a7630f7c267eda576714ca11cf0ff068d6622f576b8701f923c112577` | 141 |
+| `wycheproof/rsa_pss_4096_sha512_mgf1_32.txt` | `rsa_pss_4096_sha512_mgf1_32_test.json` | `af1e1c1c593edf91be3e9880927231d57f9df082f2d8caec2a61d9874ade101f` | 177 |
+| `wycheproof/rsa_pss_4096_sha512_mgf1_64.txt` | `rsa_pss_4096_sha512_mgf1_64_test.json` | `c93ceaa56a190c9fd4707441c5c6a75839f108202d88aec891697f9623042547` | 179 |
 | `wycheproof/rsa_pkcs1_2048_sha256.txt` | `rsa_signature_2048_sha256_test.json` | `94a917b01ff50fb874cfc05bf29b4af44868d944a6558201cf18380da93fb393` | 259 |
 | `wycheproof/rsa_pkcs1_3072_sha256.txt` | `rsa_signature_3072_sha256_test.json` | `0f5f18cabfaad3e2792e82f7e9882f8999049b456714de924b8a5e202f61ca43` | 259 |
 | `wycheproof/rsa_pkcs1_4096_sha256.txt` | `rsa_signature_4096_sha256_test.json` | `957aca128e30bd02c8982f8ca482d6521d16683f4bbc3f193cdfd4c8f04bc667` | 258 |

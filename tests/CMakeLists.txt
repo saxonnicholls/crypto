@@ -7,6 +7,8 @@ add_executable(snicholls_crypto_tests
     secret_test.cpp
     version_test.cpp
     address/base58_test.cpp
+    aead/aes128_gcm_test.cpp
+    aead/aes128_gcm_oracles_test.cpp
     aead/aes256_gcm_test.cpp
     aead/aes256_gcm_oracles_test.cpp
     aead/aes_key_wrap_test.cpp
@@ -31,19 +33,31 @@ add_executable(snicholls_crypto_tests
     detail/chacha20_test.cpp
     detail/ecdsa_der_test.cpp
     detail/limbs_test.cpp
+    detail/mont_test.cpp
     detail/mont256_test.cpp
+    detail/mont_residue_test.cpp
     detail/poly1305_test.cpp
     detail/montgomery_test.cpp
+    detail/weierstrass_a3_test.cpp
     hd/bip32_test.cpp
     hd/bip32_oracles_test.cpp
     hd/path_test.cpp
+    jose/ecdh_es_test.cpp
+    jose/ecdh_es_oracles_test.cpp
     hd/slip10_test.cpp
     hd/slip10_oracles_test.cpp
+    p256/ecdh_test.cpp
     p256/ecdsa_test.cpp
     p256/ecdsa_oracles_test.cpp
     p256/field_test.cpp
     p256/point_test.cpp
     p256/scalar_test.cpp
+    p384/ecdh_test.cpp
+    p384/ecdsa_test.cpp
+    p384/ecdsa_oracles_test.cpp
+    p384/field_test.cpp
+    p384/point_test.cpp
+    p384/scalar_test.cpp
     rsa/rsa_test.cpp
     rsa/rsa_oracles_test.cpp
     secp256k1/ecdsa_test.cpp

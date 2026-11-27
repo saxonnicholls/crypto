@@ -4,7 +4,7 @@
 //
 //  Copyright 2010-2026 Saxon Herschel Nicholls
 //
-//  AES-256 encryption (FIPS 197) without tables: the S-box is computed, the GF(2^8) inverse as x^254 by masked
+//  AES-128 and AES-256 (FIPS 197) without tables: the S-box is computed, the GF(2^8) inverse as x^254 by masked
 //  multiplication and then the affine map, so no memory index ever depends on the key or the data. Only the forward
 //  cipher (GCM and key-wrap verification need decryption only for unwrapping, see aes_decrypt below).
 //
@@ -74,38 +74,42 @@ constexpr std::uint8_t aes_inv_sbox(std::uint8_t y) noexcept
     return gf256_mul(x127, x127);
 }
 
-// AES-256's 15 round keys
-class aes256 {
+// AES with a 16- or 32-byte key: its Nr + 1 round keys (11 for AES-128, 15 for AES-256)
+template <std::size_t KeyBytes>
+class aes_cipher {
+    static_assert(KeyBytes == 16 || KeyBytes == 32, "AES-128 or AES-256");
+
 public:
     using block = std::array<std::uint8_t, 16>;
+    static constexpr std::size_t rounds = KeyBytes / 4 + 6;
 
-    constexpr explicit aes256(std::span<const std::uint8_t, 32> key) noexcept
+    constexpr explicit aes_cipher(std::span<const std::uint8_t, KeyBytes> key) noexcept
     {
-        for (std::size_t i = 0; i < 32; ++i)
+        for (std::size_t i = 0; i < KeyBytes; ++i)
             w_[i] = key[i];
         std::uint8_t rcon = 1;
-        for (std::size_t i = 32; i < 240; i += 4) {
+        for (std::size_t i = KeyBytes; i < w_.size(); i += 4) {
             std::array<std::uint8_t, 4> t{w_[i - 4], w_[i - 3], w_[i - 2], w_[i - 1]};
-            if (i % 32 == 0) {   // the position is public
+            if (i % KeyBytes == 0) {   // the position is public
                 t = {static_cast<std::uint8_t>(aes_sbox(t[1]) ^ rcon), aes_sbox(t[2]), aes_sbox(t[3]), aes_sbox(t[0])};
                 rcon = gf256_mul(rcon, 2);
-            } else if (i % 32 == 16) {
+            } else if (KeyBytes == 32 && i % KeyBytes == 16) {
                 t = {aes_sbox(t[0]), aes_sbox(t[1]), aes_sbox(t[2]), aes_sbox(t[3])};
             }
             for (std::size_t j = 0; j < 4; ++j)
-                w_[i + j] = static_cast<std::uint8_t>(w_[i - 32 + j] ^ t[j]);
+                w_[i + j] = static_cast<std::uint8_t>(w_[i - KeyBytes + j] ^ t[j]);
             secure_wipe(t);
         }
     }
-    constexpr aes256(const aes256&) noexcept = default;
-    constexpr aes256& operator=(const aes256&) noexcept = default;
-    constexpr ~aes256() { secure_wipe(w_); }
+    constexpr aes_cipher(const aes_cipher&) noexcept = default;
+    constexpr aes_cipher& operator=(const aes_cipher&) noexcept = default;
+    constexpr ~aes_cipher() { secure_wipe(w_); }
 
     [[nodiscard]] constexpr block encrypt(const block& in) const noexcept
     {
         block s = in;
         add_round_key(s, 0);
-        for (std::size_t r = 1; r < 14; ++r) {
+        for (std::size_t r = 1; r < rounds; ++r) {
             sub_bytes(s);
             shift_rows(s);
             mix_columns(s);
@@ -113,15 +117,15 @@ public:
         }
         sub_bytes(s);
         shift_rows(s);
-        add_round_key(s, 14);
+        add_round_key(s, rounds);
         return s;
     }
 
     [[nodiscard]] constexpr block decrypt(const block& in) const noexcept
     {
         block s = in;
-        add_round_key(s, 14);
-        for (std::size_t r = 13; r > 0; --r) {
+        add_round_key(s, rounds);
+        for (std::size_t r = rounds - 1; r > 0; --r) {
             inv_shift_rows(s);
             inv_sub_bytes(s);
             add_round_key(s, r);
@@ -185,8 +189,11 @@ private:
         }
     }
 
-    std::array<std::uint8_t, 240> w_{};
+    std::array<std::uint8_t, 16 * (rounds + 1)> w_{};
 };
+
+using aes128 = aes_cipher<16>;
+using aes256 = aes_cipher<32>;
 
 // GHASH's multiplication in GF(2^128) (NIST SP 800-38D, Algorithm 1), bit by bit with masks: constant time
 constexpr std::array<std::uint8_t, 16> ghash_mul(const std::array<std::uint8_t, 16>& x, const std::array<std::uint8_t, 16>& y) noexcept

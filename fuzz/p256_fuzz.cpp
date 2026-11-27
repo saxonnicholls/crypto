@@ -6,13 +6,15 @@
 //
 //  Differential fuzzing of P-256 against OpenSSL: key validity and public keys; this library's RFC 6979 signatures
 //  verified by OpenSSL (whose signing nonces are random); then a signature made adversarial (r or s replaced by 0,
-//  n - 1, n, n + 1, p, 2^256 - 1, by n - s, or bits flipped) verified by both; and arbitrary bytes as SEC1.
+//  n - 1, n, n + 1, p, 2^256 - 1, by n - s, or bits flipped) verified by both; ECDH with a second key (the shared
+//  secret byte for byte against OpenSSL's d Q); and arbitrary bytes as SEC1.
 //
 //  The stated rule: verification and key parsing agree both ways, except that OpenSSL reads SEC1's hybrid form
 //  (0x06, 0x07), which this library refuses.
 //
 #include "support/fuzz_support.hpp"
 
+#include <snicholls/crypto/p256/ecdh.hpp>
 #include <snicholls/crypto/p256/ecdsa.hpp>
 
 #include <openssl/bn.h>
@@ -70,6 +72,25 @@ bool openssl_verify(std::span<const std::uint8_t> pub, const std::array<std::uin
     return ok;
 }
 
+// OpenSSL's ECDH: the x-coordinate of d Q, Q given as SEC1
+std::array<std::uint8_t, 32> openssl_ecdh(const std::array<std::uint8_t, 32>& d, std::span<const std::uint8_t> pub)
+{
+    EC_GROUP* g = EC_GROUP_new_by_curve_name(NID_X9_62_prime256v1);
+    EC_POINT* q = openssl_point(g, pub);
+    EC_POINT* r = EC_POINT_new(g);
+    BIGNUM* k = BN_bin2bn(d.data(), 32, nullptr);
+    BIGNUM* x = BN_new();
+    std::array<std::uint8_t, 32> out{};
+    if (q && EC_POINT_mul(g, r, nullptr, q, k, nullptr) == 1 && EC_POINT_get_affine_coordinates(g, r, x, nullptr, nullptr) == 1)
+        BN_bn2binpad(x, out.data(), 32);
+    BN_free(x);
+    BN_free(k);
+    EC_POINT_free(r);
+    EC_POINT_free(q);
+    EC_GROUP_free(g);
+    return out;
+}
+
 } // namespace
 
 extern "C" int LLVMFuzzerTestOneInput(const std::uint8_t* data, std::size_t size)
@@ -117,6 +138,16 @@ extern "C" int LLVMFuzzerTestOneInput(const std::uint8_t* data, std::size_t size
     const auto sig = p256::sign(*key, h);
     if (!openssl_verify(pub.uncompressed(), h, sig.jose()))
         f::divergence(T, "OpenSSL does not verify our signature: key " + f::hex(sk) + " hash " + f::hex(h));
+
+    // ECDH with a second key (when its bytes are a key), both ways
+    if (const auto peer = p256::private_key::from_bytes(in.take<32>())) {
+        const auto z = p256::shared_secret(*key, peer->public_key());
+        const auto zz = p256::shared_secret(*peer, pub);
+        if (!z || !zz || !(z.unwrap() == zz.unwrap()))
+            f::divergence(T, "ECDH does not agree both ways: key " + f::hex(sk));
+        else if (!std::equal(z.unwrap().reveal().begin(), z.unwrap().reveal().end(), openssl_ecdh(sk, peer->public_key().compressed()).begin()))
+            f::divergence(T, "ECDH differs from OpenSSL's: key " + f::hex(sk));
+    }
 
     // An adversarial signature
     auto adv = sig;

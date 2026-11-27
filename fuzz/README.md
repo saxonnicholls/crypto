@@ -16,6 +16,7 @@ from Ubuntu 24.04). The `snicholls::crypto` target never links them.
 | `secp256k1_schnorr` | libsecp256k1 | BIP-340 signatures byte for byte with the same aux_rand over any message length; adversarial verification (r >= p, s >= n, another key, bits flipped) |
 | `ed25519` | libsodium, OpenSSL | keys and signatures byte for byte; verification with every small-order point in every encoding as A or R, S = 0, S + L, bits flipped, arbitrary keys |
 | `x25519` | libsodium, OpenSSL | arbitrary scalars; u small-order, at or above p, with bit 255 set; the all-zero result refused by all |
+| `p384` | OpenSSL | keys (with 0, 1, n - 1, n, n + 1, p, 2^384 - 1 substituted) and public keys byte for byte; ECDH both ways and against OpenSSL's d Q; OpenSSL's signatures verified, then made adversarial (r or s replaced, n - s, bits flipped) and verified by both; arbitrary bytes as SEC1 (OpenSSL's hybrid form the stated difference) |
 | `text` | python base58, the BIP-173 / BIP-350 reference, python-mnemonic, the bip32 crate | base58check, segwit addresses, mnemonics and derivation paths, through the JSON-lines oracles of `scripts/oracles/` |
 
 Where implementations follow different rules, a difference is allowed only as the stated rule

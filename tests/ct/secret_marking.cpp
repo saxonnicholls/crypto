@@ -22,6 +22,7 @@
 
 #define SNICHOLLS_CRYPTO_DECLASSIFY(pointer, size) VALGRIND_MAKE_MEM_DEFINED(pointer, size)
 
+#include <snicholls/crypto/aead/aes128_gcm.hpp>
 #include <snicholls/crypto/aead/aes256_gcm.hpp>
 #include <snicholls/crypto/aead/aes_key_wrap.hpp>
 #include <snicholls/crypto/aead/chacha20_poly1305.hpp>
@@ -30,7 +31,11 @@
 #include <snicholls/crypto/curve25519/x25519.hpp>
 #include <snicholls/crypto/hd/bip32.hpp>
 #include <snicholls/crypto/hd/slip10.hpp>
+#include <snicholls/crypto/jose/ecdh_es.hpp>
+#include <snicholls/crypto/p256/ecdh.hpp>
 #include <snicholls/crypto/p256/ecdsa.hpp>
+#include <snicholls/crypto/p384/ecdh.hpp>
+#include <snicholls/crypto/p384/ecdsa.hpp>
 #include <snicholls/crypto/secp256k1/ecdsa.hpp>
 #include <snicholls/crypto/secp256k1/schnorr.hpp>
 
@@ -125,6 +130,16 @@ void aead_paths()
     make_public(msg);
     check(gopened && back == msg, "AES-256-GCM seal and open (the computed S-box)");
 
+    auto key16 = std::span<const std::uint8_t, 16>(key.data(), 16);
+    mark_secret(msg);
+    auto g128 = aead::aes128_gcm_seal(key16, n12, {}, msg, ct).unwrap();
+    make_public(ct);
+    make_public(g128);
+    const bool g128_opened = aead::aes128_gcm_open(key16, n12, {}, ct, g128, back).is_ok();
+    make_public(back);
+    make_public(msg);
+    check(g128_opened && back == msg, "AES-128-GCM seal and open");
+
     std::array<std::uint8_t, 32> cek{};
     for (std::size_t i = 0; i < cek.size(); ++i)
         cek[i] = static_cast<std::uint8_t>(i);
@@ -154,6 +169,61 @@ void p256_paths()
     auto sig = p256::sign(key, hash);
     make_public(sig);
     check(static_cast<bool>(p256::verify(pub, hash, sig)), "P-256 ECDSA sign (RFC 6979)");
+}
+
+// P-256 ECDH and JOSE's ECDH-ES on both curves: the private keys secret, the peers' keys public
+// P-384: a private key's validity, its public key and ECDH, the keys secret, the peers' keys public
+void p384_paths()
+{
+    namespace p384 = snicholls::crypto::p384;
+    std::array<std::uint8_t, 48> a{}, b{};
+    for (std::size_t i = 0; i < 48; ++i) {
+        a[i] = static_cast<std::uint8_t>(0x3a + 7 * i);
+        b[i] = static_cast<std::uint8_t>(0x29 + 11 * i);
+    }
+    a[0] = b[0] = 0x3a;   // below n
+    mark_secret(a);
+    mark_secret(b);
+    const auto ka = p384::private_key::from_bytes(a).unwrap(), kb = p384::private_key::from_bytes(b).unwrap();
+    auto pa = ka.public_key(), pb = kb.public_key();
+    make_public(pa);
+    make_public(pb);
+    check(p384::public_key::parse(pa.compressed()).is_ok(), "P-384 public key");
+    auto za = p384::shared_secret(ka, pb).unwrap(), zb = p384::shared_secret(kb, pa).unwrap();
+    auto equal = za == zb;
+    make_public(equal);
+    check(equal, "P-384 ECDH shared secret");
+}
+
+void jose_paths()
+{
+    using namespace snicholls::crypto;
+    auto a = bytes32(17), b = bytes32(19);
+    mark_secret(a);
+    mark_secret(b);
+    const auto ka = p256::private_key::from_bytes(a).unwrap(), kb = p256::private_key::from_bytes(b).unwrap();
+    auto pa = ka.public_key(), pb = kb.public_key();
+    make_public(pa);
+    make_public(pb);
+    auto za = p256::shared_secret(ka, pb).unwrap(), zb = p256::shared_secret(kb, pa).unwrap();
+    auto equal = za == zb;
+    make_public(equal);
+    check(equal, "P-256 ECDH shared secret");
+
+    const std::array<std::uint8_t, 5> apu{'A', 'l', 'i', 'c', 'e'};
+    auto ja = jose::ecdh_es_p256<32>(ka, pb, "ECDH-ES+A256KW", apu).unwrap(), jb = jose::ecdh_es_p256<32>(kb, pa, "ECDH-ES+A256KW", apu).unwrap();
+    equal = ja == jb;
+    make_public(equal);
+    check(equal, "JOSE ECDH-ES on P-256 (Concat KDF)");
+
+    const secret_bytes<32> sa{std::span<const std::uint8_t, 32>(a)}, sb{std::span<const std::uint8_t, 32>(b)};
+    auto xa = x25519::public_key_from_secret(sa), xb = x25519::public_key_from_secret(sb);
+    make_public(xa);
+    make_public(xb);
+    auto ea = jose::ecdh_es_x25519<64>(sa, xb, "A256CBC-HS512").unwrap(), eb = jose::ecdh_es_x25519<64>(sb, xa, "A256CBC-HS512").unwrap();
+    equal = ea == eb;
+    make_public(equal);
+    check(equal, "JOSE ECDH-ES on X25519, 64 bytes");
 }
 
 void hd_paths()
@@ -250,6 +320,8 @@ int main(int argc, char** argv)
     secp256k1_paths();
     p256_paths();
     aead_paths();
+    p384_paths();
+    jose_paths();
     hd_paths();
     curve25519_paths();
     bip39_paths();

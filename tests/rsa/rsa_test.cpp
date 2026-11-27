@@ -49,7 +49,13 @@ counts run(const std::string& name)
         }
         const auto msg = hex_bytes(f[2]), sig = hex_bytes(f[3]);
         for (const auto& key : keys) {
-            const auto r = pss ? verify_pss_sha256(key, view(msg), view(sig), salt) : verify_pkcs1v15_sha256(key, view(msg), view(sig));
+            const bool h384 = name.find("sha384") != std::string::npos, h512 = name.find("sha512") != std::string::npos;
+            const auto r = pss ? (h384   ? verify_pss_sha384(key, view(msg), view(sig), salt)
+                                  : h512 ? verify_pss_sha512(key, view(msg), view(sig), salt)
+                                         : verify_pss_sha256(key, view(msg), view(sig), salt))
+                               : (h384   ? verify_pkcs1v15_sha384(key, view(msg), view(sig))
+                                  : h512 ? verify_pkcs1v15_sha512(key, view(msg), view(sig))
+                                         : verify_pkcs1v15_sha256(key, view(msg), view(sig)));
             if (f[1] == "valid") {
                 EXPECT_TRUE(r) << name << " tcId " << f[0];
             } else {
@@ -91,6 +97,30 @@ TEST(CryptoRsaWycheproof, PssSha256Mgf1SaltZero)
     const auto a = run("rsa_pss_2048_sha256_mgf1_0.txt");
     EXPECT_EQ(a.valid + a.invalid + a.acceptable, 103);
     EXPECT_GT(a.valid, 0);
+}
+
+// SHA-384 and SHA-512 (RS384, RS512; X.509's sha384WithRSAEncryption; TLS's rsa_pkcs1_sha384 and _sha512)
+TEST(CryptoRsaWycheproof, Pkcs1v15Sha384AndSha512AllKeySizes)
+{
+    for (const char* name : {"rsa_pkcs1_2048_sha384.txt", "rsa_pkcs1_3072_sha384.txt", "rsa_pkcs1_4096_sha384.txt",
+                             "rsa_pkcs1_2048_sha512.txt", "rsa_pkcs1_3072_sha512.txt", "rsa_pkcs1_4096_sha512.txt"}) {
+        const auto c = run(name);
+        EXPECT_GT(c.valid, 0) << name;
+        EXPECT_GT(c.invalid, 200) << name;
+        EXPECT_LE(c.acceptable, 1) << name;   // the DigestInfo without its NULL, refused
+    }
+}
+
+// PSS with SHA-384 (salt 48) and SHA-512 (salt 32 and 64), MGF1 on the same hash (TLS's rsa_pss_rsae_sha384, _sha512)
+TEST(CryptoRsaWycheproof, PssSha384AndSha512)
+{
+    for (const char* name : {"rsa_pss_2048_sha384_mgf1_48.txt", "rsa_pss_4096_sha384_mgf1_48.txt", "rsa_pss_4096_sha512_mgf1_32.txt",
+                             "rsa_pss_4096_sha512_mgf1_64.txt"}) {
+        const auto c = run(name);
+        EXPECT_GT(c.valid, 0) << name;
+        EXPECT_GT(c.invalid, 40) << name;
+        EXPECT_EQ(c.acceptable, 0) << name;
+    }
 }
 
 namespace {
